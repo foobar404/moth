@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/moth/static/css/main.ef44319d.css",
+    "main.js": "/moth/static/js/main.880c97b1.js",
+    "index.html": "/moth/index.html",
+    "main.ef44319d.css.map": "/moth/static/css/main.ef44319d.css.map",
+    "main.880c97b1.js.map": "/moth/static/js/main.880c97b1.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ef44319d.css",
+    "static/js/main.880c97b1.js"
+  ]
+}
