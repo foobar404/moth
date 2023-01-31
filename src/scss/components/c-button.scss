@@ -1,0 +1,109 @@
+.c-button {
+    align-items: center;
+    background-color: $color-first;
+    border: none;
+    border-radius: $border-radius-round;
+    box-shadow: $shadow-normal;
+    color: $color-white;
+    cursor: pointer;
+    display: inline-flex;
+    font-weight: 700;
+    height: 40px;
+    padding: 0 $spacing-9;
+    transition: .1s ease;
+
+    &:hover {
+        transform: scale(1.2);
+        z-index: 2;
+    }
+
+    &.--active-first {
+        color: $color-first !important;
+        border: 2px solid $color-first;
+    }
+
+    &.--active-second {
+        color: $color-second !important;
+        border: 2px solid $color-second;
+    }
+
+    &.--active-third {
+        color: $color-third !important;
+        border: 2px solid $color-third;
+    }
+
+    &.--active-fourth {
+        color: $color-fourth !important;
+        border: 2px solid $color-fourth;
+    }
+
+    &.--active-gray {
+        color: $color-gray-dark !important;
+        border: 2px solid $color-gray-dark;
+    }
+
+    &.--xs {
+        padding: 0;
+        border-radius: $border-radius-round;
+        min-height: 30px;
+        min-width: 30px;
+        height: 30px;
+        width: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &.--sm {
+        padding: 0;
+        border-radius: $border-radius-rounded;
+        min-height: 40px;
+        min-width: 40px;
+        height: 40px;
+        width: 40px;
+        font-size: $font-size-lg;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &.--slim {
+        height: 30px;
+    }
+
+    &.--primary {
+        background: linear-gradient(45deg, $color-first, $color-second);
+    }
+
+    &.--secondary {
+        background: linear-gradient(45deg, $color-third, $color-fourth);
+    }
+
+    &.--second {
+        background: $color-second;
+        color: $color-black;
+
+        &:active,
+        &:focus {
+            color: $color-fourth;
+            border: 2px solid $color-fourth;
+        }
+    }
+
+    &.--third {
+        background: $color-third;
+    }
+
+    &.--fourth {
+        background: $color-fourth;
+    }
+
+    &.--danger {
+        background: $color-red;
+    }
+
+    &__icon {
+        font-size: $font-size-lg;
+        margin-right: $spacing-2;
+    }
+}

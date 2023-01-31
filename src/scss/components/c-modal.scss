@@ -1,0 +1,49 @@
+.c-modal {
+    z-index: 99999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(45deg, $color-first, $color-second);
+    background-size: 400% 400%;
+    animation: gradient 5s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+
+    &__body {
+        cursor: default;
+        position: relative;
+        background: $color-gray-dark;
+        padding: $spacing-4;
+        border-radius: $border-radius-rounded;
+        box-shadow: $shadow-normal;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__exit {
+        position: absolute;
+        top: $spacing-4;
+        right: $spacing-4;
+    }
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}

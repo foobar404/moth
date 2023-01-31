@@ -1,0 +1,13 @@
+.c-color-card {
+    height: 30px;
+    width: 30px;
+    border-radius: 5px;
+    display: inline-block;
+    cursor: pointer;
+    transition: .1s ease;
+    box-shadow: $shadow-normal;
+
+    &:hover {
+        transform: scale(1.5);
+    }
+}

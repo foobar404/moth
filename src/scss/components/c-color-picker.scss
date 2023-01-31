@@ -1,0 +1,160 @@
+.c-color-picker {
+    width: 100%;
+
+    &__input {
+        border-radius: 0% !important;
+        width: 65px !important;
+        box-shadow: none !important;
+        border-top-width: 2px !important;
+        border-right-width: 4px !important;
+        border-bottom-width: 2px !important;
+        border-left-width: 4px !important;
+        box-sizing: border-box !important;
+        transition: 0s ease !important;
+        border-bottom: 2px dotted #ccc9 !important;
+
+        &:focus {
+            outline: none !important;
+            border: none !important;
+        }
+    }
+
+    &__color-panel {
+        width: 100%;
+        height: 200px;
+        cursor: pointer;
+        position: relative;
+        border-top-right-radius: $border-radius-rounded;
+        border-top-left-radius: $border-radius-rounded;
+        overflow: hidden;
+    }
+
+    &__color-panel-layer1 {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+    }
+
+    &__color-panel-layer2 {
+        background: linear-gradient(to right, rgb(255, 255, 255), rgba(255, 255, 255, 0));
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+    }
+
+    &__color-panel-layer3 {
+        background: linear-gradient(45deg, hsl(0, 0%, 50%), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),
+            linear-gradient(0deg, rgb(0, 0, 0), rgba(0, 0, 0, 0));
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+    }
+
+    &__rainbox {
+        width: 100%;
+        height: 30px;
+        background: linear-gradient(to right, rgba(255, 0, 0, 1) 0%, rgba(255, 255, 0, 1) 17%, rgba(0, 255, 0, 1) 33%, rgba(0, 255, 255, 1) 50%, rgba(0, 0, 255, 1) 67%, rgba(255, 0, 255, 1) 83%, rgba(255, 0, 0, 1) 100%);
+    }
+
+    &__opacity {
+        &::before {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0.2)), -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0.2));
+            background-size: 10px 10px;
+            background-position: 0px 0px, 5px 5px;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+        }
+    }
+
+    &__color-bar {
+        width: 100%;
+        height: 30px;
+        position: relative;
+    }
+
+    &__preview {
+        border-bottom-right-radius: $border-radius-rounded;
+        border-bottom-left-radius: $border-radius-rounded;
+        cursor: pointer;
+        height: 60px;
+        position: relative;
+        transition: all .1s ease;
+        width: 100%;
+
+        &:hover {
+            transform: scale(1.05);
+            filter: brightness(.8);
+        }
+    }
+
+    &__drawer {
+        height: 0px;
+        width: 100%;
+        overflow: auto;
+        background-color: $color-gray-dark;
+        transition: all .1s ease;
+        padding: 0 $spacing-2;
+
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0.2)), -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.2) 75%, rgba(255, 255, 255, 0.2));
+        background-size: 20px 20px;
+        background-position: 0px 0px, 10px 10px;
+
+        &::-webkit-scrollbar {
+            width: 5px;
+            background: black;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+    }
+
+    &__drawer-text {
+        color: white;
+        text-shadow: 2px 2px 10px black;
+    }
+
+    &__color-slider {
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+
+    &__color-slider-handle {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        width: 12px;
+        height: 100%;
+        box-shadow: $shadow-normal;
+        border: 3px solid #fff9;
+        transition: left .075s ease;
+        will-change: left;
+    }
+
+    &__color-dot {
+        height: 100%;
+        width: 100%;
+        position: relative;
+    }
+
+    &__color-dot-handle {
+        cursor: pointer;
+        position: absolute;
+        top: 100px;
+        left: 200px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: $shadow-normal;
+        border: 3px solid #fff9;
+    }
+}

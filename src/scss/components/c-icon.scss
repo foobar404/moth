@@ -1,0 +1,23 @@
+.c-icon {
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
+    transition: .1s ease;
+
+    &:hover {
+        transform: scale(1.2);
+    }
+
+    &:focus {
+        outline: none;
+        border: none;
+    }
+
+    &.--active {
+        color: $color-fourth;
+    }
+
+    &.--active-alt {
+        color: $color-second;
+    }
+}
