@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/moth/static/css/main.ef44319d.css",
-    "main.js": "/moth/static/js/main.880c97b1.js",
+    "main.css": "/moth/static/css/main.bbcecf3d.css",
+    "main.js": "/moth/static/js/main.d6dc18ee.js",
     "index.html": "/moth/index.html",
-    "main.ef44319d.css.map": "/moth/static/css/main.ef44319d.css.map",
-    "main.880c97b1.js.map": "/moth/static/js/main.880c97b1.js.map"
+    "main.bbcecf3d.css.map": "/moth/static/css/main.bbcecf3d.css.map",
+    "main.d6dc18ee.js.map": "/moth/static/js/main.d6dc18ee.js.map"
   },
   "entrypoints": [
-    "static/css/main.ef44319d.css",
-    "static/js/main.880c97b1.js"
+    "static/css/main.bbcecf3d.css",
+    "static/js/main.d6dc18ee.js"
   ]
 }
