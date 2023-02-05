@@ -1,44 +1,43 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import { IFrame, ILayer, IProject, ICanvas, IColorPallete, IColor } from "./";
-import { IoImage, IoLayers, IoColorPalette } from "react-icons/io5";
-import { MdMovieFilter } from "react-icons/md";
+import pngText from "png-chunk-text";
 import { HiStar } from "react-icons/hi";
 import { ImCross } from "react-icons/im";
 import { Modal } from "../../components";
-import { useModal } from "../../utils/useModal";
-import pngText from "png-chunk-text";
-import pngExtract from "png-chunks-extract";
 import pngEncode from "png-chunks-encode";
+import pngExtract from "png-chunks-extract";
 import { Buffer as pngBuffer } from "buffer";
+import { MdMovieFilter } from "react-icons/md";
+import { useModal } from "../../utils/useModal";
+import React, { useEffect, useState } from 'react';
+import { IoImage, IoLayers, IoColorPalette } from "react-icons/io5";
+import { IFrame, ILayer, IProject, ICanvas, IColorPallete, IColor } from "./";
 
 
 interface IProps {
-    canvas?: ICanvas;
     frames: IFrame[];
+    project: IProject;
+    pixelSize: number;
     activeFrame: IFrame;
     activeLayer: ILayer;
-    project: IProject;
-    setProject: (project: IProject) => void;
+    activeColor: IColor;
+    getProject: () => IProject;
     colorPalettes: IColorPallete[];
     activeColorPallete: IColorPallete;
-    activeColor: IColor;
-    setShowMobilePanel: (show: boolean) => void;
-    pixelSize: number;
-    getProject: () => IProject;
+    setProject: (project: IProject) => void;
     loadProject: (projectName: string) => void;
+    setShowMobilePanel: (show: boolean) => void;
+    canvas?: ICanvas;
 }
 
 interface IExportSettings {
-    rows?: number;
-    columns?: number;
-    offset?: number;
     gap?: number;
+    rows?: number;
+    scale?: number;
+    offset?: number;
+    columns?: number;
     layerOnly?: boolean;
     frameOnly?: boolean;
     allFrames?: boolean;
     allLayers?: boolean;
-    scale?: number;
 }
 
 export function Nav(props: IProps) {
@@ -310,13 +309,13 @@ function useNav(props: IProps) {
     }
 
     return {
-        exportProject,
-        importProject,
-        modal,
         name,
+        modal,
+        setName,
         projectList,
         deleteProject,
-        setName,
+        exportProject,
+        importProject,
         saveProjectName,
     }
 }

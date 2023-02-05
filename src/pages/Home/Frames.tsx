@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { ICanvas, ILayer, IFrame, IPreview } from './';
 import { IoPlay, IoStop, IoCopy } from "react-icons/io5";
-import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
+import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
 
 
 interface IProps {
-    defaultCanvasSize: number;
-    canvas?: ICanvas;
     frames: IFrame[];
-    setFrames: React.Dispatch<React.SetStateAction<IFrame[]>>;
-    activeFrame: IFrame;
-    setActiveFrame: (frame: IFrame, frames?: IFrame[]) => void;
-    activeLayer: ILayer;
-    setActiveLayer: (layer: ILayer, frame?: IFrame, frames?: IFrame[]) => void;
+    canvas?: ICanvas;
     preview: IPreview;
+    activeFrame: IFrame;
+    activeLayer: ILayer;
+    defaultCanvasSize: number;
+    setFrames: React.Dispatch<React.SetStateAction<IFrame[]>>;
     setPreview: React.Dispatch<React.SetStateAction<IPreview>>;
+    setActiveFrame: (frame: IFrame, frames?: IFrame[]) => void;
+    setActiveLayer: (layer: ILayer, frame?: IFrame, frames?: IFrame[]) => void;
 }
 
 export function Frames(props: IProps) {
@@ -244,20 +244,20 @@ function useLayers(props: IProps) {
     }
 
     return {
-        addNewFrame,
-        deleteFrame,
-        duplicateFrame,
+        stop,
+        play,
+        setFps,
+        playing,
         imageMap,
         onionSkin,
+        setPlaying,
+        togglePlay,
+        addNewFrame,
+        deleteFrame,
+        setOnionSkin,
         moveFrameLeft,
         moveFrameRight,
-        play,
-        playing,
-        setFps,
-        setOnionSkin,
-        setPlaying,
-        stop,
-        togglePlay
+        duplicateFrame,
     }
 }
 

@@ -1,39 +1,39 @@
+import { IoEye } from "react-icons/io5";
+import { ImMinus } from "react-icons/im";
+import ReactTooltip from 'react-tooltip';
+import { HiEyeOff } from "react-icons/hi";
+import { BiPlusMedical } from "react-icons/bi";
+import { FaUndoAlt, FaRedoAlt } from "react-icons/fa";
 import React, { useEffect, useRef, useState } from 'react';
 import { ICanvas, ILayer, IColor, IFrame, IToolSettings, IColorPallete, IColorStats } from "./";
-import { BiPlusMedical } from "react-icons/bi";
-import { ImMinus } from "react-icons/im";
-import { FaUndoAlt, FaRedoAlt } from "react-icons/fa";
-import { IoEye } from "react-icons/io5";
-import { HiEyeOff } from "react-icons/hi";
-import ReactTooltip from 'react-tooltip';
 
 
 interface IProps {
-    canvas?: ICanvas;
-    setCanvas: (canvas: ICanvas) => void;
-    activeLayer: ILayer;
-    setActiveLayer: (layer: ILayer) => void;
-    activeFrame: IFrame;
-    defaultCanvasSize: number;
-    activeColor: IColor;
-    setActiveColor: (color: IColor) => void;
-    toolSettings: IToolSettings;
-    setToolSettings: (toolSettings: IToolSettings | ((t: IToolSettings) => IToolSettings)) => void;
-    activeColorPallete: IColorPallete;
-    setActiveColorPallete: (colorPallete: IColorPallete) => void;
     frames: IFrame[];
-    setColorStats: (cs: IColorStats | ((cs: IColorStats) => IColorStats)) => void;
     pixelSize: number;
+    activeLayer: ILayer;
+    activeFrame: IFrame;
+    activeColor: IColor;
+    defaultCanvasSize: number;
+    toolSettings: IToolSettings;
+    activeColorPallete: IColorPallete;
+    setCanvas: (canvas: ICanvas) => void;
+    setActiveLayer: (layer: ILayer) => void;
+    setActiveColor: (color: IColor) => void;
+    setActiveColorPallete: (colorPallete: IColorPallete) => void;
+    setColorStats: (cs: IColorStats | ((cs: IColorStats) => IColorStats)) => void;
+    setToolSettings: (toolSettings: IToolSettings | ((t: IToolSettings) => IToolSettings)) => void;
+    canvas?: ICanvas;
 }
 
 interface IMouseState {
     x: number;
     y: number;
-    movementX: number;
-    movementY: number;
     left: boolean;
     right: boolean;
     middle: boolean;
+    movementX: number;
+    movementY: number;
     type: 'mousedown' | 'mouseup' | 'mousemove';
 }
 
@@ -88,7 +88,9 @@ export function Canvas(props: IProps) {
                     <BiPlusMedical />
                 </button>
                 <span data-tip="brush size"
-                    data-for="tooltip">{props.toolSettings.size}</span>
+                    data-for="tooltip">
+                    {props.toolSettings.size}
+                </span>
             </nav>
 
             <nav className="p-app__canvas-controls">
@@ -164,12 +166,12 @@ function useCanvas(props: IProps) {
         "[": () => setBrushSize(-1),
         "]": () => setBrushSize(1),
     }
-    let [tempCanvas, setTempCanvas] = useState<{ element: HTMLCanvasElement, ctx: CanvasRenderingContext2D } | null>(null);
-    let [activePoints, setActivePoints] = useState<{ x: number, y: number }[]>([]);
-    let [selectionArea, setSelectionArea] = useState<ImageData | null>(null);
-    let [layerHistory, setLayerHistory] = useState<ILayer[]>([]);
-    let [activeKeys, setActiveKeys] = useState<string[]>([]);
     let [showGrid, setShowGrid] = useState(true);
+    let [activeKeys, setActiveKeys] = useState<string[]>([]);
+    let [layerHistory, setLayerHistory] = useState<ILayer[]>([]);
+    let [selectionArea, setSelectionArea] = useState<ImageData | null>(null);
+    let [activePoints, setActivePoints] = useState<{ x: number, y: number }[]>([]);
+    let [tempCanvas, setTempCanvas] = useState<{ element: HTMLCanvasElement, ctx: CanvasRenderingContext2D } | null>(null);
 
     useEffect(() => {
         document.addEventListener('keydown', (e) => {
@@ -286,7 +288,7 @@ function useCanvas(props: IProps) {
 
     function mouseEventHandler(e: React.MouseEvent<HTMLCanvasElement>) {
         if (!props.canvas) return;
-        e.preventDefault();
+        // e.preventDefault();
         e.stopPropagation();
 
         let mouseState: IMouseState = {
@@ -800,14 +802,14 @@ function useCanvas(props: IProps) {
     }, [props.canvas]);
 
     return {
-        mouseEventHandler,
-        canvasRef,
-        resizeHandler,
-        setZoom,
-        setBrushSize,
-        setShowGrid,
-        showGrid,
         undo,
+        setZoom,
+        showGrid,
+        canvasRef,
+        setShowGrid,
+        setBrushSize,
+        resizeHandler,
+        mouseEventHandler,
     };
 }
 

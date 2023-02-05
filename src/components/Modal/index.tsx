@@ -4,9 +4,9 @@ import { ImCross } from "react-icons/im";
 
 
 interface IProps {
+    children: any;
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
-    children: any;
 }
 
 export function Modal(props: IProps) {
@@ -26,6 +26,6 @@ export function Modal(props: IProps) {
                     {props.children}
                 </section>
             </main>
-        </Portal >
+        </Portal>
     )
 }

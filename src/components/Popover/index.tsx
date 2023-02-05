@@ -6,6 +6,27 @@ interface IProps {
 }
 
 export function Popover(props: IProps) {
+    const data = usePopover();
+
+    return (<>
+        <span onClick={(e) => { data.showPopover(); e.stopPropagation() }}>
+            {props.children[0]}
+        </span>
+
+        {data.isVisible && (
+            <section className="c-popover"
+                style={{
+                    left: data.popoverCoords.x + "px",
+                    top: data.popoverCoords.y + "px"
+                }}>
+
+                {props.children[1]}
+            </section>
+        )}
+    </>)
+}
+
+function usePopover(){
     let [isVisible, setIsVisible] = React.useState(false);
     let [mouseCoords, setMouseCoords] = React.useState({ x: 0, y: 0 });
     let [popoverCoords, setPopoverCoords] = React.useState({ x: 0, y: 0 });
@@ -27,20 +48,9 @@ export function Popover(props: IProps) {
         setPopoverCoords(mouseCoords);
     }
 
-    return (<>
-        <span onClick={(e) => { showPopover(); e.stopPropagation() }}>
-            {props.children[0]}
-        </span>
-
-        {isVisible && (
-            <section className="c-popover"
-                style={{
-                    left: popoverCoords.x + "px",
-                    top: popoverCoords.y + "px"
-                }}>
-
-                {props.children[1]}
-            </section>
-        )}
-    </>)
+    return {
+        isVisible,
+        showPopover,
+        popoverCoords,
+    }
 }

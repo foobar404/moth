@@ -1,40 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import { Nav } from "./Nav";
+import { Tools } from './Tools';
 import { Canvas } from './Canvas';
 import { Colors } from './Colors';
 import { Frames } from './Frames';
-import { Nav } from "./Nav";
-import { Preview } from "./Preview";
-import { Tools } from './Tools';
 import { Layers } from './Layers';
+import { Preview } from "./Preview";
 import ReactTooltip from 'react-tooltip';
 import { ImCross } from "react-icons/im";
+import React, { useEffect, useState } from 'react';
 
 
 export interface IProject {
 	name: string;
-	colorPalettes?: IColorPallete[];
 	frames?: IFrame[];
 	canvas?: ICanvas;
+	colorPalettes?: IColorPallete[];
 }
 
 export interface ICanvas {
 	height: number;
 	width: number;
+	zoom?: number;
 	element?: HTMLCanvasElement;
 	ctx?: CanvasRenderingContext2D;
-	zoom?: number;
 }
 
 export interface ILayer {
-	image: ImageData;
-	opacity: number;
-	symbol: symbol;
 	name: string;
+	symbol: symbol;
+	opacity: number;
+	image: ImageData;
 }
 
 export interface IFrame {
-	layers: ILayer[];
 	symbol: symbol;
+	layers: ILayer[];
 }
 
 export interface IColor {
@@ -46,8 +46,8 @@ export interface IColor {
 
 export interface IColorPallete {
 	name: string;
-	colors: IColor[];
 	symbol: symbol;
+	colors: IColor[];
 }
 
 export interface IColorStats { [color: string]: { count: number, lastUsed: string } }
@@ -55,10 +55,10 @@ export interface IColorStats { [color: string]: { count: number, lastUsed: strin
 export type ITool = "brush" | "eraser" | "eyedropper" | "bucket" | "move" | "wand" | "box" | "bone" | "line" | "mirror";
 
 export interface IToolSettings {
-	rightTool: ITool;
-	leftTool: ITool;
-	middleTool: ITool;
 	size: number;
+	leftTool: ITool;
+	rightTool: ITool;
+	middleTool: ITool;
 	mirror: {
 		x: boolean;
 		y: boolean;
@@ -66,8 +66,8 @@ export interface IToolSettings {
 }
 
 export interface IPreview {
-	zoom: number;
 	fps: number;
+	zoom: number;
 	element?: HTMLCanvasElement;
 	ctx?: CanvasRenderingContext2D;
 }
@@ -79,8 +79,7 @@ export function Home() {
 		<main className="p-app">
 			<ReactTooltip id="tooltip" />
 
-			<Nav
-				activeFrame={data.activeFrame}
+			<Nav activeFrame={data.activeFrame}
 				activeLayer={data.activeLayer}
 				canvas={data.canvas}
 				frames={data.frames}
@@ -95,8 +94,7 @@ export function Home() {
 				loadProject={data.loadProject} />
 
 			<section className="p-app__sidebar-left p-app__block">
-				<Tools
-					activeColor={data.activeColor}
+				<Tools activeColor={data.activeColor}
 					setActiveColor={data.setActiveColor}
 					toolSettings={data.toolSettings}
 					setToolSettings={data.setToolSettings}
@@ -106,8 +104,7 @@ export function Home() {
 					colorStats={data.colorStats} />
 			</section>
 
-			<Canvas
-				canvas={data.canvas}
+			<Canvas canvas={data.canvas}
 				setCanvas={data.setCanvas}
 				defaultCanvasSize={data.defaultCanvasSize}
 				activeFrame={data.activeFrame}
@@ -123,8 +120,7 @@ export function Home() {
 				setColorStats={data.setColorStats}
 				pixelSize={data.pixelSize} />
 
-			<section
-				className={`p-app__sidebar-right p-app__block c-panel --right ${data.showMobilePanel ? "--show" : ""}`}>
+			<section className={`p-app__sidebar-right p-app__block c-panel --right ${data.showMobilePanel ? "--show" : ""}`}>
 
 				{/* mobile buttons */}
 				<button onClick={() => data.setShowMobilePanel(false)}
@@ -132,8 +128,7 @@ export function Home() {
 					<ImCross />
 				</button>
 
-				<Colors
-					activeColor={data.activeColor}
+				<Colors activeColor={data.activeColor}
 					setActiveColor={data.setActiveColor}
 					colorPalettes={data.colorPalettes}
 					setColorPalettes={data.setColorPalettes}
@@ -144,22 +139,19 @@ export function Home() {
 					activeFrame={data.activeFrame}
 					activeLayer={data.activeLayer} />
 
-				<Layers
-					canvas={data.canvas}
+				<Layers canvas={data.canvas}
 					activeFrame={data.activeFrame}
 					setActiveFrame={data.setActiveFrame}
 					activeLayer={data.activeLayer}
 					setActiveLayer={data.setActiveLayer} />
 
-				<Preview
-					canvas={data.canvas}
+				<Preview canvas={data.canvas}
 					frames={data.frames}
 					preview={data.preview}
 					setPreview={data.setPreview} />
 			</section>
 
-			<Frames
-				defaultCanvasSize={data.defaultCanvasSize}
+			<Frames defaultCanvasSize={data.defaultCanvasSize}
 				canvas={data.canvas}
 				frames={data.frames}
 				setFrames={data.setFrames}
@@ -175,39 +167,21 @@ export function Home() {
 
 function useHome() {
 	const pixelSize = 1;
-	const defaultCanvasSize = 32;
 	const date = new Date();
+	const defaultCanvasSize = 32;
 
-	let [project, setProjectOriginal] = useState<IProject>({
-		name: date.toLocaleString(),
-	});
+	let [project, setProjectOriginal] = useState<IProject>({ name: date.toLocaleString(), });
 	let [preview, setPreview] = useState<IPreview>({ zoom: 1, fps: 24 });
 	let [canvas, setCanvasOriginal] = useState<ICanvas>();
-	let [frames, setFrames] = useState<IFrame[]>(project?.frames ?? [
-		{
-			layers: [{ image: new ImageData(defaultCanvasSize, defaultCanvasSize), opacity: 255, symbol: Symbol(), name: "New Layer" }],
-			symbol: Symbol()
-		}
-	]);
+	let [frames, setFrames] = useState<IFrame[]>(project?.frames ?? [{ layers: [{ image: new ImageData(defaultCanvasSize, defaultCanvasSize), opacity: 255, symbol: Symbol(), name: "New Layer" }], symbol: Symbol() }]);
 	let [activeFrame, setActiveFrameOriginal] = useState<IFrame>(frames[0]);
 	let [activeLayer, setActiveLayerOriginal] = useState<ILayer>(frames[0].layers[0]);
-	let [colorPalettes, setColorPalettes] = useState<IColorPallete[]>(project?.colorPalettes ?? [
-		{ name: "default", colors: [{ r: 0, g: 0, b: 0, a: 255 }], symbol: Symbol() },
-	]);
+	let [colorPalettes, setColorPalettes] = useState<IColorPallete[]>(project?.colorPalettes ?? [{ name: "default", colors: [{ r: 0, g: 0, b: 0, a: 255 }], symbol: Symbol() },]);
 	let [activeColorPallete, setActiveColorPalleteOriginal] = useState<IColorPallete>(colorPalettes[0]);
 	let [colorStats, setColorStats] = useState<IColorStats | {}>({});
 	let [activeColor, setActiveColor] = useState<IColor>(colorPalettes[0].colors[0]);
 	let [showMobilePanel, setShowMobilePanel] = useState<boolean>(false);
-	let [toolSettings, setToolSettings] = React.useState<IToolSettings>({
-		leftTool: "brush",
-		rightTool: "eraser",
-		middleTool: "eyedropper",
-		size: 1,
-		mirror: {
-			x: true,
-			y: false,
-		},
-	});
+	let [toolSettings, setToolSettings] = React.useState<IToolSettings>({ leftTool: "brush", rightTool: "eraser", middleTool: "eyedropper", size: 1, mirror: { x: true, y: false, }, });
 
 	useEffect(() => {
 		document.addEventListener('contextmenu', event => event.preventDefault());
@@ -338,33 +312,33 @@ function useHome() {
 	}
 
 	return {
-		activeColor,
-		activeColorPallete,
-		activeFrame,
-		activeLayer,
-		canvas,
-		colorPalettes,
-		colorStats,
-		defaultCanvasSize,
 		frames,
-		loadProject,
-		getProject,
-		pixelSize,
+		canvas,
 		project,
 		preview,
-		setActiveColor,
-		setActiveColorPallete,
-		setActiveFrame,
-		setActiveLayer,
+		pixelSize,
 		setCanvas,
-		setColorPalettes,
 		setFrames,
 		setPreview,
+		colorStats,
+		getProject,
 		setProject,
-		setShowMobilePanel,
-		setToolSettings,
-		setColorStats,
-		showMobilePanel,
+		activeLayer,
+		activeColor,
+		activeFrame,
+		loadProject,
 		toolSettings,
+		colorPalettes,
+		setColorStats,
+		setActiveFrame,
+		setActiveColor,
+		setActiveLayer,
+		showMobilePanel,
+		setToolSettings,
+		setColorPalettes,
+		defaultCanvasSize,
+		setShowMobilePanel,
+		activeColorPallete,
+		setActiveColorPallete,
 	};
 }

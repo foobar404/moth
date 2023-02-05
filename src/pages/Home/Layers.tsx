@@ -1,17 +1,17 @@
-import React, { IframeHTMLAttributes, useEffect, useState } from 'react';
-import { IFrame, ILayer, ICanvas } from "./";
-import { IoEye, IoCopy } from "react-icons/io5";
-import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
 import { MdDelete } from "react-icons/md";
+import { IFrame, ILayer, ICanvas } from "./";
 import { RiGitMergeFill } from "react-icons/ri";
+import { IoEye, IoCopy } from "react-icons/io5";
+import React, { useEffect, useState } from 'react';
+import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 
 
 interface IProps {
     canvas?: ICanvas;
     activeFrame: IFrame;
-    setActiveFrame: (frame: IFrame) => void;
     activeLayer: ILayer;
+    setActiveFrame: (frame: IFrame) => void;
     setActiveLayer: (layer: ILayer, frame?: IFrame, frames?: IFrame[]) => void;
 }
 
@@ -111,6 +111,11 @@ function useLayers(props: IProps) {
     let [layersAreVisible, setLayersAreVisible] = useState(true);
 
     useEffect(() => {
+        if (layersAreVisible) showAllLayers();
+        else showActiveLayer();
+    }, [layersAreVisible]);
+
+    useEffect(() => {
         let map: any = {};
         props.activeFrame.layers.forEach(layer => {
             let img = getImage(layer.image);
@@ -201,11 +206,6 @@ function useLayers(props: IProps) {
         setLayersAreVisible(visible);
     }
 
-    useEffect(() => {
-        if (layersAreVisible) showAllLayers();
-        else showActiveLayer();
-    }, [layersAreVisible])
-
     function moveLayerUp() {
         let newFrame = { ...props.activeFrame };
         let index = newFrame.layers.findIndex(l => l.symbol == props.activeLayer.symbol);
@@ -216,6 +216,7 @@ function useLayers(props: IProps) {
         }
         props.setActiveFrame(newFrame);
     }
+    
     function moveLayerDown() {
         let newFrame = { ...props.activeFrame };
         let index = newFrame.layers.findIndex(l => l.symbol == props.activeLayer.symbol);
@@ -226,6 +227,7 @@ function useLayers(props: IProps) {
         }
         props.setActiveFrame(newFrame);
     }
+
     function mergeLayer() {
         let tempCanvas = document.createElement("canvas");
         let tempCtx = tempCanvas.getContext("2d");
@@ -272,16 +274,16 @@ function useLayers(props: IProps) {
     }
 
     return {
+        imageMap,
+        mergeLayer,
+        updateLayer,
         addNewLayer,
         deleteLayer,
-        duplicateLayer,
-        imageMap,
-        layersAreVisible,
         moveLayerUp,
         moveLayerDown,
-        mergeLayer,
+        duplicateLayer,
+        layersAreVisible,
         onionSkinHandler,
         toggleLayerVisibility,
-        updateLayer
     }
 }

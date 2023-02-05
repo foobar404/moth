@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { Popover, ColorPicker } from "../../components/";
-import { IColorPallete, IColor, IColorStats, IFrame, ILayer } from "./";
-import { BiPlusMedical } from "react-icons/bi";
-import { MdDelete, MdAccessTimeFilled } from "react-icons/md";
-import { FaSortAlphaDown, FaFilter } from "react-icons/fa";
 import ReactTooltip from 'react-tooltip';
 import { HiColorSwatch } from "react-icons/hi";
 import { BsTrophyFill } from "react-icons/bs";
-import { IoImage, IoLayers } from "react-icons/io5";
+import { BiPlusMedical } from "react-icons/bi";
 import { MdMovieFilter } from "react-icons/md";
+import React, { useEffect, useState } from 'react';
+import { IoImage, IoLayers } from "react-icons/io5";
+import { Popover, ColorPicker } from "../../components/";
+import { FaSortAlphaDown, FaFilter } from "react-icons/fa";
+import { MdDelete, MdAccessTimeFilled } from "react-icons/md";
+import { IColorPallete, IColor, IColorStats, IFrame, ILayer } from "./";
 
 
 interface IProps {
-    colorPalettes: IColorPallete[];
-    setColorPalettes: (colorPalettes: IColorPallete[] | any) => void;
-    activeColorPallete: IColorPallete;
-    setActiveColorPallete: (colorPallete: IColorPallete | any, colorPalettesOverride?: IColorPallete[]) => void;
-    activeColor: IColor;
-    setActiveColor: (color: IColor) => void;
-    colorStats: IColorStats;
     frames: IFrame[];
+    activeColor: IColor;
     activeFrame: IFrame;
     activeLayer: ILayer;
+    colorStats: IColorStats;
+    colorPalettes: IColorPallete[];
+    activeColorPallete: IColorPallete;
+    setActiveColor: (color: IColor) => void;
+    setColorPalettes: (colorPalettes: IColorPallete[] | any) => void;
+    setActiveColorPallete: (colorPallete: IColorPallete | any, colorPalettesOverride?: IColorPallete[]) => void;
 }
 
 export function Colors(props: IProps) {
@@ -191,7 +191,6 @@ function useColors(props: IProps) {
 
     function addColor() {
         props.activeColorPallete.colors.push(props.activeColor);
-
         props.setActiveColorPallete({ ...props.activeColorPallete });
     }
 
@@ -327,7 +326,7 @@ function useColors(props: IProps) {
     function sortColorsByMostRecent(colorOverride?: IColor[]) {
         let colors = [...(colorOverride ?? visibleColors)].sort((a, b) => {
             let colorString = `${a.r},${a.g},${a.b},${a.a}`;
-            let colorString2 = `${b.r},${b.g},${b.b},${b.a}`;
+            let colorString2: string = `${b.r},${b.g},${b.b},${b.a}`;
 
             if (props.colorStats[colorString2]?.lastUsed && !props.colorStats[colorString]?.lastUsed) return 1;
             if (!props.colorStats[colorString2]?.lastUsed && props.colorStats[colorString]?.lastUsed) return -1;
@@ -377,20 +376,20 @@ function useColors(props: IProps) {
 
     return {
         addColor,
-        addNewColorPalette,
         colorState,
         deleteColor,
-        deleteColorPalette,
+        visibleColors,
         setColorPalette,
-        showColorsInPalette,
-        showColorsInProject,
-        showColorsInFrame,
+        sortColorsByHue,
         showColorsInLayer,
+        showColorsInFrame,
+        updatePaletteName,
+        addNewColorPalette,
+        deleteColorPalette,
+        showColorsInProject,
+        showColorsInPalette,
         sortColorsByMostUsed,
         sortColorsByMostRecent,
-        sortColorsByHue,
-        updatePaletteName,
-        visibleColors,
     };
 }
 

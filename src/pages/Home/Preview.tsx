@@ -1,13 +1,13 @@
-import React, { useRef, useState } from 'react';
 import { useEffect } from 'react';
 import { IFrame, ICanvas, IPreview } from './';
+import React, { useRef, useState } from 'react';
 
 
 interface IProps {
-    canvas?: ICanvas;
     frames: IFrame[];
     preview: IPreview;
     setPreview: React.Dispatch<React.SetStateAction<IPreview>>;
+    canvas?: ICanvas;
 }
 
 export function Preview(props: IProps) {

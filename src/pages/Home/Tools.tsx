@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { ITool, IToolSettings, IColor, ILayer, IColorPallete, IColorStats } from './';
-import { IoBandageSharp, IoColorWandSharp } from "react-icons/io5";
-import { IoMdMove } from "react-icons/io";
-import { GiMirrorMirror } from "react-icons/gi";
-import { AiFillFire } from "react-icons/ai";
-import { FaEyeDropper, FaBox, FaBone, FaBrush, FaTools } from "react-icons/fa";
-import { BsBucketFill } from "react-icons/bs";
-import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical } from "react-icons/tb";
-import { IoNuclear } from "react-icons/io5";
-import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } from "react-icons/bi";
 import ReactTooltip from 'react-tooltip';
+import { IoMdMove } from "react-icons/io";
+import { AiFillFire } from "react-icons/ai";
+import { IoNuclear } from "react-icons/io5";
+import { BsBucketFill } from "react-icons/bs";
+import { GiMirrorMirror } from "react-icons/gi";
+import { IoBandageSharp } from "react-icons/io5";
+import React, { useEffect, useState } from 'react';
+import { BiRotateRight, BiRotateLeft } from "react-icons/bi";
+import { FaEyeDropper, FaBrush, FaTools } from "react-icons/fa";
+import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical } from "react-icons/tb";
+import { ITool, IToolSettings, IColor, ILayer, IColorPallete, IColorStats } from './';
 
 
 interface IProps {
     activeColor: IColor;
-    setActiveColor: (color: IColor) => void;
-    toolSettings: IToolSettings;
-    setToolSettings: (toolSettings: any) => void;
     activeLayer: ILayer;
-    setActiveLayer: (layer: ILayer) => void;
-    activeColorPallete: IColorPallete;
     colorStats: IColorStats;
+    toolSettings: IToolSettings;
+    activeColorPallete: IColorPallete;
+    setActiveLayer: (layer: ILayer) => void;
+    setActiveColor: (color: IColor) => void;
+    setToolSettings: (toolSettings: any) => void;
 }
 
 export function Tools(props: IProps) {
@@ -170,10 +170,9 @@ export function Tools(props: IProps) {
 }
 
 function useTools(props: IProps) {
-    let [view, setView] = useState<'tools' | 'actions'>("tools");
     let [keys, setKeys] = useState<string[]>([]);
+    let [view, setView] = useState<'tools' | 'actions'>("tools");
     let [mostRecentColors, setMostRecentColors] = useState<IColor[]>([]);
-
     let actions = {
         "clear": () => {
             if (!window.confirm("Are you sure you want to clear the current layer?")) return;
@@ -312,8 +311,6 @@ function useTools(props: IProps) {
 
                 let newKeys = [...oldKeys, e.key.toLowerCase()];
 
-                console.log(newKeys);
-
                 for (let i = 0; i < newKeys.length; i++) {
                     let jStart = newKeys.length === 1 ? i : i + 1;
 
@@ -393,14 +390,14 @@ function useTools(props: IProps) {
     }
 
     return {
-        actions,
-        getButtonStyles,
-        getButtonTooltip,
-        setBrushSize,
-        mostRecentColors,
-        sortColorsByMostRecent,
-        updateTool,
-        setView,
         view,
+        actions,
+        setView,
+        updateTool,
+        setBrushSize,
+        getButtonStyles,
+        mostRecentColors,
+        getButtonTooltip,
+        sortColorsByMostRecent,
     }
 }
