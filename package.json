@@ -17,6 +17,7 @@
     "buffer": "^6.0.3",
     "gh-pages": "^4.0.0",
     "install": "^0.13.0",
+    "js-base64": "^3.7.5",
     "npm": "^8.19.2",
     "png-chunk-text": "^1.0.0",
     "png-chunks-encode": "^1.0.0",

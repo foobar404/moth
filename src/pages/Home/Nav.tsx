@@ -1,3 +1,4 @@
+import { Base64 } from 'js-base64';
 import pngText from "png-chunk-text";
 import { HiStar } from "react-icons/hi";
 import { ImCross } from "react-icons/im";
@@ -239,14 +240,14 @@ function useNav(props: IProps) {
             let chunks = pngExtract(data);
 
             const mothChunk = chunks.filter((chunk: any) => {
-                return chunk.name === 'tEXt'
+                return chunk.name === 'tEXt';
             }).map((chunk: any) => {
-                return pngText.decode(chunk.data)
+                return pngText.decode(chunk.data);
             }).filter((chunk: any) => {
-                return chunk.keyword === "moth"
+                return chunk.keyword === "moth";
             })[0];
 
-            if (mothChunk) props.setProject(JSON.parse(mothChunk.text));
+            if (mothChunk) props.setProject(JSON.parse(Base64.decode(mothChunk.text)));
         }
     }
 
@@ -294,7 +295,7 @@ function useNav(props: IProps) {
 
         // add meta data to png
         let project = props.getProject();
-        chunks.splice(-1, 0, pngText.encode('moth', JSON.stringify(project)));
+        chunks.splice(-1, 0, pngText.encode('moth', Base64.encode(JSON.stringify(project))));
 
         // convert data to png
         let newBuffer = pngBuffer.from(pngEncode(chunks), 'base64');
