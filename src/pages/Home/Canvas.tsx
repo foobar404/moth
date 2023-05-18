@@ -148,9 +148,9 @@ export function Canvas(props: IProps) {
                 <canvas className="p-app__canvas-elm"
                     ref={data.canvasRef}
                     onContextMenu={() => false}
-                    onTouchStart={data.mouseEventHandler as any}
-                    onTouchMove={data.mouseEventHandler as any}
-                    onTouchEnd={data.mouseEventHandler as any}
+                    onPointerDown={data.mouseEventHandler as any}
+                    onPointerMove={data.mouseEventHandler as any}
+                    onPointerUp={data.mouseEventHandler as any}
                     onMouseDown={data.mouseEventHandler}
                     onMouseMove={data.mouseEventHandler}
                     onMouseUp={data.mouseEventHandler}></canvas>
