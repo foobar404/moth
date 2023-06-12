@@ -1,11 +1,12 @@
 # Key Features
 
 - bugs 
-    - all frame actions are broken
     - show all layers toggle broken when changing active layer 
-    - when changing frames, contents of frame get copied over
     - drawing is slow, there is an infinite loop somewhere 
     - changing layer opacity is weird
+    - onion skin for frames doesint work
+    - color picker circle doesint move 
+    - actions not working 
 
 - previous 2 color switch
     - just as a quick reference, does no effect the pallete
