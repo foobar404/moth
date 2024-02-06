@@ -144,11 +144,6 @@ export function Home() {
 					setActiveFrame={data.setActiveFrame}
 					activeLayer={data.activeLayer}
 					setActiveLayer={data.setActiveLayer} />
-
-				<Preview canvas={data.canvas}
-					frames={data.frames}
-					preview={data.preview}
-					setPreview={data.setPreview} />
 			</section>
 
 			<Frames defaultCanvasSize={data.defaultCanvasSize}
@@ -342,3 +337,4 @@ function useHome() {
 		setActiveColorPallete,
 	};
 }
+

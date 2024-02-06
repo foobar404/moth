@@ -16,10 +16,10 @@ export function ColorDot(props: IProps) {
         setRect(document.querySelector(".c-color-picker__color-dot")!.getBoundingClientRect());
     }, []);
 
-    useEffect(() => {
-        if (!props.value) return;
-        setHandlePosition(props.value);
-    }, [props.value]);
+    // useEffect(() => {
+    //     if (!props.value) return;
+    //     setHandlePosition(props.value);
+    // }, [props.value]);
 
     function moveDot(e: any, mouseDown?: boolean) {
         if (!rect) return;

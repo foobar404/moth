@@ -15,6 +15,7 @@ interface IProps {
     setActiveLayer: (layer: ILayer, frame?: IFrame, frames?: IFrame[]) => void;
 }
 
+
 export function Layers(props: IProps) {
     const data = useLayers(props);
 
@@ -68,8 +69,8 @@ export function Layers(props: IProps) {
                 <label data-tip="change non-active layers opacity"
                     data-for="tooltip">
                     <p hidden>layers opacity lever</p>
-                    <input onChange={data.onionSkinHandler}
-                        className="c-input --xs --wide"
+                    <input onChange={e => data.onionSkinHandler(e.target.valueAsNumber)}
+                        className="c-input --xs w-full"
                         type="range"
                         min="1"
                         max="255"
@@ -108,12 +109,8 @@ export function Layers(props: IProps) {
 
 function useLayers(props: IProps) {
     let [imageMap, setImageMap] = useState<any>({});
-    let [layersAreVisible, setLayersAreVisible] = useState(true);
-
-    useEffect(() => {
-        if (layersAreVisible) showAllLayers();
-        else showActiveLayer();
-    }, [layersAreVisible]);
+    let [layerOpacity, setLayerOpacity] = useState(255);
+    const layersAreVisible = layerOpacity === 255;
 
     useEffect(() => {
         let map: any = {};
@@ -138,7 +135,7 @@ function useLayers(props: IProps) {
 
     function updateLayer(layer: ILayer) {
         props.setActiveLayer(layer);
-        layersAreVisible ? showAllLayers() : showActiveLayer();
+        onionSkinHandler(layerOpacity);
     }
 
     function addNewLayer() {
@@ -169,28 +166,7 @@ function useLayers(props: IProps) {
         props.setActiveLayer(newFrame.layers[0], newFrame);
     }
 
-    function showActiveLayer() {
-        let newLayers = props.activeFrame.layers
-            .map(layer => {
-                layer.symbol == props.activeLayer.symbol ? layer.opacity = 255 : layer.opacity = 0;
-                return layer;
-            });
-        props.activeFrame.layers = newLayers;
-        props.setActiveFrame({ ...props.activeFrame });
-    }
-
-    function showAllLayers() {
-        let newLayers = props.activeFrame.layers
-            .map(layer => {
-                layer.opacity = 255;
-                return layer;
-            });
-        props.activeFrame.layers = newLayers;
-        props.setActiveFrame({ ...props.activeFrame });
-    }
-
-    function onionSkinHandler(e: { target: { valueAsNumber: number } }) {
-        let opacity = e.target.valueAsNumber;
+    function onionSkinHandler(opacity: number) {
         let newLayers = props.activeFrame.layers
             .map(layer => {
                 let newOpacity = layer.symbol === props.activeLayer.symbol ? 255 : opacity;
@@ -202,8 +178,8 @@ function useLayers(props: IProps) {
     }
 
     function toggleLayerVisibility() {
-        let visible = !layersAreVisible;
-        setLayersAreVisible(visible);
+        if (layerOpacity === 255) setLayerOpacity(0);
+        else setLayerOpacity(255);
     }
 
     function moveLayerUp() {
@@ -216,7 +192,7 @@ function useLayers(props: IProps) {
         }
         props.setActiveFrame(newFrame);
     }
-    
+
     function moveLayerDown() {
         let newFrame = { ...props.activeFrame };
         let index = newFrame.layers.findIndex(l => l.symbol == props.activeLayer.symbol);

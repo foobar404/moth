@@ -3,6 +3,7 @@ import { ICanvas, ILayer, IFrame, IPreview } from './';
 import { IoPlay, IoStop, IoCopy } from "react-icons/io5";
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
+import { Preview } from './Preview';
 
 
 interface IProps {
@@ -22,81 +23,88 @@ export function Frames(props: IProps) {
     const data = useLayers(props);
 
     return (<section className="p-app__frames p-app__block">
-        <nav className={"p-app__frames-controls"}>
-            <section className="p-app__frame-controls-section">
-                <button data-tip="new frame" data-for="tooltip"
-                    onClick={data.addNewFrame}
-                    className="c-button --xs --fourth mr-2">
-                    <MdAddPhotoAlternate />
-                </button>
-                <button data-tip="duplicate frame"
-                    data-for="tooltip"
-                    onClick={data.duplicateFrame}
-                    className="c-button --xs --fourth mr-2">
-                    <IoCopy />
-                </button>
+        <section>
+            <nav className={"p-app__frames-controls"}>
+                <section className="p-app__frame-controls-section">
+                    <button data-tip="new frame" data-for="tooltip"
+                        onClick={data.addNewFrame}
+                        className="c-button --xs --fourth mr-2">
+                        <MdAddPhotoAlternate />
+                    </button>
+                    <button data-tip="duplicate frame"
+                        data-for="tooltip"
+                        onClick={data.duplicateFrame}
+                        className="c-button --xs --fourth mr-2">
+                        <IoCopy />
+                    </button>
 
-                <button data-tip="move frame left"
-                    data-for="tooltip"
-                    onClick={data.moveFrameLeft}
-                    className="c-button --xs --fourth mr-2">
-                    <BsFillCaretLeftFill />
-                </button>
-                <button data-tip="move frame right"
-                    data-for="tooltip"
-                    onClick={data.moveFrameRight}
-                    className="c-button --xs --fourth mr-2">
-                    <BsFillCaretRightFill />
-                </button>
+                    <button data-tip="move frame left"
+                        data-for="tooltip"
+                        onClick={data.moveFrameLeft}
+                        className="c-button --xs --fourth mr-2">
+                        <BsFillCaretLeftFill />
+                    </button>
+                    <button data-tip="move frame right"
+                        data-for="tooltip"
+                        onClick={data.moveFrameRight}
+                        className="c-button --xs --fourth mr-2">
+                        <BsFillCaretRightFill />
+                    </button>
 
-                <button data-tip="delete frame"
-                    data-for="tooltip"
-                    onClick={data.deleteFrame}
-                    className="c-button --xs --fourth">
-                    <MdDelete />
-                </button>
+                    <button data-tip="delete frame"
+                        data-for="tooltip"
+                        onClick={data.deleteFrame}
+                        className="c-button --xs --fourth">
+                        <MdDelete />
+                    </button>
+                </section>
+
+                <section className="p-app__frame-controls-section flex items-center">
+                    <label data-tip="FPS" data-for="tooltip">
+                        <input type="number"
+                            value={props.preview.fps}
+                            className="c-input --xs mr-2"
+                            onChange={e => data.setFps(Number(e.target.value))} />
+                    </label>
+                    <button data-tip={`${data.playing ? "stop" : "play"} animation`}
+                        data-for="tooltip"
+                        onClick={data.togglePlay}
+                        className="c-button --xs --fourth">
+                        {data.playing ? <IoStop /> : <IoPlay />}
+                    </button>
+                </section>
+
+                <section className="p-app__frame-controls-section flex items-center">
+                    <button data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
+                        data-for="tooltip"
+                        onClick={() => data.setOnionSkin(x => !x)}
+                        className="c-button --xs --fourth mr-2">
+                        {data.onionSkin ? <MdLayersClear /> : <MdLayers />}
+                    </button>
+                    <label data-tip="onion skin opacity" data-for="tooltip">
+                        <p hidden>onion skin slider</p>
+                        <input type="range" className="c-input --xs --wide"></input>
+                    </label>
+                </section>
+            </nav>
+
+            <section className="p-app__frames-container">
+                {props.frames.map((frame, i) => (
+                    <img key={i}
+                        className={`p-app__frame ${frame.symbol === props.activeFrame.symbol ? "--active" : ""}`}
+                        src={data.imageMap[frame.symbol]}
+                        onClick={() => {
+                            props.setActiveFrame(frame);
+                            props.setActiveLayer(frame.layers[0], frame);
+                        }} />
+                ))}
             </section>
-
-            <section className="p-app__frame-controls-section flex items-center">
-                <label data-tip="FPS" data-for="tooltip">
-                    <input type="number"
-                        value={props.preview.fps}
-                        className="c-input --xs mr-2"
-                        onChange={e => data.setFps(Number(e.target.value))} />
-                </label>
-                <button data-tip={`${data.playing ? "stop" : "play"} animation`}
-                    data-for="tooltip"
-                    onClick={data.togglePlay}
-                    className="c-button --xs --fourth">
-                    {data.playing ? <IoStop /> : <IoPlay />}
-                </button>
-            </section>
-
-            <section className="p-app__frame-controls-section flex items-center">
-                <button data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
-                    data-for="tooltip"
-                    onClick={() => data.setOnionSkin(x => !x)}
-                    className="c-button --xs --fourth mr-2">
-                    {data.onionSkin ? <MdLayersClear /> : <MdLayers />}
-                </button>
-                <label data-tip="onion skin opacity" data-for="tooltip">
-                    <p hidden>onion skin slider</p>
-                    <input type="range" className="c-input --xs --wide"></input>
-                </label>
-            </section>
-        </nav>
-
-        <section className="p-app__frames-container">
-            {props.frames.map((frame, i) => (
-                <img key={i}
-                    className={`p-app__frame ${frame.symbol === props.activeFrame.symbol ? "--active" : ""}`}
-                    src={data.imageMap[frame.symbol]}
-                    onClick={() => {
-                        props.setActiveFrame(frame);
-                        props.setActiveLayer(frame.layers[0], frame);
-                    }} />
-            ))}
         </section>
+
+        <Preview canvas={props.canvas}
+            frames={props.frames}
+            preview={props.preview}
+            setPreview={props.setPreview} />
     </section>)
 }
 
