@@ -26,6 +26,7 @@ interface IProps {
     canvas?: ICanvas;
 }
 
+
 interface IMouseState {
     x: number;
     y: number;
@@ -36,6 +37,7 @@ interface IMouseState {
     movementY: number;
     type: 'mousedown' | 'mouseup' | 'mousemove';
 }
+
 
 export function Canvas(props: IProps) {
     const data = useCanvas(props);

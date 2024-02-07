@@ -1,14 +1,14 @@
 import ReactTooltip from 'react-tooltip';
 import { IoMdMove } from "react-icons/io";
 import { AiFillFire } from "react-icons/ai";
-import { IoNuclear } from "react-icons/io5";
+import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
 import { BsBucketFill } from "react-icons/bs";
 import { GiMirrorMirror } from "react-icons/gi";
 import { IoBandageSharp } from "react-icons/io5";
 import React, { useEffect, useState } from 'react';
 import { BiRotateRight, BiRotateLeft } from "react-icons/bi";
-import { FaEyeDropper, FaBrush, FaTools } from "react-icons/fa";
-import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical } from "react-icons/tb";
+import { FaEyeDropper, FaBrush, FaTools, FaBox } from "react-icons/fa";
+import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
 import { ITool, IToolSettings, IColor, ILayer, IColorPallete, IColorStats } from './';
 
 
@@ -70,19 +70,25 @@ export function Tools(props: IProps) {
                     onMouseDown={(e) => data.updateTool(e, "move")}>
                     <IoMdMove />
                 </button>
-                {/* <button data-tip={`wand selection tool ( w​ ) ${data.getButtonTooltip("wand")}`}
-                    data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("wand")}`}
-                    onMouseDown={(e) => data.updateTool(e, "wand")}>
-                    <IoColorWandSharp />
-                </button> */}
-                {/* <button data-tip={`box selection tool ( x​ ) ${data.getButtonTooltip("box")}`}
+                <button data-tip={`box selection tool ( x​ ) ${data.getButtonTooltip("box")}`}
                     data-for="tooltip"
                     className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("box")}`}
                     onMouseDown={(e) => data.updateTool(e, "box")}>
                     <FaBox />
-                </button> */}
-                {/* <button data-tip={`bone tool ( o​ ) ${data.getButtonTooltip("bone")}`}
+                </button>
+                <button data-tip={`wand selection tool ( w​ ) ${data.getButtonTooltip("wand")}`}
+                    data-for="tooltip"
+                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("wand")}`}
+                    onMouseDown={(e) => data.updateTool(e, "wand")}>
+                    <IoColorWandSharp />
+                </button>
+                <button data-tip={`laso selection tool ( o​ ) ${data.getButtonTooltip("laso")}`}
+                    data-for="tooltip"
+                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("laso")}`}
+                    onMouseDown={(e) => data.updateTool(e, "laso")}>
+                    <TbArrowLoopRight />
+                </button>
+                {/* <button data-tip={`bone tool ( n​ ) ${data.getButtonTooltip("bone")}`}
                     data-for="tooltip"
                     className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("bone")}`}
                     onMouseDown={(e) => data.updateTool(e, "bone")}>
@@ -272,9 +278,10 @@ function useTools(props: IProps) {
         "i": () => updateTool(null, "eyedropper", 0),
         "g": () => updateTool(null, "bucket", 0),
         "m": () => updateTool(null, "move", 0),
-        "w": () => updateTool(null, "wand", 0),
         "x": () => updateTool(null, "box", 0),
-        "o": () => updateTool(null, "bone", 0),
+        "w": () => updateTool(null, "wand", 0),
+        "o": () => updateTool(null, "laso", 0),
+        "n": () => updateTool(null, "bone", 0),
         "l": () => updateTool(null, "line", 0),
         "r": () => updateTool(null, "mirror", 0),
         "shift+h": actions.flipHorizontal,
@@ -337,7 +344,7 @@ function useTools(props: IProps) {
                 return newKeys;
             })
         });
-        
+
         document.body.addEventListener("keyup", (e) => {
             setKeys(k => k.filter(x => x !== e.key.toLowerCase()));
         });

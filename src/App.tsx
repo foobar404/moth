@@ -1,7 +1,11 @@
 import React from 'react';
 import { Home } from './pages/Home/index';
 import { BrowserRouter, Routes, Route, } from 'react-router-dom';
+import mixpanel from 'mixpanel-browser';
+ 
 
+mixpanel.init('d0fd76de4b27e761d97f59a0ca878094', {debug: true, track_pageview: true, persistence: 'localStorage'});
+ 
 
 export function App() {
   return (

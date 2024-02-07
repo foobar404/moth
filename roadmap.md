@@ -2,6 +2,7 @@
     - onion skin for frames doesint work
     - move dot out of range resets color to red
     - changing the canvas size is weird 
+    - hsl rgb number inputs dont all work
 
 # MVP
 - add tabs for colors/animation/layers

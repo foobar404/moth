@@ -7,7 +7,10 @@ import { Layers } from './Layers';
 import { Preview } from "./Preview";
 import ReactTooltip from 'react-tooltip';
 import { ImCross } from "react-icons/im";
+import { IoLayers } from "react-icons/io5";
+import { IoMdColorPalette } from "react-icons/io";
 import React, { useEffect, useState } from 'react';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 
 export interface IProject {
@@ -17,6 +20,7 @@ export interface IProject {
 	colorPalettes?: IColorPallete[];
 }
 
+
 export interface ICanvas {
 	height: number;
 	width: number;
@@ -25,6 +29,7 @@ export interface ICanvas {
 	ctx?: CanvasRenderingContext2D;
 }
 
+
 export interface ILayer {
 	name: string;
 	symbol: symbol;
@@ -32,10 +37,12 @@ export interface ILayer {
 	image: ImageData;
 }
 
+
 export interface IFrame {
 	symbol: symbol;
 	layers: ILayer[];
 }
+
 
 export interface IColor {
 	r: number;
@@ -44,15 +51,19 @@ export interface IColor {
 	a: number;
 }
 
+
 export interface IColorPallete {
 	name: string;
 	symbol: symbol;
 	colors: IColor[];
 }
 
+
 export interface IColorStats { [color: string]: { count: number, lastUsed: string } }
 
-export type ITool = "brush" | "eraser" | "eyedropper" | "bucket" | "move" | "wand" | "box" | "bone" | "line" | "mirror";
+
+export type ITool = "brush" | "eraser" | "eyedropper" | "bucket" | "move" | "wand" | "box" | "laso" | "bone" | "line" | "mirror";
+
 
 export interface IToolSettings {
 	size: number;
@@ -65,12 +76,14 @@ export interface IToolSettings {
 	}
 }
 
+
 export interface IPreview {
 	fps: number;
 	zoom: number;
 	element?: HTMLCanvasElement;
 	ctx?: CanvasRenderingContext2D;
 }
+
 
 export function Home() {
 	const data = useHome();
@@ -121,29 +134,43 @@ export function Home() {
 				pixelSize={data.pixelSize} />
 
 			<section className={`p-app__sidebar-right p-app__block c-panel --right ${data.showMobilePanel ? "--show" : ""}`}>
-
 				{/* mobile buttons */}
 				<button onClick={() => data.setShowMobilePanel(false)}
 					className="c-modal__exit c-button --sm --danger md:!hidden">
 					<ImCross />
 				</button>
 
-				<Colors activeColor={data.activeColor}
-					setActiveColor={data.setActiveColor}
-					colorPalettes={data.colorPalettes}
-					setColorPalettes={data.setColorPalettes}
-					activeColorPallete={data.activeColorPallete}
-					setActiveColorPallete={data.setActiveColorPallete}
-					colorStats={data.colorStats}
-					frames={data.frames}
-					activeFrame={data.activeFrame}
-					activeLayer={data.activeLayer} />
+				<Tabs>
+					<TabList>
+						<Tab>
+							<IoMdColorPalette className="c-icon" data-tip="Colors" data-for="tooltip" />
+						</Tab>
+						<Tab>
+							<IoLayers className="c-icon" data-tip="Layers" data-for="tooltip" />
+						</Tab>
+					</TabList>
 
-				<Layers canvas={data.canvas}
-					activeFrame={data.activeFrame}
-					setActiveFrame={data.setActiveFrame}
-					activeLayer={data.activeLayer}
-					setActiveLayer={data.setActiveLayer} />
+					<TabPanel>
+						<Colors frames={data.frames}
+							colorStats={data.colorStats}
+							activeLayer={data.activeLayer}
+							activeColor={data.activeColor}
+							activeFrame={data.activeFrame}
+							colorPalettes={data.colorPalettes}
+							setActiveColor={data.setActiveColor}
+							setColorPalettes={data.setColorPalettes}
+							activeColorPallete={data.activeColorPallete}
+							setActiveColorPallete={data.setActiveColorPallete} />
+					</TabPanel>
+
+					<TabPanel>
+						<Layers canvas={data.canvas}
+							activeFrame={data.activeFrame}
+							setActiveFrame={data.setActiveFrame}
+							activeLayer={data.activeLayer}
+							setActiveLayer={data.setActiveLayer} />
+					</TabPanel>
+				</Tabs>
 			</section>
 
 			<Frames defaultCanvasSize={data.defaultCanvasSize}

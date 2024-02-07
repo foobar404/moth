@@ -67,10 +67,11 @@ export function Layers(props: IProps) {
                 </button>
 
                 <label data-tip="change non-active layers opacity"
-                    data-for="tooltip">
+                    data-for="tooltip"
+                    className="w-full">
                     <p hidden>layers opacity lever</p>
                     <input onChange={e => data.onionSkinHandler(e.target.valueAsNumber)}
-                        className="c-input --xs w-full"
+                        className="c-input w-full"
                         type="range"
                         min="1"
                         max="255"
@@ -107,6 +108,7 @@ export function Layers(props: IProps) {
     )
 }
 
+
 function useLayers(props: IProps) {
     let [imageMap, setImageMap] = useState<any>({});
     let [layerOpacity, setLayerOpacity] = useState(255);
@@ -120,6 +122,10 @@ function useLayers(props: IProps) {
         });
         setImageMap(map);
     }, [props.activeLayer, props.activeFrame]);
+
+    useEffect(() => {
+        onionSkinHandler(layerOpacity);
+    }, [layerOpacity, props.activeLayer]);
 
     function getImage(data?: ImageData) {
         if (!data) return "";
@@ -135,7 +141,6 @@ function useLayers(props: IProps) {
 
     function updateLayer(layer: ILayer) {
         props.setActiveLayer(layer);
-        onionSkinHandler(layerOpacity);
     }
 
     function addNewLayer() {
@@ -175,6 +180,7 @@ function useLayers(props: IProps) {
             });
         props.activeFrame.layers = newLayers;
         props.setActiveFrame({ ...props.activeFrame });
+        setLayerOpacity(opacity);
     }
 
     function toggleLayerVisibility() {
