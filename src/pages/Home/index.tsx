@@ -4,7 +4,6 @@ import { Canvas } from './Canvas';
 import { Colors } from './Colors';
 import { Frames } from './Frames';
 import { Layers } from './Layers';
-import { Preview } from "./Preview";
 import ReactTooltip from 'react-tooltip';
 import { ImCross } from "react-icons/im";
 import { IoLayers } from "react-icons/io5";
@@ -140,12 +139,13 @@ export function Home() {
 					<ImCross />
 				</button>
 
-				<Tabs>
+				<Tabs selectedIndex={data.tabIndex}
+					onSelect={(index) => data.setTabIndex(index)}>
 					<TabList>
-						<Tab>
+						<Tab className={`p-app__tab ${data.tabIndex === 0 ? "--active" : ""}`}>
 							<IoMdColorPalette className="c-icon" data-tip="Colors" data-for="tooltip" />
 						</Tab>
-						<Tab>
+						<Tab className={`p-app__tab ${data.tabIndex === 1 ? "--active" : ""}`}>
 							<IoLayers className="c-icon" data-tip="Layers" data-for="tooltip" />
 						</Tab>
 					</TabList>
@@ -192,6 +192,7 @@ function useHome() {
 	const date = new Date();
 	const defaultCanvasSize = 32;
 
+	let [tabIndex, setTabIndex] = useState(0);
 	let [project, setProjectOriginal] = useState<IProject>({ name: date.toLocaleString(), });
 	let [preview, setPreview] = useState<IPreview>({ zoom: 1, fps: 24 });
 	let [canvas, setCanvasOriginal] = useState<ICanvas>();
@@ -362,6 +363,8 @@ function useHome() {
 		setShowMobilePanel,
 		activeColorPallete,
 		setActiveColorPallete,
+		tabIndex,
+		setTabIndex,
 	};
 }
 

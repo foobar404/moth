@@ -5,8 +5,6 @@
     - hsl rgb number inputs dont all work
 
 # MVP
-- add tabs for colors/animation/layers
-
 - previous 2 color switch
     - just as a quick reference, does no effect the pallete
 

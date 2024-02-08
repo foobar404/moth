@@ -148,6 +148,20 @@
         }
     }
 
+    &__tab{
+        background-color: $color-black;
+        border-top-left-radius: $border-radius-rounded;
+        border-top-right-radius: $border-radius-rounded;
+        color: $color-white;
+        display: inline-block;
+        padding: $spacing-2 $spacing-3;
+        text-align: center;
+
+        &.--active{
+            background: $color-fourth;
+        }
+    }
+
     &__color-bar {
         cursor: pointer;
         height: 50px;

@@ -6,6 +6,7 @@ import { BiPlusMedical } from "react-icons/bi";
 import { FaUndoAlt, FaRedoAlt } from "react-icons/fa";
 import React, { useEffect, useRef, useState } from 'react';
 import { ICanvas, ILayer, IColor, IFrame, IToolSettings, IColorPallete, IColorStats } from "./";
+import { useShortcuts } from "../../utils/useShortcuts";
 
 
 interface IProps {
@@ -134,7 +135,7 @@ export function Canvas(props: IProps) {
                 </button>
                 <button data-tip="redo ( ctrl + shift + z )"
                     data-for="tooltip"
-                    onClick={data.undo}
+                    onClick={data.redo}
                     className="c-button --xs --fourth mr-2">
                     <FaRedoAlt />
                 </button>
@@ -163,50 +164,16 @@ export function Canvas(props: IProps) {
 
 function useCanvas(props: IProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    let shortcuts: { [shortcut: string]: () => any } = {
-        "control+z": undo,
-        "[": () => setBrushSize(-1),
-        "]": () => setBrushSize(1),
-    }
     let [showGrid, setShowGrid] = useState(true);
-    let [activeKeys, setActiveKeys] = useState<string[]>([]);
     let [layerHistory, setLayerHistory] = useState<ILayer[]>([]);
     let [selectionArea, setSelectionArea] = useState<ImageData | null>(null);
     let [activePoints, setActivePoints] = useState<{ x: number, y: number }[]>([]);
     let [tempCanvas, setTempCanvas] = useState<{ element: HTMLCanvasElement, ctx: CanvasRenderingContext2D } | null>(null);
-
-    useEffect(() => {
-        document.addEventListener('keydown', (e) => {
-            if (e.repeat) return;
-
-            setActiveKeys((oldActiveKeys) => {
-                if (oldActiveKeys.includes(e.key.toLowerCase())) return oldActiveKeys;
-
-                let keys = [...oldActiveKeys, e.key.toLowerCase()];
-
-                for (let i = 0; i < keys.length; i++) {
-                    for (let j = i + 1; j < keys.length; j++) {
-                        let key1 = `${keys[i]}+${keys[j]}`;
-                        let key2 = `${keys[j]}+${keys[i]}`;
-                        let key3 = keys[i];
-                        let key4 = keys[j];
-
-                        if (shortcuts[key1]) shortcuts[key1]();
-                        if (shortcuts[key2]) shortcuts[key2]();
-                        if (shortcuts[key3]) shortcuts[key3]();
-                        if (shortcuts[key4]) shortcuts[key4]();
-                    }
-                }
-
-                return keys;
-            });
-        });
-        document.addEventListener('keyup', (e) => {
-            setActiveKeys((oldActiveKeys) => (
-                oldActiveKeys.filter(key => key !== e.key.toLowerCase())
-            ));
-        });
-    }, []);
+    let shortcuts = useShortcuts({
+        "control+z": undo,
+        "[": () => setBrushSize(-1),
+        "]": () => setBrushSize(1),
+    });
 
     useEffect(() => {
         paint(null, true);
@@ -258,6 +225,35 @@ function useCanvas(props: IProps) {
             let zoom = e.deltaY > 0 ? -.2 : .2;
             setZoom(zoom);
         }, { passive: false });
+    }, [props.canvas]);
+
+    useEffect(() => {
+        // push a copy of activeLayer to layerHistory
+        if (!props.canvas) return;
+        if (!props.canvas.ctx) return;
+
+        let image = props.canvas.ctx!.createImageData(props.activeLayer.image.width, props.activeLayer.image.height);
+        image.data.set(props.activeLayer.image.data);
+
+        let oldData = layerHistory[layerHistory.length - 1];
+        let newData = image;
+
+        if (oldData && newData)
+            if (JSON.stringify(oldData.image.data) === JSON.stringify(newData.data)) return;
+
+        let layerCopy: ILayer = {
+            symbol: props.activeLayer.symbol,
+            name: props.activeLayer.name,
+            image: image,
+            opacity: props.activeLayer.opacity
+        };
+
+        setLayerHistory(lh => {
+            let layerHistoryCopy = [...lh, layerCopy];
+            if (layerHistory.length >= 200)
+                layerHistoryCopy = layerHistoryCopy.slice(-200);
+            return layerHistoryCopy;
+        });
     }, [props.canvas]);
 
     useEffect(() => {
@@ -417,6 +413,8 @@ function useCanvas(props: IProps) {
             return [...oldLayerHistory];
         });
     }
+
+    function redo(){}
 
     function resizeHandler(size: { height?: number, width?: number }) {
         if (!props.canvas) return;
@@ -774,37 +772,9 @@ function useCanvas(props: IProps) {
         }
     }
 
-    useEffect(() => {
-        // push a copy of activeLayer to layerHistory
-        if (!props.canvas) return;
-        if (!props.canvas.ctx) return;
-
-        let image = props.canvas.ctx!.createImageData(props.activeLayer.image.width, props.activeLayer.image.height);
-        image.data.set(props.activeLayer.image.data);
-
-        let oldData = layerHistory[layerHistory.length - 1];
-        let newData = image;
-
-        if (oldData && newData)
-            if (JSON.stringify(oldData.image.data) === JSON.stringify(newData.data)) return;
-
-        let layerCopy: ILayer = {
-            symbol: props.activeLayer.symbol,
-            name: props.activeLayer.name,
-            image: image,
-            opacity: props.activeLayer.opacity
-        };
-
-        setLayerHistory(lh => {
-            let layerHistoryCopy = [...lh, layerCopy];
-            if (layerHistory.length >= 200)
-                layerHistoryCopy = layerHistoryCopy.slice(-200);
-            return layerHistoryCopy;
-        });
-    }, [props.canvas]);
-
     return {
         undo,
+        redo,
         setZoom,
         showGrid,
         canvasRef,

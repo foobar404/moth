@@ -1,15 +1,17 @@
 import ReactTooltip from 'react-tooltip';
 import { IoMdMove } from "react-icons/io";
 import { AiFillFire } from "react-icons/ai";
-import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
 import { BsBucketFill } from "react-icons/bs";
 import { GiMirrorMirror } from "react-icons/gi";
 import { IoBandageSharp } from "react-icons/io5";
+import { useCanvas } from '../../utils/useCanvas';
+import { useShortcuts } from '../../utils/useShortcuts';
 import React, { useEffect, useState } from 'react';
-import { BiRotateRight, BiRotateLeft } from "react-icons/bi";
+import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } from "react-icons/bi";
+import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
 import { FaEyeDropper, FaBrush, FaTools, FaBox } from "react-icons/fa";
-import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
 import { ITool, IToolSettings, IColor, ILayer, IColorPallete, IColorStats } from './';
+import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
 
 
 interface IProps {
@@ -22,6 +24,7 @@ interface IProps {
     setActiveColor: (color: IColor) => void;
     setToolSettings: (toolSettings: any) => void;
 }
+
 
 export function Tools(props: IProps) {
     const data = useTools(props);
@@ -123,7 +126,7 @@ export function Tools(props: IProps) {
                     className="c-button --sm --second mb-2">
                     <TbFlipVertical />
                 </button>
-                {/* <button data-tip="center layer horizontally ( shift + ~ )"
+                <button data-tip="center layer horizontally ( shift + ~ )"
                     data-for="tooltip"
                     onClick={() => data.actions["centerHorizontal"]()}
                     className="c-button --sm --second mb-2">
@@ -134,7 +137,7 @@ export function Tools(props: IProps) {
                     onClick={() => data.actions["centerVertical"]()}
                     className="c-button --sm --second mb-2">
                     <BiVerticalCenter />
-                </button> */}
+                </button>
                 <button data-tip="rotate layer 90° right ( shift + r ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["rotateRight"]()}
@@ -175,104 +178,111 @@ export function Tools(props: IProps) {
     </>)
 }
 
+
 function useTools(props: IProps) {
-    let [keys, setKeys] = useState<string[]>([]);
+    const canvas1 = useCanvas();
+    const canvas2 = useCanvas();
     let [view, setView] = useState<'tools' | 'actions'>("tools");
     let [mostRecentColors, setMostRecentColors] = useState<IColor[]>([]);
     let actions = {
         "clear": () => {
             if (!window.confirm("Are you sure you want to clear the current layer?")) return;
 
-            let newLayer = { ...props.activeLayer };
-            newLayer.image = new ImageData(newLayer.image.width, newLayer.image.height);
-            props.setActiveLayer(newLayer);
+            props.setActiveLayer({
+                ...props.activeLayer,
+                image: new ImageData(props.activeLayer.image.width, props.activeLayer.image.height)
+            });
         },
         "flipHorizontal": () => {
-            let tempCanvas = document.createElement("canvas");
-            let tempCtx = tempCanvas.getContext("2d");
-            tempCanvas.width = props.activeLayer.image.width;
-            tempCanvas.height = props.activeLayer.image.height;
+            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
 
-            let tempCanvas2 = document.createElement("canvas");
-            let tempCtx2 = tempCanvas2.getContext("2d");
-            tempCanvas2.width = props.activeLayer.image.width;
-            tempCanvas2.height = props.activeLayer.image.height;
+            canvas1.putImageData(props.activeLayer.image);
+            canvas2.ctx.translate(0, canvas2.height);
+            canvas2.ctx.scale(1, -1);
+            canvas2.drawImage(canvas1.canvas);
 
-            tempCtx!.putImageData(props.activeLayer.image, 0, 0);
-            tempCtx2!.translate(0, tempCanvas2.height);
-            tempCtx2!.scale(1, -1);
-            tempCtx2!.drawImage(tempCanvas, 0, 0);
-
-            let newLayer = { ...props.activeLayer };
-            newLayer.image = tempCtx2!.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-            props.setActiveLayer(newLayer);
+            props.setActiveLayer({
+                ...props.activeLayer,
+                image: canvas2.getImageData()
+            });
         },
         "flipVertical": () => {
-            let tempCanvas = document.createElement("canvas");
-            let tempCtx = tempCanvas.getContext("2d");
-            tempCanvas.width = props.activeLayer.image.width;
-            tempCanvas.height = props.activeLayer.image.height;
+            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
 
-            let tempCanvas2 = document.createElement("canvas");
-            let tempCtx2 = tempCanvas2.getContext("2d");
-            tempCanvas2.width = props.activeLayer.image.width;
-            tempCanvas2.height = props.activeLayer.image.height;
+            canvas1.putImageData(props.activeLayer.image, 0, 0);
+            canvas2.ctx.translate(canvas2.width, 0);
+            canvas2.ctx.scale(-1, 1);
+            canvas2.drawImage(canvas1.canvas, 0, 0);
 
-            tempCtx!.putImageData(props.activeLayer.image, 0, 0);
-            tempCtx2!.translate(tempCanvas2.width, 0);
-            tempCtx2!.scale(-1, 1);
-            tempCtx2!.drawImage(tempCanvas, 0, 0);
-
-            let newLayer = { ...props.activeLayer };
-            newLayer.image = tempCtx2!.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-            props.setActiveLayer(newLayer);
+            props.setActiveLayer({
+                ...props.activeLayer,
+                image: canvas2.getImageData()
+            });
         },
         "rotateRight": () => {
-            let tempCanvas = document.createElement("canvas");
-            let tempCtx = tempCanvas.getContext("2d");
-            tempCanvas.width = props.activeLayer.image.width;
-            tempCanvas.height = props.activeLayer.image.height;
+            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
 
-            let tempCanvas2 = document.createElement("canvas");
-            let tempCtx2 = tempCanvas2.getContext("2d");
-            tempCanvas2.width = props.activeLayer.image.width;
-            tempCanvas2.height = props.activeLayer.image.height;
+            canvas1.putImageData(props.activeLayer.image);
+            canvas2.ctx.translate(canvas2.width / 2, canvas2.height / 2);
+            canvas2.ctx.rotate(90 * Math.PI / 180);
+            canvas2.ctx.translate(-canvas2.width / 2, -canvas2.height / 2);
+            canvas2.drawImage(canvas1.canvas, 0, 0);
 
-            tempCtx!.putImageData(props.activeLayer.image, 0, 0);
-            tempCtx2!.translate(tempCanvas2.width / 2, tempCanvas2.height / 2);
-            tempCtx2!.rotate(90 * Math.PI / 180);
-            tempCtx2!.translate(-tempCanvas2.width / 2, -tempCanvas2.height / 2);
-            tempCtx2!.drawImage(tempCanvas, 0, 0);
-
-            let newLayer = { ...props.activeLayer };
-            newLayer.image = tempCtx2!.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-            props.setActiveLayer(newLayer);
+            props.setActiveLayer({
+                ...props.activeLayer,
+                image: canvas2.getImageData()
+            });
         },
         "rotateLeft": () => {
-            let tempCanvas = document.createElement("canvas");
-            let tempCtx = tempCanvas.getContext("2d");
-            tempCanvas.width = props.activeLayer.image.width;
-            tempCanvas.height = props.activeLayer.image.height;
+            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
 
-            let tempCanvas2 = document.createElement("canvas");
-            let tempCtx2 = tempCanvas2.getContext("2d");
-            tempCanvas2.width = props.activeLayer.image.width;
-            tempCanvas2.height = props.activeLayer.image.height;
+            canvas1.putImageData(props.activeLayer.image, 0, 0);
+            canvas2.ctx.translate(canvas2.width / 2, canvas2.height / 2);
+            canvas2.ctx.rotate(-90 * Math.PI / 180);
+            canvas2.ctx.translate(-canvas2.width / 2, -canvas2.height / 2);
+            canvas2.drawImage(canvas1.canvas);
 
-            tempCtx!.putImageData(props.activeLayer.image, 0, 0);
-            tempCtx2!.translate(tempCanvas2.width / 2, tempCanvas2.height / 2);
-            tempCtx2!.rotate(-90 * Math.PI / 180);
-            tempCtx2!.translate(-tempCanvas2.width / 2, -tempCanvas2.height / 2);
-            tempCtx2!.drawImage(tempCanvas, 0, 0);
-
-            let newLayer = { ...props.activeLayer };
-            newLayer.image = tempCtx2!.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-            props.setActiveLayer(newLayer);
+            props.setActiveLayer({
+                ...props.activeLayer,
+                image: canvas2.getImageData()
+            });
         },
-        "centerHorizontal": () => { },
-        "centerVertical": () => { },
+        "centerHorizontal": () => {
+            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+
+            const imageData = props.activeLayer.image;
+            const bounds = findVisibleBounds(imageData);
+            const visibleWidth = bounds.maxX - bounds.minX + 1;
+            const dx = (canvas2.width - visibleWidth) / 2 - bounds.minX;
+
+            canvas1.ctx.putImageData(imageData, dx, 0);
+
+            props.setActiveLayer({
+                ...props.activeLayer,
+                image: canvas1.getImageData()
+            });
+        },
+        "centerVertical": () => {
+            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+
+            const imageData = props.activeLayer.image;
+            const bounds = findVisibleBounds(imageData);
+            const visibleHeight = bounds.maxY - bounds.minY + 1;
+            const dy = (canvas1.height - visibleHeight) / 2 - bounds.minY;
+
+            canvas1.ctx.putImageData(imageData, 0, dy);
+
+            props.setActiveLayer({
+                ...props.activeLayer,
+                image: canvas1.getImageData()
+            });
+        },
     }
-    let shortcuts: any = {
+    let shortcuts: any = useShortcuts({
         "b": () => updateTool(null, "brush", 0),
         "e": () => updateTool(null, "eraser", 0),
         "i": () => updateTool(null, "eyedropper", 0),
@@ -301,7 +311,7 @@ function useTools(props: IProps) {
         "8": () => props.setActiveColor(mostRecentColors[7]),
         "9": () => props.setActiveColor(mostRecentColors[8]),
         "0": () => props.setActiveColor(mostRecentColors[9]),
-    };
+    });
 
     useEffect(() => {
         ReactTooltip.rebuild();
@@ -311,44 +321,26 @@ function useTools(props: IProps) {
         setMostRecentColors(sortColorsByMostRecent());
     }, [props.activeColor, props.activeColorPallete]);
 
-    useEffect(() => {
-        document.body.addEventListener("keydown", (e) => {
-            setKeys(oldKeys => {
-                if (oldKeys.includes(e.key.toLowerCase())) return oldKeys;
+    function findVisibleBounds(imageData) {
+        const data = imageData.data;
+        const width = imageData.width;
+        const height = imageData.height;
+        let minX = width, maxX = 0, minY = height, maxY = 0;
 
-                let newKeys = [...oldKeys, e.key.toLowerCase()];
-
-                for (let i = 0; i < newKeys.length; i++) {
-                    let jStart = newKeys.length === 1 ? i : i + 1;
-
-                    for (let j = jStart; j < newKeys.length; j++) {
-                        let key1 = newKeys[i];
-                        let key2 = newKeys[j];
-                        let key3 = `${newKeys[i]}+${newKeys[j]}`;
-
-                        if (key3 in shortcuts) {
-                            shortcuts[key3]();
-                            return newKeys;
-                        }
-                        if (key2 in shortcuts) {
-                            shortcuts[key2]();
-                            return newKeys;
-                        }
-                        if (key1 in shortcuts) {
-                            shortcuts[key1]();
-                            return newKeys;
-                        }
-                    }
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const alpha = data[(y * width + x) * 4 + 3];
+                if (alpha > .004) { // This pixel is not transparent.
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
                 }
+            }
+        }
 
-                return newKeys;
-            })
-        });
-
-        document.body.addEventListener("keyup", (e) => {
-            setKeys(k => k.filter(x => x !== e.key.toLowerCase()));
-        });
-    }, []);
+        return { minX, maxX, minY, maxY };
+    }
 
     function sortColorsByMostRecent() {
         let colors = props.activeColorPallete.colors.sort((a, b) => {
