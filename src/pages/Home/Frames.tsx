@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { ICanvas, ILayer, IFrame, IPreview } from './';
+import { Preview } from './Preview';
 import { IoPlay, IoStop, IoCopy } from "react-icons/io5";
+import React, { useState, useEffect, useReducer } from 'react';
+import { ICanvas, ILayer, IFrame, IPreview } from '../../types';
+import { initReducerState, reducer, useCanvas } from '../../utils';
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
-import { Preview } from './Preview';
 
 
 interface IProps {
     frames: IFrame[];
-    canvas?: ICanvas;
-    preview: IPreview;
     activeFrame: IFrame;
     activeLayer: ILayer;
-    defaultCanvasSize: number;
     setFrames: React.Dispatch<React.SetStateAction<IFrame[]>>;
-    setPreview: React.Dispatch<React.SetStateAction<IPreview>>;
     setActiveFrame: (frame: IFrame, frames?: IFrame[]) => void;
     setActiveLayer: (layer: ILayer, frame?: IFrame, frames?: IFrame[]) => void;
 }
+
 
 export function Frames(props: IProps) {
     const data = useLayers(props);
@@ -27,7 +25,7 @@ export function Frames(props: IProps) {
             <nav className={"p-app__frames-controls"}>
                 <section className="p-app__frame-controls-section">
                     <button data-tip="new frame" data-for="tooltip"
-                        onClick={data.addNewFrame}
+                        onClick={data.addFrame}
                         className="c-button --xs --fourth mr-2">
                         <MdAddPhotoAlternate />
                     </button>
@@ -60,7 +58,7 @@ export function Frames(props: IProps) {
                 </section>
 
                 <section className="p-app__frame-controls-section flex items-center">
-                    <label data-tip="FPS" data-for="tooltip">
+                    {/* <label data-tip="FPS" data-for="tooltip">
                         <input type="number"
                             value={props.preview.fps}
                             className="c-input --xs mr-2"
@@ -71,7 +69,7 @@ export function Frames(props: IProps) {
                         onClick={data.togglePlay}
                         className="c-button --xs --fourth">
                         {data.playing ? <IoStop /> : <IoPlay />}
-                    </button>
+                    </button> */}
                 </section>
 
                 <section className="p-app__frame-controls-section flex items-center">
@@ -101,18 +99,19 @@ export function Frames(props: IProps) {
             </section>
         </section>
 
-        <Preview canvas={props.canvas}
-            frames={props.frames}
-            preview={props.preview}
-            setPreview={props.setPreview} />
+        <Preview frames={props.frames}
+            preview={data.preview} />
     </section>)
 }
 
 function useLayers(props: IProps) {
+    const canvas1 = useCanvas();
+    const canvas2 = useCanvas();
     let [playing, setPlaying] = useState(false);
     let [onionSkin, setOnionSkin] = useState(false);
     let [imageMap, setImageMap] = useState<any>({});
-    let [loopRef, setLoopRef] = useState<NodeJS.Timer>();
+    let [global, setGlobal] = useReducer(reducer, initReducerState);
+    let [preview, setPreview] = useState<IPreview>({  fps: 24 });
 
     useEffect(() => {
         let map: { [s: symbol]: string } = {};
@@ -125,30 +124,22 @@ function useLayers(props: IProps) {
 
     function getImage(frame?: IFrame) {
         if (!frame) return "";
-        if (!props.canvas) return "";
 
-        let mainCanvas = document.createElement("canvas");
-        mainCanvas.width = props.canvas.width;
-        mainCanvas.height = props.canvas.height;
-        let mainCtx = mainCanvas.getContext("2d");
-
-        let tempCanvas = document.createElement("canvas");
-        tempCanvas.width = props.canvas.width;
-        tempCanvas.height = props.canvas.height;
-        let tempCtx = tempCanvas.getContext("2d");
+        canvas1.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
+        canvas2.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
 
         let reversedLayers = frame.layers.slice(0).reverse();
         reversedLayers.forEach(layer => {
-            tempCtx!.putImageData(layer.image, 0, 0);
-            mainCtx!.drawImage(tempCanvas, 0, 0, props.canvas!.width, props.canvas!.height);
+            canvas1.putImageData(layer.image);
+            canvas2!.drawImage(canvas1.canvas);
         });
 
-        return mainCanvas.toDataURL();
+        return canvas2.toDataURL();
     }
 
-    function addNewFrame() {
+    function addFrame() {
         let newFrame: IFrame = {
-            layers: [{ image: new ImageData(props!.canvas!.width, props!.canvas!.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
+            layers: [{ image: new ImageData(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
             symbol: Symbol()
         };
 
@@ -161,7 +152,7 @@ function useLayers(props: IProps) {
         let newFrames = props.frames.filter(frame => frame.symbol !== props.activeFrame.symbol);
         if (newFrames.length === 0) {
             newFrames.push({
-                layers: [{ image: new ImageData(props!.canvas!.width, props!.canvas!.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
+                layers: [{ image: new ImageData(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
                 symbol: Symbol()
             })
         }
@@ -172,10 +163,10 @@ function useLayers(props: IProps) {
         let newFrame: IFrame = {
             layers: props.activeFrame.layers.map(layer => {
                 return {
-                    image: new ImageData(layer.image.data.slice(0), layer.image.width, layer.image.height),
-                    opacity: layer.opacity,
                     symbol: Symbol(),
-                    name: layer.name
+                    name: layer.name,
+                    opacity: layer.opacity,
+                    image: new ImageData(layer.image.data.slice(0), layer.image.width, layer.image.height),
                 }
             }),
             symbol: Symbol()
@@ -205,62 +196,13 @@ function useLayers(props: IProps) {
         props.setFrames(newFrames);
     }
 
-    function play() {
-        if (!props.preview.ctx) return;
-        if (!props.canvas) return;
-
-        let i = 0;
-        let tempCanvas = document.createElement("canvas");
-        tempCanvas.width = props.canvas.width;
-        tempCanvas.height = props.canvas.height;
-        let tempCtx = tempCanvas.getContext("2d");
-
-        let previewElm = document.querySelector(".p-app__preview");
-        if (previewElm) previewElm.scrollIntoView({ behavior: "smooth", block: "end" });
-
-        setPlaying(true);
-        setLoopRef(setInterval(() => {
-            if (i >= props.frames.length) i = 0;
-
-            let frame = props.frames[i];
-            props.preview.ctx!.clearRect(0, 0, props?.canvas?.width ?? 0, props?.canvas?.height ?? 0);
-            let reversedLayers = frame.layers.slice().reverse();
-            reversedLayers.forEach(layer => {
-                tempCtx!.putImageData(layer.image, 0, 0);
-                props.preview.ctx!.drawImage(tempCanvas, 0, 0);
-            })
-            i++;
-        }, 1000 / props.preview.fps));
-    }
-
-    function stop() {
-        if (!loopRef) return;
-
-        setPlaying(false);
-        clearInterval(loopRef!);
-    }
-
-    function togglePlay() {
-        if (playing) stop();
-        else play();
-    }
-
-    function setFps(fps: number) {
-        props.setPreview({ ...props.preview, fps });
-        stop();
-        play();
-    }
-
     return {
-        stop,
-        play,
-        setFps,
+        preview,
         playing,
         imageMap,
         onionSkin,
         setPlaying,
-        togglePlay,
-        addNewFrame,
+        addFrame,
         deleteFrame,
         setOnionSkin,
         moveFrameLeft,

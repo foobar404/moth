@@ -4,24 +4,19 @@ import { AiFillFire } from "react-icons/ai";
 import { BsBucketFill } from "react-icons/bs";
 import { GiMirrorMirror } from "react-icons/gi";
 import { IoBandageSharp } from "react-icons/io5";
-import { useCanvas } from '../../utils/useCanvas';
-import { useShortcuts } from '../../utils/useShortcuts';
 import React, { useEffect, useState } from 'react';
-import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } from "react-icons/bi";
+import { useShortcuts, useCanvas } from '../../utils';
+import { ITool, IToolSettings, ILayer } from '../../types';
 import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
-import { FaEyeDropper, FaBrush, FaTools, FaBox } from "react-icons/fa";
-import { ITool, IToolSettings, IColor, ILayer, IColorPallete, IColorStats } from './';
+import { FaEyeDropper, FaBrush, FaTools, FaBox, FaLightbulb, FaShapes } from "react-icons/fa";
+import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } from "react-icons/bi";
 import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
 
 
 interface IProps {
-    activeColor: IColor;
     activeLayer: ILayer;
-    colorStats: IColorStats;
     toolSettings: IToolSettings;
-    activeColorPallete: IColorPallete;
     setActiveLayer: (layer: ILayer) => void;
-    setActiveColor: (color: IColor) => void;
     setToolSettings: (toolSettings: any) => void;
 }
 
@@ -55,17 +50,29 @@ export function Tools(props: IProps) {
                     onMouseDown={(e) => data.updateTool(e, "eraser")}>
                     <IoBandageSharp />
                 </button>
-                <button data-tip={`eyedropper tool ( i​ ) ${data.getButtonTooltip("eyedropper")}`}
-                    data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("eyedropper")}`}
-                    onMouseDown={(e) => data.updateTool(e, "eyedropper")}>
-                    <FaEyeDropper />
-                </button>
                 <button data-tip={`bucket tool ( g​ ) ${data.getButtonTooltip("bucket")}`}
                     data-for="tooltip"
                     className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("bucket")}`}
                     onMouseDown={(e) => data.updateTool(e, "bucket")}>
                     <BsBucketFill />
+                </button>
+                <button data-tip={`shape tool ( s​ ) ${data.getButtonTooltip("shape")}`}
+                    data-for="tooltip"
+                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("shape")}`}
+                    onMouseDown={(e) => data.updateTool(e, "shape")}>
+                    <FaShapes />
+                </button>
+                <button data-tip={`light tool ( t​ ) ${data.getButtonTooltip("light")}`}
+                    data-for="tooltip"
+                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("light")}`}
+                    onMouseDown={(e) => data.updateTool(e, "light")}>
+                    <FaLightbulb />
+                </button>
+                <button data-tip={`eyedropper tool ( i​ ) ${data.getButtonTooltip("eyedropper")}`}
+                    data-for="tooltip"
+                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("eyedropper")}`}
+                    onMouseDown={(e) => data.updateTool(e, "eyedropper")}>
+                    <FaEyeDropper />
                 </button>
                 <button data-tip={`move tool ( m​ ) ${data.getButtonTooltip("move")}`}
                     data-for="tooltip"
@@ -158,23 +165,6 @@ export function Tools(props: IProps) {
                 </button>
             </section>
         )}
-
-        <section className="p-app__color-swatch">
-            {data.mostRecentColors.map((_, i) => {
-                let index = data.mostRecentColors.length - 1 - i;
-                let recentColor = data.mostRecentColors[index];
-
-                return (
-                    <div key={index}
-                        className="p-app__color-swatch-layer"
-                        onClick={() => props.setActiveColor(recentColor)}
-                        style={{
-                            background: `rgb(${recentColor.r}, ${recentColor.g}, ${recentColor.b})`
-                        }}>
-                    </div>
-                )
-            })}
-        </section>
     </>)
 }
 
@@ -183,7 +173,6 @@ function useTools(props: IProps) {
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     let [view, setView] = useState<'tools' | 'actions'>("tools");
-    let [mostRecentColors, setMostRecentColors] = useState<IColor[]>([]);
     let actions = {
         "clear": () => {
             if (!window.confirm("Are you sure you want to clear the current layer?")) return;
@@ -282,11 +271,13 @@ function useTools(props: IProps) {
             });
         },
     }
-    let shortcuts: any = useShortcuts({
+    let keys = useShortcuts({
         "b": () => updateTool(null, "brush", 0),
         "e": () => updateTool(null, "eraser", 0),
-        "i": () => updateTool(null, "eyedropper", 0),
+        "s": () => updateTool(null, "shape", 0),
         "g": () => updateTool(null, "bucket", 0),
+        "t": () => updateTool(null, "light", 0),
+        "i": () => updateTool(null, "eyedropper", 0),
         "m": () => updateTool(null, "move", 0),
         "x": () => updateTool(null, "box", 0),
         "w": () => updateTool(null, "wand", 0),
@@ -301,25 +292,11 @@ function useTools(props: IProps) {
         "shift+r": actions.rotateRight,
         "shift+l": actions.rotateLeft,
         "shift+c": actions.clear,
-        "1": () => props.setActiveColor(mostRecentColors[0]),
-        "2": () => props.setActiveColor(mostRecentColors[1]),
-        "3": () => props.setActiveColor(mostRecentColors[2]),
-        "4": () => props.setActiveColor(mostRecentColors[3]),
-        "5": () => props.setActiveColor(mostRecentColors[4]),
-        "6": () => props.setActiveColor(mostRecentColors[5]),
-        "7": () => props.setActiveColor(mostRecentColors[6]),
-        "8": () => props.setActiveColor(mostRecentColors[7]),
-        "9": () => props.setActiveColor(mostRecentColors[8]),
-        "0": () => props.setActiveColor(mostRecentColors[9]),
     });
 
     useEffect(() => {
         ReactTooltip.rebuild();
     }, [view]);
-
-    useEffect(() => {
-        setMostRecentColors(sortColorsByMostRecent());
-    }, [props.activeColor, props.activeColorPallete]);
 
     function findVisibleBounds(imageData) {
         const data = imageData.data;
@@ -330,7 +307,7 @@ function useTools(props: IProps) {
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 const alpha = data[(y * width + x) * 4 + 3];
-                if (alpha > .004) { // This pixel is not transparent.
+                if (alpha > 0) { // This pixel is not transparent.
                     if (x < minX) minX = x;
                     if (x > maxX) maxX = x;
                     if (y < minY) minY = y;
@@ -340,20 +317,6 @@ function useTools(props: IProps) {
         }
 
         return { minX, maxX, minY, maxY };
-    }
-
-    function sortColorsByMostRecent() {
-        let colors = props.activeColorPallete.colors.sort((a, b) => {
-            let colorString = `${a.r},${a.g},${a.b},${a.a}`;
-            let colorString2 = `${b.r},${b.g},${b.b},${b.a}`;
-
-            if (props.colorStats[colorString2]?.lastUsed && !props.colorStats[colorString]?.lastUsed) return 1;
-            if (!props.colorStats[colorString2]?.lastUsed && props.colorStats[colorString]?.lastUsed) return -1;
-
-            return (props.colorStats[colorString2]?.lastUsed ?? colorString2) > (props.colorStats[colorString]?.lastUsed ?? colorString) ? 1 : -1;
-        });
-
-        return colors;
     }
 
     function getButtonStyles(tool: ITool) {
@@ -383,20 +346,12 @@ function useTools(props: IProps) {
             props.setToolSettings((s: IToolSettings) => ({ ...s, rightTool: tool }));
     }
 
-    function setBrushSize(delta: number) {
-        props.setToolSettings((p: IToolSettings) =>
-            ({ ...p, size: (p.size + delta < 1) ? 1 : (p.size + delta) }));
-    }
-
     return {
         view,
         actions,
         setView,
         updateTool,
-        setBrushSize,
         getButtonStyles,
-        mostRecentColors,
         getButtonTooltip,
-        sortColorsByMostRecent,
     }
 }

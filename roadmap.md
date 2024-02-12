@@ -3,14 +3,9 @@
     - move dot out of range resets color to red
     - changing the canvas size is weird 
     - hsl rgb number inputs dont all work
+    - the first time you use an action it wipes the screen
 
 # MVP
-- previous 2 color switch
-    - just as a quick reference, does no effect the pallete
-
- - colors used in pallette  
-        - when changing color in pallete, update all instances of that color in all layers
-
 - box selection tools
     - stretch with side grab 
     - rotate with corner grab
@@ -22,6 +17,20 @@
 - laso selection
 
 - lighten/darken tool 
+
+- basic shapes
+    - square
+    - circle
+    - rect
+    - oval
+
+- previous 2 color switch
+    - just as a quick reference, does no effect the pallete
+ - colors used in pallette  
+        - when changing color in pallete, update all instances of that color in all layers
+
+- light/dark theme
+- minimize UI
 
 - import/export 
     - import project file

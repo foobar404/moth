@@ -1,14 +1,14 @@
 import { MdDelete } from "react-icons/md";
-import { IFrame, ILayer, ICanvas } from "./";
 import { RiGitMergeFill } from "react-icons/ri";
 import { IoEye, IoCopy } from "react-icons/io5";
-import React, { useEffect, useState } from 'react';
+import { initReducerState, reducer, useCanvas } from "../../utils";
+import { IFrame, ILayer, ICanvas } from "../../types";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
+import React, { useEffect, useReducer, useState } from 'react';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 
 
 interface IProps {
-    canvas?: ICanvas;
     activeFrame: IFrame;
     activeLayer: ILayer;
     setActiveFrame: (frame: IFrame) => void;
@@ -112,6 +112,10 @@ export function Layers(props: IProps) {
 function useLayers(props: IProps) {
     let [imageMap, setImageMap] = useState<any>({});
     let [layerOpacity, setLayerOpacity] = useState(255);
+    let [global, setGlobal] = useReducer(reducer, initReducerState);
+
+    const canvas1 = useCanvas();
+    const canvas2 = useCanvas();
     const layersAreVisible = layerOpacity === 255;
 
     useEffect(() => {
@@ -130,13 +134,9 @@ function useLayers(props: IProps) {
     function getImage(data?: ImageData) {
         if (!data) return "";
 
-        let canvas = document.createElement('canvas');
-        let ctx = canvas.getContext('2d');
-        canvas.width = data.width;
-        canvas.height = data.height;
-        ctx?.putImageData(data, 0, 0);
-
-        return canvas.toDataURL();
+        canvas1.resize(data.width, data.height);
+        canvas1.putImageData(data);
+        return canvas1.toDataURL();
     }
 
     function updateLayer(layer: ILayer) {
@@ -145,10 +145,10 @@ function useLayers(props: IProps) {
 
     function addNewLayer() {
         let newLayer: ILayer = {
-            image: new ImageData(props.canvas?.width ?? 1, props.canvas?.height ?? 1),
             opacity: 255,
             symbol: Symbol(),
-            name: "New Layer"
+            name: "New Layer",
+            image: new ImageData(global["Canvas.mainCanvas"].width ?? 1, global["Canvas.mainCanvas"].height ?? 1),
         };
 
         props.setActiveLayer(newLayer);
@@ -160,10 +160,10 @@ function useLayers(props: IProps) {
         let newLayers = props.activeFrame.layers.filter(layer => layer.symbol !== props.activeLayer.symbol);
         if (newLayers.length === 0) {
             newLayers.push({
-                image: new ImageData(props.canvas?.width ?? 1, props.canvas?.height ?? 1),
                 opacity: 255,
                 symbol: Symbol(),
-                name: "New Layer"
+                name: "New Layer",
+                image: new ImageData(global["Canvas.mainCanvas"].width ?? 1, global["Canvas.mainCanvas"].height ?? 1),
             })
         }
         let newFrame = { ...props.activeFrame, layers: newLayers };
@@ -211,15 +211,8 @@ function useLayers(props: IProps) {
     }
 
     function mergeLayer() {
-        let tempCanvas = document.createElement("canvas");
-        let tempCtx = tempCanvas.getContext("2d");
-        tempCanvas.width = props.activeLayer.image.width;
-        tempCanvas.height = props.activeLayer.image.height;
-
-        let tempCanvas2 = document.createElement("canvas");
-        let tempCtx2 = tempCanvas2.getContext("2d");
-        tempCanvas2.width = props.activeLayer.image.width;
-        tempCanvas2.height = props.activeLayer.image.height;
+        canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+        canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
 
         let newFrame = { ...props.activeFrame };
         let index = newFrame.layers.findIndex(l => l.symbol == props.activeLayer.symbol);
@@ -227,11 +220,11 @@ function useLayers(props: IProps) {
         if (newFrame.layers.length > 1 && index != newFrame.layers.length - 1) {
             let layerBelow = newFrame.layers[index + 1];
 
-            tempCtx?.putImageData(props.activeLayer.image, 0, 0);
-            tempCtx2?.putImageData(layerBelow.image, 0, 0);
-            tempCtx2?.drawImage(tempCanvas, 0, 0);
+            canvas1.putImageData(props.activeLayer.image);
+            canvas2.putImageData(layerBelow.image);
+            canvas2.drawImage(canvas1.canvas);
 
-            newFrame.layers[index].image = tempCtx2!.getImageData(0, 0, tempCanvas2.width, tempCanvas2.height);
+            newFrame.layers[index].image = canvas2.getImageData();
             newFrame.layers.splice(index + 1, 1);
 
             props.setActiveLayer(newFrame.layers[index]);
@@ -240,9 +233,7 @@ function useLayers(props: IProps) {
     }
 
     function duplicateLayer() {
-        if (!props.canvas) return;
-
-        let image = props.canvas.ctx!.createImageData(props.activeLayer.image.width, props.activeLayer.image.height);
+        let image = canvas1.ctx.createImageData(props.activeLayer.image.width, props.activeLayer.image.height);
         image.data.set(props.activeLayer.image.data);
 
         let newLayer: ILayer = {

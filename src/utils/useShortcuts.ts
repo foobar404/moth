@@ -7,37 +7,51 @@ interface IProps {
 
 
 export function useShortcuts(props: IProps) {
-    let [keys, setKeys] = useState<string[]>([]);
+    let [keys, setKeys] = useState(new Set());
 
     useEffect(() => {
         document.body.addEventListener("keydown", (e) => {
-            if (e.repeat) return;
+            setKeys(prevKeys => {
+                if (prevKeys.has(e.key.toLowerCase())) return prevKeys; 
 
-            setKeys(oldKeys => {
-                if (oldKeys.includes(e.key.toLowerCase())) return oldKeys;
-
-                let keys = [...oldKeys, e.key.toLowerCase()];
-
-                for (let i = 0; i < keys.length; i++) {
-                    for (let j = i + 1; j < keys.length; j++) {
-                        let key1 = `${keys[i]}+${keys[j]}`;
-                        let key2 = `${keys[j]}+${keys[i]}`;
-                        let key3 = keys[i];
-                        let key4 = keys[j];
-
-                        if (props[key1]) props[key1]();
-                        else if (props[key2]) props[key2]();
-                        else if (props[key3]) props[key3]();
-                        else if (props[key4]) props[key4]();
-                    }
-                }
-
-                return keys;
-            })
+                const newKeys = new Set(prevKeys);
+                newKeys.add(e.key.toLowerCase());
+                return newKeys;
+            });
         });
 
         document.body.addEventListener("keyup", (e) => {
-            setKeys(k => k.filter(x => x !== e.key.toLowerCase()));
+            setKeys(prevKeys => {
+                const newKeys = new Set(prevKeys);
+                newKeys.delete(e.key.toLowerCase());
+                return newKeys;
+            });
         });
     }, []);
+
+    useEffect(() => {
+        let permutations = generatePermutations(Array.from(keys) as string[]);
+
+        permutations.forEach(permutation => {
+            if (permutation.join("+") in props)
+                props[permutation.join("+")]();
+        })
+    }, [keys]);
+
+    function generatePermutations(arr: string[]): string[][] {
+        if (arr.length <= 1) return [arr];
+        let result = [];
+        for (let i = 0; i < arr.length; i++) {
+            const current = arr[i];
+            const remaining = arr.slice(0, i).concat(arr.slice(i + 1));
+            const remainingPerms = generatePermutations(remaining);
+            for (let perm of remainingPerms) {
+                //@ts-ignore
+                result.push([current].concat(perm));
+            }
+        }
+        return result;
+    }
+
+    return { keys }
 }

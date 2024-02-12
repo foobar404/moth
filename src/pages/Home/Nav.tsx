@@ -7,27 +7,17 @@ import pngEncode from "png-chunks-encode";
 import pngExtract from "png-chunks-extract";
 import { Buffer as pngBuffer } from "buffer";
 import { MdMovieFilter } from "react-icons/md";
-import { useModal } from "../../utils/useModal";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { IoImage, IoLayers, IoColorPalette } from "react-icons/io5";
-import { IFrame, ILayer, IProject, ICanvas, IColorPallete, IColor } from "./";
+import { initReducerState, reducer, useCanvas, useModal } from '../../utils';
+import { useGlobalStore } from '../../utils/useGlobalStore';
 
 
 interface IProps {
-    frames: IFrame[];
-    project: IProject;
-    pixelSize: number;
-    activeFrame: IFrame;
-    activeLayer: ILayer;
-    activeColor: IColor;
-    getProject: () => IProject;
-    colorPalettes: IColorPallete[];
-    activeColorPallete: IColorPallete;
-    setProject: (project: IProject) => void;
     loadProject: (projectName: string) => void;
     setShowMobilePanel: (show: boolean) => void;
-    canvas?: ICanvas;
 }
+
 
 interface IExportSettings {
     gap?: number;
@@ -40,6 +30,7 @@ interface IExportSettings {
     allFrames?: boolean;
     allLayers?: boolean;
 }
+
 
 export function Nav(props: IProps) {
     const data = useNav(props);
@@ -64,7 +55,7 @@ export function Nav(props: IProps) {
                         Export Current Layer
                     </button>
                 </section>
-                {/* <section className="flex flex-wrap">
+                <section className="flex flex-wrap">
                     <label className="mr-4">
                         <p>scale</p>
                         <input type="number" className="c-input --sm" />
@@ -89,7 +80,7 @@ export function Nav(props: IProps) {
                         <p>gap</p>
                         <input type="number" className="c-input --sm" />
                     </label>
-                </section> */}
+                </section>
             </main>
         </Modal>
 
@@ -122,12 +113,8 @@ export function Nav(props: IProps) {
                         type="text"
                         className="c-input mr-2"
                         placeholder="Enter Name"
-                        value={data.name}
-                        onChange={e => data.setName(e.target.value)}
-                        onBlur={e => data.saveProjectName()}
-                        onKeyPress={e => {
-                            if (e.key === "Enter") e.currentTarget.blur();
-                        }} />
+                        value={data.projectName}
+                        onChange={e => data.saveProjectName(e.target.value)} />
                 </label>
 
                 {/* mobile buttons */}
@@ -160,59 +147,68 @@ export function Nav(props: IProps) {
 
 function useNav(props: IProps) {
     const modal = useModal();
+    const canvas1 = useCanvas();
+    const canvas2 = useCanvas();
+    const canvas3 = useCanvas();
+    const { projectName, setProjectName, frames } = useGlobalStore();
     let [projectList, setProjectList] = useState<string[]>([]);
-    let [name, setName] = useState<string>(props.project.name);
 
     useEffect(() => {
         let cachedList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
         setProjectList(cachedList);
     }, []);
 
-    useEffect(() => {
-        setName(props.project.name);
-    }, [props.project.name]);
+    // useEffect(() => {
+    //     // save project locally
+    //     const interval = setInterval(() => {
+    //         let localProject = props.getProject();
 
-    useEffect(() => {
-        // save project locally
-        const interval = setInterval(() => {
-            let localProject = props.getProject();
+    //         // if the project doesint have any changes yet dont save it
+    //         if (localProject.frames?.length === 1 && localProject.frames[0].layers?.length === 1) {
+    //             let anyNewPixels = localProject.frames[0].layers[0].image.data?.some(p => p !== 0);
+    //             if (!anyNewPixels) return;
+    //         }
 
-            // if the project doesint have any changes yet dont save it
-            if (localProject.frames?.length === 1 && localProject.frames[0].layers?.length === 1) {
-                let anyNewPixels = localProject.frames[0].layers[0].image.data?.some(p => p !== 0);
-                if (!anyNewPixels) return;
-            }
+    //         let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
+    //         if (!currentProjectList.includes(props.project.name)) {
+    //             currentProjectList.push(props.project.name);
+    //             localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+    //         }
 
-            let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
-            if (!currentProjectList.includes(props.project.name)) {
-                currentProjectList.push(props.project.name);
-                localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
-            }
+    //         if (currentProjectList.length > 10) {
+    //             let front = currentProjectList.shift();
+    //             localStorage.removeItem(front);
+    //             localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+    //         }
 
-            if (currentProjectList.length > 10) {
-                let front = currentProjectList.shift();
-                localStorage.removeItem(front);
-                localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
-            }
+    //         let projectName = props.project.name.startsWith("moth-") ? props.project.name + " " : props.project.name;
+    //         localStorage.setItem(projectName, JSON.stringify(localProject));
+    //     }, 1000);
+    //     return () => clearInterval(interval);
+    // }, [props.frames, props.project, props.colorPalettes]);
 
-            let projectName = props.project.name.startsWith("moth-") ? props.project.name + " " : props.project.name;
-            localStorage.setItem(projectName, JSON.stringify(localProject));
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [props.canvas, props.frames, props.project, props.colorPalettes]);
+    // function getProject(): IProject {
+    // 	return {
+    // 		name: project.name,
+    // 		frames: frames,
+    // 		colorPalettes: colorPalettes,
+    // 		canvas: {
+    // 			width: global["Canvas.mainCanvas"].width,
+    // 			height: global["Canvas.mainCanvas"].height
+    // 		}
+    // 	}
+    // }
 
-    function saveProjectName() {
-        if (name === props.project.name) return;
-
+    function saveProjectName(name) {
         let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
-        let index = currentProjectList.indexOf(props.project.name);
+        let index = currentProjectList.indexOf(projectName);
         currentProjectList[index] = name;
 
         localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
-        localStorage.removeItem(props.project.name);
-        props.setProject({ ...props.project, name });
+        localStorage.removeItem(projectName);
 
         setProjectList(currentProjectList);
+        setProjectName(name);
     }
 
     function deleteProject(project: string) {
@@ -220,7 +216,7 @@ function useNav(props: IProps) {
 
         let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
         currentProjectList = currentProjectList.filter((p: string) => p !== project);
-        let projectListWithoutCurrent = currentProjectList.filter((p: string) => p !== props.project.name);
+        let projectListWithoutCurrent = currentProjectList.filter((p: string) => p !== projectName);
 
         localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
         localStorage.removeItem(project);
@@ -247,47 +243,41 @@ function useNav(props: IProps) {
                 return chunk.keyword === "moth";
             })[0];
 
-            if (mothChunk) props.setProject(JSON.parse(Base64.decode(mothChunk.text)));
+            if (mothChunk) {
+                //! do something with this
+                JSON.parse(Base64.decode(mothChunk.text));
+            }
         }
     }
 
     function exportProject(settings?: IExportSettings) {
-        let height = props.canvas!.height;
+        let height = global["Canvas.mainCanvas"].height;
         let width = (settings?.frameOnly || settings?.layerOnly) ?
-            props.canvas!.width :
-            props.canvas!.width * props.frames.length;
-        let tempCanvas1 = document.createElement("canvas");
-        let tempCtx1 = tempCanvas1.getContext("2d");
-        tempCanvas1.height = height;
-        tempCanvas1.width = width;
+            global["Canvas.mainCanvas"].width :
+            global["Canvas.mainCanvas"].width * frames.length;
+        canvas1.resize(width, height);
 
-        let frames = (settings?.frameOnly || settings?.layerOnly) ?
+        let newFrames = (settings?.frameOnly || settings?.layerOnly) ?
             [props.activeFrame] : props.frames;
 
-        frames.forEach((frame, i) => {
-            let tempCanvas2 = document.createElement("canvas");
-            let tempCtx2 = tempCanvas2.getContext("2d");
-            tempCanvas2.height = props.canvas!.height;
-            tempCanvas2.width = props.canvas!.width;
+        newFrames.forEach((frame, i) => {
+            canvas2.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
 
             let layersRevered = frame.layers.slice().reverse();
             let layers = (settings?.layerOnly) ? [props.activeLayer] : layersRevered;
 
             layers.forEach(layer => {
-                let tempCanvas3 = document.createElement("canvas");
-                let tempCtx3 = tempCanvas3.getContext("2d");
-                tempCanvas3.height = props.canvas!.height;
-                tempCanvas3.width = props.canvas!.width;
+                canvas3.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
 
-                tempCtx3?.putImageData(layer.image, 0, 0);
-                tempCtx2?.drawImage(tempCanvas3, 0, 0);
+                canvas3.putImageData(layer.image);
+                canvas2.drawImage(canvas3.canvas);
             });
 
-            tempCtx1?.drawImage(tempCanvas2, (i * props.canvas!.width), 0);
+            canvas1.drawImage(canvas2.canvas, (i * global["Canvas.mainCanvas"].width), 0);
         });
 
         // get current project as png
-        let tempPng = tempCanvas1!.toDataURL("image/png");
+        let tempPng = canvas1.toDataURL();
         let tempPngData = tempPng.replace(/^data:image\/(png|jpg);base64,/, "");
         let tempPngBuffer = pngBuffer.from(tempPngData, "base64");
         let data = new Uint8Array(tempPngBuffer.buffer);
@@ -312,7 +302,7 @@ function useNav(props: IProps) {
     return {
         name,
         modal,
-        setName,
+        projectName,
         projectList,
         deleteProject,
         exportProject,

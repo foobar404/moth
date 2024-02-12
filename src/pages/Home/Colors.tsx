@@ -1,14 +1,14 @@
 import ReactTooltip from 'react-tooltip';
-import { HiColorSwatch } from "react-icons/hi";
 import { BsTrophyFill } from "react-icons/bs";
 import { BiPlusMedical } from "react-icons/bi";
+import { HiColorSwatch } from "react-icons/hi";
 import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
 import { IoImage, IoLayers } from "react-icons/io5";
 import { Popover, ColorPicker } from "../../components/";
 import { FaSortAlphaDown, FaFilter } from "react-icons/fa";
 import { MdDelete, MdAccessTimeFilled } from "react-icons/md";
-import { IColorPallete, IColor, IColorStats, IFrame, ILayer } from "./";
+import { IColorPallete, IColor, IColorStats, IFrame, ILayer } from "../../types";
 
 
 interface IProps {
@@ -23,6 +23,7 @@ interface IProps {
     setColorPalettes: (colorPalettes: IColorPallete[] | any) => void;
     setActiveColorPallete: (colorPallete: IColorPallete | any, colorPalettesOverride?: IColorPallete[]) => void;
 }
+
 
 export function Colors(props: IProps) {
     const data = useColors(props);
@@ -154,6 +155,23 @@ export function Colors(props: IProps) {
                     </div>
                 ))}
             </section>
+
+            {/* <section className="p-app__color-swatch">
+                {data.mostRecentColors.map((_, i) => {
+                    let index = data.mostRecentColors.length - 1 - i;
+                    let recentColor = data.mostRecentColors[index];
+
+                    return (
+                        <div key={index}
+                            className="p-app__color-swatch-layer"
+                            onClick={() => props.setActiveColor(recentColor)}
+                            style={{
+                                background: `rgb(${recentColor.r}, ${recentColor.g}, ${recentColor.b})`
+                            }}>
+                        </div>
+                    )
+                })}
+            </section> */}
         </section>
     )
 }
