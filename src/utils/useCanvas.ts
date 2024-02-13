@@ -10,15 +10,34 @@ interface IProps {
 export function useCanvas(props?: IProps) {
     let { current: canvas } = useRef<HTMLCanvasElement>(makeCanvas());
     let { current: ctx } = useRef<CanvasRenderingContext2D>(canvas.getContext('2d')!);
-    let width = canvas.width;
-    let height = canvas.height;
 
     function makeCanvas() {
         let canvas = document.createElement('canvas');
-        canvas.width = props?.width ?? 0;
-        canvas.height = props?.height ?? 0;
+        canvas.width = props?.width ?? 8;
+        canvas.height = props?.height ?? 8;
 
         return canvas;
+    }
+
+    function getHeight() {
+        return canvas.height;
+    }
+
+    function getWidth() {
+        return canvas.width;
+    }
+
+    function getSize(asArray = false) {
+        if (asArray) return [canvas.width, canvas.height];
+        else return { width: canvas.width, height: canvas.height };
+    }
+
+    function getElement() {
+        return canvas;
+    }
+
+    function getCtx() {
+        return ctx;
     }
 
     function clear(x = 0, y = 0, w = canvas.width, h = canvas.height) {
@@ -148,8 +167,8 @@ export function useCanvas(props?: IProps) {
     //     let colorsAreTheSame = current.r == prevColor.r && current.g == prevColor.g && current.b == prevColor.b && current.a == prevColor.a;
     //     if (!colorsAreTheSame) return;
 
-    //     canvas1.ctx.fillStyle = `rgba(${newColor.r},${newColor.g},${newColor.b},${newColor.a / 255})`;
-    //     canvas1.ctx.fillRect(x, y, 1, 1);
+    //     canvas1.getCtx().fillStyle = `rgba(${newColor.r},${newColor.g},${newColor.b},${newColor.a / 255})`;
+    //     canvas1.getCtx().fillRect(x, y, 1, 1);
 
     //     floodFill(image, x - 1, y, newColor, current, scannedCoords);
     //     floodFill(image, x + 1, y, newColor, current, scannedCoords);
@@ -158,10 +177,13 @@ export function useCanvas(props?: IProps) {
     // }
 
     return {
-        ctx,
-        width,
-        height,
-        canvas,
+        // ctx,
+        // canvas,
+        getHeight,
+        getWidth,
+        getSize,
+        getElement,
+        getCtx,
         clear,
         resize,
         drawGrid,

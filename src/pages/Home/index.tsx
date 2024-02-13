@@ -49,7 +49,7 @@ export function Home() {
 
 					{/* color panel */}
 					<TabPanel>
-						<Colors />
+						<Colors />	
 					</TabPanel>
 
 					{/* layers panel */}

@@ -1,23 +1,15 @@
+import { ILayer } from "../../types";
 import { MdDelete } from "react-icons/md";
 import { RiGitMergeFill } from "react-icons/ri";
 import { IoEye, IoCopy } from "react-icons/io5";
-import { initReducerState, reducer, useCanvas } from "../../utils";
-import { IFrame, ILayer, ICanvas } from "../../types";
+import React, { useEffect, useState } from 'react';
+import { useCanvas, useGlobalStore } from "../../utils";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
-import React, { useEffect, useReducer, useState } from 'react';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 
 
-interface IProps {
-    activeFrame: IFrame;
-    activeLayer: ILayer;
-    setActiveFrame: (frame: IFrame) => void;
-    setActiveLayer: (layer: ILayer, frame?: IFrame, frames?: IFrame[]) => void;
-}
-
-
-export function Layers(props: IProps) {
-    const data = useLayers(props);
+export function Layers() {
+    const data = useLayers();
 
     return (
         <section>
@@ -77,8 +69,8 @@ export function Layers(props: IProps) {
                         max="255"
                         step="1"
                         value={
-                            props.activeFrame.layers.reduce((acc, v) => {
-                                if (v.symbol !== props.activeLayer.symbol) return v.opacity;
+                            data.activeFrame.layers.reduce((acc, v) => {
+                                if (v.symbol !== data.activeLayer.symbol) return v.opacity;
                                 else return acc;
                             }, 255)
                         } />
@@ -86,8 +78,8 @@ export function Layers(props: IProps) {
             </nav>
 
             <section className="p-app__layer-container mb-2">
-                {props.activeFrame.layers.map((layer: ILayer, i) => (
-                    <div className={`p-app__layer ${layer.symbol === props.activeLayer.symbol ? "--active" : ""}`}
+                {data.activeFrame.layers.map((layer: ILayer, i) => (
+                    <div className={`p-app__layer ${layer.symbol === data.activeLayer.symbol ? "--active" : ""}`}
                         onClick={() => data.updateLayer(layer)}
                         key={i}>
                         <img src={data.imageMap[layer.symbol]} className="p-app__layer-img" />
@@ -96,8 +88,8 @@ export function Layers(props: IProps) {
                             value={layer.name}
                             onChange={e => {
                                 let value = e.target.value;
-                                props.setActiveLayer({
-                                    ...props.activeLayer,
+                                data.setActiveLayer({
+                                    ...data.activeLayer,
                                     name: value
                                 })
                             }} />
@@ -109,27 +101,28 @@ export function Layers(props: IProps) {
 }
 
 
-function useLayers(props: IProps) {
+function useLayers() {
     let [imageMap, setImageMap] = useState<any>({});
     let [layerOpacity, setLayerOpacity] = useState(255);
-    let [global, setGlobal] = useReducer(reducer, initReducerState);
 
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const layersAreVisible = layerOpacity === 255;
+    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
+
 
     useEffect(() => {
         let map: any = {};
-        props.activeFrame.layers.forEach(layer => {
+        activeFrame.layers.forEach(layer => {
             let img = getImage(layer.image);
             map[layer.symbol] = img;
         });
         setImageMap(map);
-    }, [props.activeLayer, props.activeFrame]);
+    }, [activeLayer, activeFrame]);
 
     useEffect(() => {
         onionSkinHandler(layerOpacity);
-    }, [layerOpacity, props.activeLayer]);
+    }, [layerOpacity, activeLayer]);
 
     function getImage(data?: ImageData) {
         if (!data) return "";
@@ -140,7 +133,7 @@ function useLayers(props: IProps) {
     }
 
     function updateLayer(layer: ILayer) {
-        props.setActiveLayer(layer);
+        setActiveLayer(layer);
     }
 
     function addNewLayer() {
@@ -148,38 +141,38 @@ function useLayers(props: IProps) {
             opacity: 255,
             symbol: Symbol(),
             name: "New Layer",
-            image: new ImageData(global["Canvas.mainCanvas"].width ?? 1, global["Canvas.mainCanvas"].height ?? 1),
+            image: new ImageData(canvasSize.width ?? 1, canvasSize.height ?? 1),
         };
 
-        props.setActiveLayer(newLayer);
+        setActiveLayer(newLayer);
     }
 
     function deleteLayer() {
         if (!window.confirm("Are you sure you want to delete this layer?")) return;
 
-        let newLayers = props.activeFrame.layers.filter(layer => layer.symbol !== props.activeLayer.symbol);
+        let newLayers = activeFrame.layers.filter(layer => layer.symbol !== activeLayer.symbol);
         if (newLayers.length === 0) {
             newLayers.push({
                 opacity: 255,
                 symbol: Symbol(),
                 name: "New Layer",
-                image: new ImageData(global["Canvas.mainCanvas"].width ?? 1, global["Canvas.mainCanvas"].height ?? 1),
+                image: new ImageData(canvasSize.width ?? 1, canvasSize.height ?? 1),
             })
         }
-        let newFrame = { ...props.activeFrame, layers: newLayers };
-        props.setActiveFrame(newFrame);
-        props.setActiveLayer(newFrame.layers[0], newFrame);
+        let newFrame = { ...activeFrame, layers: newLayers };
+        setActiveFrame(newFrame);
+        setActiveLayer(newFrame.layers[0]);
     }
 
     function onionSkinHandler(opacity: number) {
-        let newLayers = props.activeFrame.layers
+        let newLayers = activeFrame.layers
             .map(layer => {
-                let newOpacity = layer.symbol === props.activeLayer.symbol ? 255 : opacity;
+                let newOpacity = layer.symbol === activeLayer.symbol ? 255 : opacity;
                 layer.opacity = newOpacity;
                 return layer;
             });
-        props.activeFrame.layers = newLayers;
-        props.setActiveFrame({ ...props.activeFrame });
+        activeFrame.layers = newLayers;
+        setActiveFrame({ ...activeFrame });
         setLayerOpacity(opacity);
     }
 
@@ -189,65 +182,68 @@ function useLayers(props: IProps) {
     }
 
     function moveLayerUp() {
-        let newFrame = { ...props.activeFrame };
-        let index = newFrame.layers.findIndex(l => l.symbol == props.activeLayer.symbol);
+        let newFrame = { ...activeFrame };
+        let index = newFrame.layers.findIndex(l => l.symbol == activeLayer.symbol);
         if (index != 0) {
             let temp = newFrame.layers[index];
             newFrame.layers[index] = newFrame.layers[index - 1];
             newFrame.layers[index - 1] = temp;
         }
-        props.setActiveFrame(newFrame);
+        setActiveFrame(newFrame);
     }
 
     function moveLayerDown() {
-        let newFrame = { ...props.activeFrame };
-        let index = newFrame.layers.findIndex(l => l.symbol == props.activeLayer.symbol);
+        let newFrame = { ...activeFrame };
+        let index = newFrame.layers.findIndex(l => l.symbol == activeLayer.symbol);
         if (index != newFrame.layers.length - 1) {
             let temp = newFrame.layers[index];
             newFrame.layers[index] = newFrame.layers[index + 1];
             newFrame.layers[index + 1] = temp;
         }
-        props.setActiveFrame(newFrame);
+        setActiveFrame(newFrame);
     }
 
     function mergeLayer() {
-        canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
-        canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+        canvas1.resize(activeLayer.image.width, activeLayer.image.height);
+        canvas2.resize(activeLayer.image.width, activeLayer.image.height);
 
-        let newFrame = { ...props.activeFrame };
-        let index = newFrame.layers.findIndex(l => l.symbol == props.activeLayer.symbol);
+        let newFrame = { ...activeFrame };
+        let index = newFrame.layers.findIndex(l => l.symbol == activeLayer.symbol);
 
         if (newFrame.layers.length > 1 && index != newFrame.layers.length - 1) {
             let layerBelow = newFrame.layers[index + 1];
 
-            canvas1.putImageData(props.activeLayer.image);
+            canvas1.putImageData(activeLayer.image);
             canvas2.putImageData(layerBelow.image);
-            canvas2.drawImage(canvas1.canvas);
+            canvas2.drawImage(canvas1.getElement());
 
             newFrame.layers[index].image = canvas2.getImageData();
             newFrame.layers.splice(index + 1, 1);
 
-            props.setActiveLayer(newFrame.layers[index]);
-            props.setActiveFrame(newFrame);
+            setActiveLayer(newFrame.layers[index]);
+            setActiveFrame(newFrame);
         }
     }
 
     function duplicateLayer() {
-        let image = canvas1.ctx.createImageData(props.activeLayer.image.width, props.activeLayer.image.height);
-        image.data.set(props.activeLayer.image.data);
+        let image = canvas1.getCtx().createImageData(activeLayer.image.width, activeLayer.image.height);
+        image.data.set(activeLayer.image.data);
 
         let newLayer: ILayer = {
             symbol: Symbol(),
-            name: "Copy of " + props.activeLayer.name,
+            name: "Copy of " + activeLayer.name,
             image: image,
-            opacity: props.activeLayer.opacity,
+            opacity: activeLayer.opacity,
         };
 
-        props.setActiveLayer(newLayer);
+        setActiveLayer(newLayer);
     }
 
     return {
         imageMap,
+        activeFrame,
+        activeLayer,
+        setActiveLayer,
         mergeLayer,
         updateLayer,
         addNewLayer,

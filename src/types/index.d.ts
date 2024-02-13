@@ -7,7 +7,7 @@ export interface IProject {
 	name: string;
 	frames?: IFrame[];
 	canvas?: { height?: number; width?: number; };
-	colorPalettes?: IColorPallete[];
+	colorPalettes?: IColorPalette[];
 }
 
 
@@ -48,7 +48,7 @@ export interface IColor {
 }
 
 
-export interface IColorPallete {
+export interface IColorPalette {
 	name: string;
 	symbol: symbol;
 	colors: IColor[];

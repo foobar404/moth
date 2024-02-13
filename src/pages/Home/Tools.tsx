@@ -5,7 +5,7 @@ import { BsBucketFill } from "react-icons/bs";
 import { GiMirrorMirror } from "react-icons/gi";
 import { IoBandageSharp } from "react-icons/io5";
 import React, { useEffect, useState } from 'react';
-import { useShortcuts, useCanvas } from '../../utils';
+import { useShortcuts, useCanvas, useGlobalStore } from '../../utils';
 import { ITool, IToolSettings, ILayer } from '../../types';
 import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
 import { FaEyeDropper, FaBrush, FaTools, FaBox, FaLightbulb, FaShapes } from "react-icons/fa";
@@ -13,16 +13,8 @@ import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } fro
 import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
 
 
-interface IProps {
-    activeLayer: ILayer;
-    toolSettings: IToolSettings;
-    setActiveLayer: (layer: ILayer) => void;
-    setToolSettings: (toolSettings: any) => void;
-}
-
-
-export function Tools(props: IProps) {
-    const data = useTools(props);
+export function Tools() {
+    const data = useTools();
 
     return (<>
         <nav className="flex items-center mb-2">
@@ -169,104 +161,105 @@ export function Tools(props: IProps) {
 }
 
 
-function useTools(props: IProps) {
+function useTools() {
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
+    const { setActiveLayer, activeLayer, toolSettings, setToolSettings } = useGlobalStore();
     let [view, setView] = useState<'tools' | 'actions'>("tools");
     let actions = {
         "clear": () => {
             if (!window.confirm("Are you sure you want to clear the current layer?")) return;
 
-            props.setActiveLayer({
-                ...props.activeLayer,
-                image: new ImageData(props.activeLayer.image.width, props.activeLayer.image.height)
+            setActiveLayer({
+                ...activeLayer,
+                image: new ImageData(activeLayer.image.width, activeLayer.image.height)
             });
         },
         "flipHorizontal": () => {
-            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
-            canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas1.resize(activeLayer.image.width, activeLayer.image.height);
+            canvas2.resize(activeLayer.image.width, activeLayer.image.height);
 
-            canvas1.putImageData(props.activeLayer.image);
-            canvas2.ctx.translate(0, canvas2.height);
-            canvas2.ctx.scale(1, -1);
-            canvas2.drawImage(canvas1.canvas);
+            canvas1.putImageData(activeLayer.image);
+            canvas2.getCtx().translate(0, canvas2.getHeight());
+            canvas2.getCtx().scale(1, -1);
+            canvas2.drawImage(canvas1.getElement());
 
-            props.setActiveLayer({
-                ...props.activeLayer,
+            setActiveLayer({
+                ...activeLayer,
                 image: canvas2.getImageData()
             });
         },
         "flipVertical": () => {
-            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
-            canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas1.resize(activeLayer.image.width, activeLayer.image.height);
+            canvas2.resize(activeLayer.image.width, activeLayer.image.height);
 
-            canvas1.putImageData(props.activeLayer.image, 0, 0);
-            canvas2.ctx.translate(canvas2.width, 0);
-            canvas2.ctx.scale(-1, 1);
-            canvas2.drawImage(canvas1.canvas, 0, 0);
+            canvas1.putImageData(activeLayer.image, 0, 0);
+            canvas2.getCtx().translate(canvas2.getWidth(), 0);
+            canvas2.getCtx().scale(-1, 1);
+            canvas2.drawImage(canvas1.getElement(), 0, 0);
 
-            props.setActiveLayer({
-                ...props.activeLayer,
+            setActiveLayer({
+                ...activeLayer,
                 image: canvas2.getImageData()
             });
         },
         "rotateRight": () => {
-            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
-            canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas1.resize(activeLayer.image.width, activeLayer.image.height);
+            canvas2.resize(activeLayer.image.width, activeLayer.image.height);
 
-            canvas1.putImageData(props.activeLayer.image);
-            canvas2.ctx.translate(canvas2.width / 2, canvas2.height / 2);
-            canvas2.ctx.rotate(90 * Math.PI / 180);
-            canvas2.ctx.translate(-canvas2.width / 2, -canvas2.height / 2);
-            canvas2.drawImage(canvas1.canvas, 0, 0);
+            canvas1.putImageData(activeLayer.image);
+            canvas2.getCtx().translate(canvas2.getWidth() / 2, canvas2.getHeight() / 2);
+            canvas2.getCtx().rotate(90 * Math.PI / 180);
+            canvas2.getCtx().translate(-canvas2.getWidth() / 2, -canvas2.getHeight() / 2);
+            canvas2.drawImage(canvas1.getElement(), 0, 0);
 
-            props.setActiveLayer({
-                ...props.activeLayer,
+            setActiveLayer({
+                ...activeLayer,
                 image: canvas2.getImageData()
             });
         },
         "rotateLeft": () => {
-            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
-            canvas2.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas1.resize(activeLayer.image.width, activeLayer.image.height);
+            canvas2.resize(activeLayer.image.width, activeLayer.image.height);
 
-            canvas1.putImageData(props.activeLayer.image, 0, 0);
-            canvas2.ctx.translate(canvas2.width / 2, canvas2.height / 2);
-            canvas2.ctx.rotate(-90 * Math.PI / 180);
-            canvas2.ctx.translate(-canvas2.width / 2, -canvas2.height / 2);
-            canvas2.drawImage(canvas1.canvas);
+            canvas1.putImageData(activeLayer.image, 0, 0);
+            canvas2.getCtx().translate(canvas2.getWidth() / 2, canvas2.getHeight() / 2);
+            canvas2.getCtx().rotate(-90 * Math.PI / 180);
+            canvas2.getCtx().translate(-canvas2.getWidth() / 2, -canvas2.getHeight() / 2);
+            canvas2.drawImage(canvas1.getElement());
 
-            props.setActiveLayer({
-                ...props.activeLayer,
+            setActiveLayer({
+                ...activeLayer,
                 image: canvas2.getImageData()
             });
         },
         "centerHorizontal": () => {
-            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas1.resize(activeLayer.image.width, activeLayer.image.height);
 
-            const imageData = props.activeLayer.image;
+            const imageData = activeLayer.image;
             const bounds = findVisibleBounds(imageData);
             const visibleWidth = bounds.maxX - bounds.minX + 1;
-            const dx = (canvas2.width - visibleWidth) / 2 - bounds.minX;
+            const dx = (canvas2.getWidth() - visibleWidth) / 2 - bounds.minX;
 
-            canvas1.ctx.putImageData(imageData, dx, 0);
+            canvas1.getCtx().putImageData(imageData, dx, 0);
 
-            props.setActiveLayer({
-                ...props.activeLayer,
+            setActiveLayer({
+                ...activeLayer,
                 image: canvas1.getImageData()
             });
         },
         "centerVertical": () => {
-            canvas1.resize(props.activeLayer.image.width, props.activeLayer.image.height);
+            canvas1.resize(activeLayer.image.width, activeLayer.image.height);
 
-            const imageData = props.activeLayer.image;
+            const imageData = activeLayer.image;
             const bounds = findVisibleBounds(imageData);
             const visibleHeight = bounds.maxY - bounds.minY + 1;
-            const dy = (canvas1.height - visibleHeight) / 2 - bounds.minY;
+            const dy = (canvas1.getHeight() - visibleHeight) / 2 - bounds.minY;
 
-            canvas1.ctx.putImageData(imageData, 0, dy);
+            canvas1.getCtx().putImageData(imageData, 0, dy);
 
-            props.setActiveLayer({
-                ...props.activeLayer,
+            setActiveLayer({
+                ...activeLayer,
                 image: canvas1.getImageData()
             });
         },
@@ -321,17 +314,17 @@ function useTools(props: IProps) {
 
     function getButtonStyles(tool: ITool) {
         let classes = "";
-        if (props.toolSettings.leftTool === tool) classes += " --active-second";
-        else if (props.toolSettings.rightTool === tool) classes += " --active-third";
-        else if (props.toolSettings.middleTool === tool) classes += " --active-gray";
+        if (toolSettings.leftTool === tool) classes += " --active-second";
+        else if (toolSettings.rightTool === tool) classes += " --active-third";
+        else if (toolSettings.middleTool === tool) classes += " --active-gray";
         return classes;
     }
 
     function getButtonTooltip(tool: ITool) {
         let tooltip = "";
-        if (props.toolSettings.leftTool === tool) tooltip += "( left 🖱️ )";
-        else if (props.toolSettings.rightTool === tool) tooltip += "( right 🖱️ )";
-        else if (props.toolSettings.middleTool === tool) tooltip += "( middle 🖱️ )";
+        if (toolSettings.leftTool === tool) tooltip += "( left 🖱️ )";
+        else if (toolSettings.rightTool === tool) tooltip += "( right 🖱️ )";
+        else if (toolSettings.middleTool === tool) tooltip += "( middle 🖱️ )";
         return tooltip;
     }
 
@@ -339,11 +332,11 @@ function useTools(props: IProps) {
         let rightOrLeft = e ? e.button : mouseButton;
 
         if (rightOrLeft === 0)
-            props.setToolSettings((s: IToolSettings) => ({ ...s, leftTool: tool }));
+            setToolSettings({ ...toolSettings, leftTool: tool });
         else if (rightOrLeft == 1)
-            props.setToolSettings((s: IToolSettings) => ({ ...s, middleTool: tool }));
+            setToolSettings({ ...toolSettings, middleTool: tool });
         else if (rightOrLeft == 2)
-            props.setToolSettings((s: IToolSettings) => ({ ...s, rightTool: tool }));
+            setToolSettings({ ...toolSettings, rightTool: tool });
     }
 
     return {

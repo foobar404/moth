@@ -1,24 +1,14 @@
 import { Preview } from './Preview';
-import { IoPlay, IoStop, IoCopy } from "react-icons/io5";
+import { useCanvas, useGlobalStore } from '../../utils';
+import { IoCopy } from "react-icons/io5";
+import { IFrame, IPreview } from '../../types';
 import React, { useState, useEffect, useReducer } from 'react';
-import { ICanvas, ILayer, IFrame, IPreview } from '../../types';
-import { initReducerState, reducer, useCanvas } from '../../utils';
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
 
 
-interface IProps {
-    frames: IFrame[];
-    activeFrame: IFrame;
-    activeLayer: ILayer;
-    setFrames: React.Dispatch<React.SetStateAction<IFrame[]>>;
-    setActiveFrame: (frame: IFrame, frames?: IFrame[]) => void;
-    setActiveLayer: (layer: ILayer, frame?: IFrame, frames?: IFrame[]) => void;
-}
-
-
-export function Frames(props: IProps) {
-    const data = useLayers(props);
+export function Frames() {
+    const data = useLayers();
 
     return (<section className="p-app__frames p-app__block">
         <section>
@@ -60,7 +50,7 @@ export function Frames(props: IProps) {
                 <section className="p-app__frame-controls-section flex items-center">
                     {/* <label data-tip="FPS" data-for="tooltip">
                         <input type="number"
-                            value={props.preview.fps}
+                            value={preview.fps}
                             className="c-input --xs mr-2"
                             onChange={e => data.setFps(Number(e.target.value))} />
                     </label>
@@ -87,51 +77,50 @@ export function Frames(props: IProps) {
             </nav>
 
             <section className="p-app__frames-container">
-                {props.frames.map((frame, i) => (
+                {data.frames.map((frame, i) => (
                     <img key={i}
-                        className={`p-app__frame ${frame.symbol === props.activeFrame.symbol ? "--active" : ""}`}
+                        className={`p-app__frame ${frame.symbol === data.activeFrame.symbol ? "--active" : ""}`}
                         src={data.imageMap[frame.symbol]}
                         onClick={() => {
-                            props.setActiveFrame(frame);
-                            props.setActiveLayer(frame.layers[0], frame);
+                            data.setActiveFrame(frame);
+                            data.setActiveLayer(frame.layers[0]);
                         }} />
                 ))}
             </section>
         </section>
 
-        <Preview frames={props.frames}
-            preview={data.preview} />
+        <Preview preview={data.preview} />
     </section>)
 }
 
-function useLayers(props: IProps) {
+function useLayers() {
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
+    const { frames, setFrames, activeFrame, setActiveFrame, setActiveLayer, canvasSize} = useGlobalStore();
     let [playing, setPlaying] = useState(false);
     let [onionSkin, setOnionSkin] = useState(false);
     let [imageMap, setImageMap] = useState<any>({});
-    let [global, setGlobal] = useReducer(reducer, initReducerState);
-    let [preview, setPreview] = useState<IPreview>({  fps: 24 });
+    let [preview, setPreview] = useState<IPreview>({ fps: 24 });
 
     useEffect(() => {
         let map: { [s: symbol]: string } = {};
-        props.frames.forEach(frame => {
+        frames.forEach(frame => {
             map[frame.symbol] = getImage(frame);
         });
 
         setImageMap(map);
-    }, [props.activeFrame]);
+    }, [activeFrame]);
 
     function getImage(frame?: IFrame) {
         if (!frame) return "";
 
-        canvas1.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
-        canvas2.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
+        canvas1.resize(canvasSize.width, canvasSize.height);
+        canvas2.resize(canvasSize.width, canvasSize.height);
 
         let reversedLayers = frame.layers.slice(0).reverse();
         reversedLayers.forEach(layer => {
             canvas1.putImageData(layer.image);
-            canvas2!.drawImage(canvas1.canvas);
+            canvas2!.drawImage(canvas1.getElement());
         });
 
         return canvas2.toDataURL();
@@ -139,29 +128,29 @@ function useLayers(props: IProps) {
 
     function addFrame() {
         let newFrame: IFrame = {
-            layers: [{ image: new ImageData(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
+            layers: [{ image: new ImageData(canvasSize.width, canvasSize.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
             symbol: Symbol()
         };
 
-        props.setActiveFrame(newFrame);
+        setActiveFrame(newFrame);
     }
 
     function deleteFrame() {
         if (!window.confirm("Are you sure you want to delete this frame?")) return;
 
-        let newFrames = props.frames.filter(frame => frame.symbol !== props.activeFrame.symbol);
+        let newFrames = frames.filter(frame => frame.symbol !== activeFrame.symbol);
         if (newFrames.length === 0) {
             newFrames.push({
-                layers: [{ image: new ImageData(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
-                symbol: Symbol()
-            })
+                layers: [{ image: new ImageData(canvasSize.width, canvasSize.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
+                symbol: Symbol(),
+            });
         }
-        props.setActiveLayer(newFrames[0].layers[0], newFrames[0], newFrames);
+        setActiveLayer(newFrames[0].layers[0]);
     }
 
     function duplicateFrame() {
         let newFrame: IFrame = {
-            layers: props.activeFrame.layers.map(layer => {
+            layers: activeFrame.layers.map(layer => {
                 return {
                     symbol: Symbol(),
                     name: layer.name,
@@ -172,42 +161,46 @@ function useLayers(props: IProps) {
             symbol: Symbol()
         };
 
-        props.setActiveFrame(newFrame);
-        props.setActiveLayer(newFrame.layers[0], newFrame);
+        setActiveFrame(newFrame);
+        setActiveLayer(newFrame.layers[0]);
     }
 
     function moveFrameLeft() {
-        let index = props.frames.findIndex(frame => frame.symbol === props.activeFrame.symbol);
+        let index = frames.findIndex(frame => frame.symbol === activeFrame.symbol);
         if (index === 0) return;
 
-        let newFrames = [...props.frames];
+        let newFrames = [...frames];
         newFrames[index] = newFrames[index - 1];
-        newFrames[index - 1] = props.activeFrame;
-        props.setFrames(newFrames);
+        newFrames[index - 1] = activeFrame;
+        setFrames(newFrames);
     }
 
     function moveFrameRight() {
-        let index = props.frames.findIndex(frame => frame.symbol === props.activeFrame.symbol);
-        if (index === props.frames.length - 1) return;
+        let index = frames.findIndex(frame => frame.symbol === activeFrame.symbol);
+        if (index === frames.length - 1) return;
 
-        let newFrames = [...props.frames];
+        let newFrames = [...frames];
         newFrames[index] = newFrames[index + 1];
-        newFrames[index + 1] = props.activeFrame;
-        props.setFrames(newFrames);
+        newFrames[index + 1] = activeFrame;
+        setFrames(newFrames);
     }
 
     return {
+        frames,
         preview,
         playing,
         imageMap,
         onionSkin,
-        setPlaying,
+        activeFrame,
         addFrame,
+        setPlaying,
         deleteFrame,
         setOnionSkin,
         moveFrameLeft,
         moveFrameRight,
         duplicateFrame,
+        setActiveFrame,
+        setActiveLayer,
     }
 }
 

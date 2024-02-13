@@ -1,10 +1,9 @@
-import { useEffect, useReducer } from 'react';
-import React, { useRef, useState } from 'react';
-import { IFrame, ICanvas, IPreview } from '../../types';
+import React, { useRef } from 'react';
+import { IPreview } from '../../types';
+import { useGlobalStore } from '../../utils';
 
 
 interface IProps {
-    frames: IFrame[];
     preview: IPreview;
 }
 
@@ -15,21 +14,18 @@ export function Preview(props: IProps) {
     return (
         <canvas ref={data.canvasRef}
             className="p-app__preview"
-            height={global["Canvas.mainCanvas"]?.height}
-            width={global["Canvas.mainCanvas"]?.width}></canvas>
+            height={data.canvasSize?.height}
+            width={data.canvasSize?.width}></canvas>
     )
 }
 
 
 function usePreview(props: IProps) {
+    const { canvasSize } = useGlobalStore();
     let canvasRef = useRef<HTMLCanvasElement>(null);
 
-
     // function play() {
-    //     if (!props.preview.ctx) return;
-    //     if (!global["Canvas.mainCanvas"]) return;
-
-    //     canvas2.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
+    //     canvas2.resize(canvasSize.width, canvasSize.height);
 
     //     let i = 0;
     //     let previewElm = document.querySelector(".p-app__preview");
@@ -40,7 +36,7 @@ function usePreview(props: IProps) {
     //         if (i >= props.frames.length) i = 0;
 
     //         let frame = props.frames[i];
-    //         props.preview.ctx!.clearRect(0, 0, global["Canvas.mainCanvas"].width ?? 0, global["Canvas.mainCanvas"].height ?? 0);
+    //         props.preview.ctx!.clearRect(0, 0, canvasSize.width ?? 0, canvasSize.height ?? 0);
     //         let reversedLayers = frame.layers.slice().reverse();
     //         reversedLayers.forEach(layer => {
     //             tempCtx!.putImageData(layer.image, 0, 0);
@@ -69,7 +65,7 @@ function usePreview(props: IProps) {
     // }
 
     return {
-        global,
         canvasRef,
+        canvasSize,
     }
 }

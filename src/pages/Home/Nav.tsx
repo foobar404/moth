@@ -1,5 +1,6 @@
 import { Base64 } from 'js-base64';
 import pngText from "png-chunk-text";
+import { IProject } from '../../types';
 import { HiStar } from "react-icons/hi";
 import { ImCross } from "react-icons/im";
 import { Modal } from "../../components";
@@ -7,10 +8,9 @@ import pngEncode from "png-chunks-encode";
 import pngExtract from "png-chunks-extract";
 import { Buffer as pngBuffer } from "buffer";
 import { MdMovieFilter } from "react-icons/md";
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useCanvas, useModal, useGlobalStore } from '../../utils';
 import { IoImage, IoLayers, IoColorPalette } from "react-icons/io5";
-import { initReducerState, reducer, useCanvas, useModal } from '../../utils';
-import { useGlobalStore } from '../../utils/useGlobalStore';
 
 
 interface IProps {
@@ -124,7 +124,7 @@ export function Nav(props: IProps) {
                 </button>
 
                 <section className="flex items-center">
-                    {data.projectList.filter(p => p !== props.project.name).reverse().map((project) => (
+                    {data.projectList.filter(p => p !== data.projectName).reverse().map((project) => (
                         <span key={project} className="c-token" onClick={() => props.loadProject(project)}>
                             {project}
 
@@ -150,7 +150,10 @@ function useNav(props: IProps) {
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const canvas3 = useCanvas();
-    const { projectName, setProjectName, frames } = useGlobalStore();
+    const {
+        projectName, setProjectName, frames, activeFrame,
+        activeLayer, canvasSize, colorPalettes
+    } = useGlobalStore();
     let [projectList, setProjectList] = useState<string[]>([]);
 
     useEffect(() => {
@@ -193,11 +196,20 @@ function useNav(props: IProps) {
     // 		frames: frames,
     // 		colorPalettes: colorPalettes,
     // 		canvas: {
-    // 			width: global["Canvas.mainCanvas"].width,
-    // 			height: global["Canvas.mainCanvas"].height
+    // 			width: canvasSize.width,
+    // 			height: canvasSize.height
     // 		}
     // 	}
     // }
+
+    function getProject(): IProject {
+        return {
+            name: projectName,
+            frames: frames,
+            colorPalettes: colorPalettes,
+            canvas: canvasSize
+        };
+    }
 
     function saveProjectName(name) {
         let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
@@ -251,29 +263,29 @@ function useNav(props: IProps) {
     }
 
     function exportProject(settings?: IExportSettings) {
-        let height = global["Canvas.mainCanvas"].height;
+        let height = canvasSize.height;
         let width = (settings?.frameOnly || settings?.layerOnly) ?
-            global["Canvas.mainCanvas"].width :
-            global["Canvas.mainCanvas"].width * frames.length;
+            canvasSize.width :
+            canvasSize.width * frames.length;
         canvas1.resize(width, height);
 
         let newFrames = (settings?.frameOnly || settings?.layerOnly) ?
-            [props.activeFrame] : props.frames;
+            [activeFrame] : frames;
 
         newFrames.forEach((frame, i) => {
-            canvas2.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
+            canvas2.resize(canvasSize.width, canvasSize.height);
 
             let layersRevered = frame.layers.slice().reverse();
-            let layers = (settings?.layerOnly) ? [props.activeLayer] : layersRevered;
+            let layers = (settings?.layerOnly) ? [activeLayer] : layersRevered;
 
             layers.forEach(layer => {
-                canvas3.resize(global["Canvas.mainCanvas"].width, global["Canvas.mainCanvas"].height);
+                canvas3.resize(canvasSize.width, canvasSize.height);
 
                 canvas3.putImageData(layer.image);
-                canvas2.drawImage(canvas3.canvas);
+                canvas2.drawImage(canvas3.getElement());
             });
 
-            canvas1.drawImage(canvas2.canvas, (i * global["Canvas.mainCanvas"].width), 0);
+            canvas1.drawImage(canvas2.getElement(), (i * canvasSize.width), 0);
         });
 
         // get current project as png
@@ -284,7 +296,7 @@ function useNav(props: IProps) {
         let chunks = pngExtract(data);
 
         // add meta data to png
-        let project = props.getProject();
+        let project = getProject();
         chunks.splice(-1, 0, pngText.encode('moth', Base64.encode(JSON.stringify(project))));
 
         // convert data to png
@@ -295,12 +307,11 @@ function useNav(props: IProps) {
         // download the image
         let anchor = document.createElement("a");
         anchor.href = url;
-        anchor.download = props.project.name;
+        anchor.download = projectName;
         anchor.click();
     }
 
     return {
-        name,
         modal,
         projectName,
         projectList,

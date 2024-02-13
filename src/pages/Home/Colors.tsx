@@ -1,38 +1,25 @@
 import ReactTooltip from 'react-tooltip';
+import { useGlobalStore } from '../../utils';
 import { BsTrophyFill } from "react-icons/bs";
 import { BiPlusMedical } from "react-icons/bi";
 import { HiColorSwatch } from "react-icons/hi";
 import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
+import { IColorPalette, IColor } from "../../types";
 import { IoImage, IoLayers } from "react-icons/io5";
 import { Popover, ColorPicker } from "../../components/";
 import { FaSortAlphaDown, FaFilter } from "react-icons/fa";
 import { MdDelete, MdAccessTimeFilled } from "react-icons/md";
-import { IColorPallete, IColor, IColorStats, IFrame, ILayer } from "../../types";
 
 
-interface IProps {
-    frames: IFrame[];
-    activeColor: IColor;
-    activeFrame: IFrame;
-    activeLayer: ILayer;
-    colorStats: IColorStats;
-    colorPalettes: IColorPallete[];
-    activeColorPallete: IColorPallete;
-    setActiveColor: (color: IColor) => void;
-    setColorPalettes: (colorPalettes: IColorPallete[] | any) => void;
-    setActiveColorPallete: (colorPallete: IColorPallete | any, colorPalettesOverride?: IColorPallete[]) => void;
-}
-
-
-export function Colors(props: IProps) {
-    const data = useColors(props);
+export function Colors() {
+    const data = useColors();
 
     return (
         <section>
             <ColorPicker
-                onChange={(color: IColor) => props.setActiveColor({ r: color.r, g: color.g, b: color.b, a: Math.ceil(color.a * 255) })}
-                color={{ r: props.activeColor.r, g: props.activeColor.g, b: props.activeColor.b, a: Number((props.activeColor.a / 255).toFixed(4)) }} />
+                onChange={(color: IColor) => data.setActiveColor({ r: color.r, g: color.g, b: color.b, a: Math.ceil(color.a * 255) })}
+                color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(4)) }} />
 
             <div className="mb-2"></div>
 
@@ -42,7 +29,7 @@ export function Colors(props: IProps) {
                     data-tip="color pallete name"
                     className="c-input --xs"
                     style={{ width: '58%' }}
-                    value={props.activeColorPallete.name}
+                    value={data.activeColorPalette.name}
                     onChange={e => data.updatePaletteName(e.currentTarget.value)} />
 
                 <select data-tip="color pallete selection"
@@ -51,7 +38,7 @@ export function Colors(props: IProps) {
                     onChange={(e) => data.setColorPalette(Number(e.target.value))}
                     style={{ width: "30px" }}>
 
-                    {props.colorPalettes.map((colorPallete, i) => (
+                    {data.colorPalettes.map((colorPallete, i) => (
                         <option key={i} value={i}>{colorPallete.name}</option>
                     ))}
                 </select>
@@ -146,8 +133,8 @@ export function Colors(props: IProps) {
                 {data.visibleColors.map((color: IColor, i) => (
                     <div data-tip={`rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`}
                         data-for="tooltip"
-                        className={`p-app__color c-color-card mb-1 mr-1 ${JSON.stringify(color) === JSON.stringify(props.activeColor) ? "--active" : ""}`}
-                        onClick={() => props.setActiveColor(color)}
+                        className={`p-app__color c-color-card mb-1 mr-1 ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "--active" : ""}`}
+                        onClick={() => data.setActiveColor(color)}
                         key={i}
                         style={{
                             background: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`
@@ -164,7 +151,7 @@ export function Colors(props: IProps) {
                     return (
                         <div key={index}
                             className="p-app__color-swatch-layer"
-                            onClick={() => props.setActiveColor(recentColor)}
+                            onClick={() => setActiveColor(recentColor)}
                             style={{
                                 background: `rgb(${recentColor.r}, ${recentColor.g}, ${recentColor.b})`
                             }}>
@@ -176,8 +163,14 @@ export function Colors(props: IProps) {
     )
 }
 
-function useColors(props: IProps) {
-    let [visibleColors, setVisibleColors] = useState<IColor[]>(props.activeColorPallete.colors);
+
+function useColors() {
+    const {
+        colorStats, colorPalettes, setColorPalettes, activeColorPalette,
+        setActiveColorPalette, activeColor, frames, activeFrame, activeLayer,
+        setActiveColor,
+    } = useGlobalStore();
+    let [visibleColors, setVisibleColors] = useState<IColor[]>(activeColorPalette.colors);
     let [colorState, setColorState] = useState<{ filter: "all" | "project" | "frame" | "layer", sort: "hue" | "recent" | "count" }>({
         filter: "all",
         sort: "recent"
@@ -185,7 +178,7 @@ function useColors(props: IProps) {
 
     useEffect(() => {
         ReactTooltip.rebuild();
-    }, [props.activeColorPallete]);
+    }, [activeColorPalette]);
 
     useEffect(() => {
         let colors = visibleColors
@@ -197,65 +190,65 @@ function useColors(props: IProps) {
         if (colorState.sort === "hue") sortColorsByHue(colors);
         if (colorState.sort === "recent") sortColorsByMostRecent(colors);
         if (colorState.sort === "count") sortColorsByMostUsed(colors);
-    }, [props.activeColorPallete, props.activeColor]);
+    }, [activeColorPalette, activeColor]);
 
     function deleteColor() {
         if (!window.confirm("Are you sure you want to delete this color?")) return;
 
-        let colors = props.activeColorPallete.colors.filter(c => JSON.stringify(c) !== JSON.stringify(props.activeColor));
-        props.activeColorPallete.colors = colors;
-        props.setActiveColorPallete({ ...props.activeColorPallete });
+        let colors = activeColorPalette.colors.filter(c => JSON.stringify(c) !== JSON.stringify(activeColor));
+        activeColorPalette.colors = colors;
+        setActiveColorPalette({ ...activeColorPalette });
     }
 
     function addColor() {
-        props.activeColorPallete.colors.push(props.activeColor);
-        props.setActiveColorPallete({ ...props.activeColorPallete });
+        activeColorPalette.colors.push(activeColor);
+        setActiveColorPalette({ ...activeColorPalette });
     }
 
     function updatePaletteName(name: string) {
-        let palette = props.colorPalettes.find(p => p.symbol === props.activeColorPallete.symbol);
+        let palette = colorPalettes.find(p => p.symbol === activeColorPalette.symbol);
         if (!palette) return;
 
         palette.name = name;
-        props.setColorPalettes([...props.colorPalettes]);
+        setColorPalettes([...colorPalettes]);
     }
 
     function addNewColorPalette() {
         let name = window.prompt("Enter a name for the new palette.");
         let newPalette = {
-            name: name,
+            name: name ?? "",
             colors: [{ r: 0, g: 0, b: 0, a: 255 }],
             symbol: Symbol()
         };
 
-        props.setColorPalettes((p: IColorPallete[]) => [...p, newPalette]);
-        props.setActiveColorPallete(newPalette);
+        setColorPalettes([...colorPalettes, newPalette]);
+        setActiveColorPalette(newPalette);
     }
 
     function deleteColorPalette() {
         if (!window.confirm("Are you sure you want to delete this color palette?")) return;
-        if (props.colorPalettes.length <= 1) return;
+        if (colorPalettes.length <= 1) return;
 
-        let colorPalettes = props.colorPalettes.filter(p => p.symbol !== props.activeColorPallete.symbol);
-        props.setColorPalettes(colorPalettes);
-        props.setActiveColorPallete(colorPalettes[0], colorPalettes);
+        let newColorPalettes = colorPalettes.filter(p => p.symbol !== activeColorPalette.symbol);
+        setColorPalettes(newColorPalettes);
+        setActiveColorPalette(newColorPalettes[0]);
     }
 
     function setColorPalette(colorPalleteIndex: number) {
-        props.setActiveColorPallete({ ...props.colorPalettes[colorPalleteIndex] });
+        setActiveColorPalette({ ...colorPalettes[colorPalleteIndex] });
     }
 
     function showColorsInPalette() {
-        setVisibleColors(props.activeColorPallete.colors);
+        setVisibleColors(activeColorPalette.colors);
         setColorState(s => ({ ...s, filter: "all" }));
 
-        return props.activeColorPallete.colors;
+        return activeColorPalette.colors;
     }
 
     function showColorsInProject() {
         let allColors: { [color: string]: boolean } = {};
 
-        props.frames.forEach(frame => {
+        frames.forEach(frame => {
             frame.layers.forEach(layer => {
                 for (let i = 0; i < layer.image.data.length; i += 4) {
                     let r = layer.image.data[i];
@@ -268,7 +261,7 @@ function useColors(props: IProps) {
             });
         });
 
-        let colors = props.activeColorPallete.colors.filter(color => {
+        let colors = activeColorPalette.colors.filter(color => {
             let colorString = `${color.r},${color.g},${color.b},${color.a}`;
             return allColors[colorString];
         });
@@ -282,7 +275,7 @@ function useColors(props: IProps) {
     function showColorsInFrame() {
         let allColors: { [color: string]: boolean } = {};
 
-        props.activeFrame.layers.forEach(layer => {
+        activeFrame.layers.forEach(layer => {
             for (let i = 0; i < layer.image.data.length; i += 4) {
                 let r = layer.image.data[i];
                 let g = layer.image.data[i + 1];
@@ -293,7 +286,7 @@ function useColors(props: IProps) {
             }
         });
 
-        let colors = props.activeColorPallete.colors.filter(color => {
+        let colors = activeColorPalette.colors.filter(color => {
             let colorString = `${color.r},${color.g},${color.b},${color.a}`;
             return allColors[colorString];
         });
@@ -307,16 +300,16 @@ function useColors(props: IProps) {
     function showColorsInLayer() {
         let allColors: { [color: string]: boolean } = {};
 
-        for (let i = 0; i < props.activeLayer.image.data.length; i += 4) {
-            let r = props.activeLayer.image.data[i];
-            let g = props.activeLayer.image.data[i + 1];
-            let b = props.activeLayer.image.data[i + 2];
-            let a = props.activeLayer.image.data[i + 3];
+        for (let i = 0; i < activeLayer.image.data.length; i += 4) {
+            let r = activeLayer.image.data[i];
+            let g = activeLayer.image.data[i + 1];
+            let b = activeLayer.image.data[i + 2];
+            let a = activeLayer.image.data[i + 3];
             let colorString = `${r},${g},${b},${a}`;
             allColors[colorString] = true;
         }
 
-        let colors = props.activeColorPallete.colors.filter(color => {
+        let colors = activeColorPalette.colors.filter(color => {
             let colorString = `${color.r},${color.g},${color.b},${color.a}`;
             return allColors[colorString];
         });
@@ -332,7 +325,7 @@ function useColors(props: IProps) {
             let colorString = `${a.r},${a.g},${a.b},${a.a}`;
             let colorString2 = `${b.r},${b.g},${b.b},${b.a}`;
 
-            return (props.colorStats[colorString2]?.count ?? 0) - (props.colorStats[colorString]?.count ?? 0);
+            return (colorStats[colorString2]?.count ?? 0) - (colorStats[colorString]?.count ?? 0);
         });
 
         setVisibleColors(colors);
@@ -346,10 +339,10 @@ function useColors(props: IProps) {
             let colorString = `${a.r},${a.g},${a.b},${a.a}`;
             let colorString2: string = `${b.r},${b.g},${b.b},${b.a}`;
 
-            if (props.colorStats[colorString2]?.lastUsed && !props.colorStats[colorString]?.lastUsed) return 1;
-            if (!props.colorStats[colorString2]?.lastUsed && props.colorStats[colorString]?.lastUsed) return -1;
+            if (colorStats[colorString2]?.lastUsed && !colorStats[colorString]?.lastUsed) return 1;
+            if (!colorStats[colorString2]?.lastUsed && colorStats[colorString]?.lastUsed) return -1;
 
-            return (props.colorStats[colorString2]?.lastUsed ?? colorString2) > (props.colorStats[colorString]?.lastUsed ?? colorString) ? 1 : -1;
+            return (colorStats[colorString2]?.lastUsed ?? colorString2) > (colorStats[colorString]?.lastUsed ?? colorString) ? 1 : -1;
         });
 
         setVisibleColors(colors);
@@ -393,6 +386,11 @@ function useColors(props: IProps) {
     };
 
     return {
+        activeColor,
+        setActiveColor,
+        colorPalettes,
+        activeColorPalette,
+        setActiveColorPalette,
         addColor,
         colorState,
         deleteColor,
