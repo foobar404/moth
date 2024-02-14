@@ -8,8 +8,8 @@ interface IProps {
 
 
 export function useCanvas(props?: IProps) {
-    let { current: canvas } = useRef<HTMLCanvasElement>(makeCanvas());
-    let { current: ctx } = useRef<CanvasRenderingContext2D>(canvas.getContext('2d')!);
+    let canvas = useRef<HTMLCanvasElement>(makeCanvas());
+    let { current: ctx } = useRef<CanvasRenderingContext2D>(canvas.current.getContext('2d')!);
 
     function makeCanvas() {
         let canvas = document.createElement('canvas');
@@ -20,60 +20,66 @@ export function useCanvas(props?: IProps) {
     }
 
     function getHeight() {
-        return canvas.height;
+        return canvas.current.height;
     }
 
     function getWidth() {
-        return canvas.width;
+        return canvas.current.width;
     }
 
     function getSize(asArray = false) {
-        if (asArray) return [canvas.width, canvas.height];
-        else return { width: canvas.width, height: canvas.height };
+        if (asArray) return [canvas.current.width, canvas.current.height];
+        else return { width: canvas.current.width, height: canvas.current.height };
     }
 
     function getElement() {
-        return canvas;
+        return canvas.current;
     }
 
     function getCtx() {
         return ctx;
     }
 
-    function clear(x = 0, y = 0, w = canvas.width, h = canvas.height) {
+    function clear(x = 0, y = 0, w = canvas.current.width, h = canvas.current.height) {
         ctx.clearRect(x, y, w, h);
     }
 
     function toDataURL() {
-        return canvas.toDataURL("image/png");
+        return canvas.current.toDataURL("image/png");
     }
 
     function resize(width, height) {
-        canvas.width = width;
-        canvas.height = height;
+        canvas.current.width = width;
+        canvas.current.height = height;
     }
 
     function putImageData(imageData, x = 0, y = 0) {
         ctx.putImageData(imageData, x, y);
     }
 
-    function drawImage(source, dx = 0, dy = 0, dWidth = canvas.width, dHeight = canvas.height) {
+    function drawImage(source, dx = 0, dy = 0, dWidth = canvas.current.width, dHeight = canvas.current.height) {
         ctx.drawImage(source, dx, dy, dWidth, dHeight);
     }
 
-    function getImageData(x = 0, y = 0, width = canvas.width, height = canvas.height) {
+    function getImageData(x = 0, y = 0, width = canvas.current.width, height = canvas.current.height) {
         return ctx.getImageData(x, y, width, height);
     }
 
     function drawGrid(color1 = "#fff", color2 = "#ddd", size = 1) {
-        let rows = canvas.height;
-        let cols = canvas.width;
+        let rows = Math.floor(canvas.current.height / size);
+        let cols = Math.floor(canvas.current.width / size);
 
+        ctx.fillStyle = color1;
         for (let y = 0; y < rows; y++) {
-            for (let x = 0; x < cols; x++) {
-                let color = (y + x) % 2 === 0 ? color1 : color2;
-                ctx.fillStyle = color;
-                ctx.fillRect(x, y, size, size);
+            for (let x = (y % 2); x < cols; x += 2) { // Adjust starting index based on row number
+                ctx.fillRect(x * size, y * size, size, size);
+            }
+        }
+
+        ctx.fillStyle = color2;
+        for (let y = 0; y < rows; y++) {
+            for (let x = (y % 2 === 0 ? 1 : 0); x < cols; x += 2) { // Adjust starting index based on row number
+                ctx.fillRect(x * size, y * size, size, size);
             }
         }
     }
@@ -124,61 +130,68 @@ export function useCanvas(props?: IProps) {
         }
     };
 
-    function drawPixel(x, y, color) {
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, 1, 1);
+    function drawPixel(x, y, size = 1, color?) {
+        if (color) {
+            let { r, b, g, a } = color;
+            ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+        }
+        ctx.fillRect(x, y, size, size);
     }
 
-    function erasePixel(x, y) {
-        ctx.clearRect(x, y, 1, 1);
+    function erasePixel(x, y, size = 1) {
+        ctx.fillStyle = "rgba(0, 0, 0, .004)";
+        ctx.fillRect(x, y, size, size);
     }
 
-    // function floodFill(
-    //     x: number,
-    //     y: number,
-    //     callback: (x: number, y: number) => void,
-    //     tolerance: number = 0,
-    //     scannedCoords?: {
-    //         [key: string]: boolean
-    //     }
-    // ) {
-    //     if (!prevColor) prevColor = {
-    //         r: image.data[(((y * image.width) + x) * 4)],
-    //         g: image.data[(((y * image.width) + x) * 4) + 1],
-    //         b: image.data[(((y * image.width) + x) * 4) + 2],
-    //         a: image.data[(((y * image.width) + x) * 4) + 3]
-    //     };
-    //     if (!scannedCoords) scannedCoords = {};
-    //     if (scannedCoords[`${x},${y}`]) return;
-    //     if (x < 0) return;
-    //     if (y < 0) return;
-    //     if (x >= canvas.width) return;
-    //     if (y >= canvas.height) return;
+    function floodFill(
+        startX,
+        startY,
+        callback: ((x: number, y: number) => void) | null = null,
+        tolerance = 0
+    ) {
+        const startColor = getColorAtPixel(startX, startY);
+        let pointsToCheck: [number, number][] = [[startX, startY]];
+        let matchingPoints: [number, number][] = [];
+        let checkedPoints = new Set();
 
-    //     scannedCoords[`${x},${y}`] = true;
+        while (pointsToCheck.length > 0) {
+            let [x, y] = pointsToCheck.pop()!;
+            if (!isValidPoint(x, y) || checkedPoints.has(`${x},${y}`) || !colorMatches(x, y, startColor, tolerance)) {
+                continue;
+            }
 
-    //     let current = {
-    //         r: image.data[(((y * image.width) + x) * 4)],
-    //         g: image.data[(((y * image.width) + x) * 4) + 1],
-    //         b: image.data[(((y * image.width) + x) * 4) + 2],
-    //         a: image.data[(((y * image.width) + x) * 4) + 3]
-    //     }
+            matchingPoints.push([x, y]);
+            checkedPoints.add(`${x},${y}`);
 
-    //     let colorsAreTheSame = current.r == prevColor.r && current.g == prevColor.g && current.b == prevColor.b && current.a == prevColor.a;
-    //     if (!colorsAreTheSame) return;
+            if (callback) {
+                callback(x, y);
+            }
 
-    //     canvas1.getCtx().fillStyle = `rgba(${newColor.r},${newColor.g},${newColor.b},${newColor.a / 255})`;
-    //     canvas1.getCtx().fillRect(x, y, 1, 1);
+            // Add neighboring points to check
+            pointsToCheck.push([x + 1, y]);
+            pointsToCheck.push([x - 1, y]);
+            pointsToCheck.push([x, y + 1]);
+            pointsToCheck.push([x, y - 1]);
+        }
 
-    //     floodFill(image, x - 1, y, newColor, current, scannedCoords);
-    //     floodFill(image, x + 1, y, newColor, current, scannedCoords);
-    //     floodFill(image, x, y - 1, newColor, current, scannedCoords);    
-    //     floodFill(image, x, y + 1, newColor, current, scannedCoords);
-    // }
+        return matchingPoints;
+
+        function isValidPoint(x, y) {
+            return x >= 0 && y >= 0 && x < canvas.current.width && y < canvas.current.height;
+        }
+
+        function colorMatches(x, y, targetColor, tolerance) {
+            const pixelColor = getColorAtPixel(x, y);
+            return pixelColor.every((value, index) => Math.abs(value - targetColor[index]) <= tolerance);
+        }
+
+        function getColorAtPixel(x, y) {
+            const imageData = ctx.getImageData(x, y, 1, 1).data;
+            return [imageData[0], imageData[1], imageData[2], imageData[3]]; // RGBA
+        }
+    }
 
     return {
-        // ctx,
-        // canvas,
         getHeight,
         getWidth,
         getSize,
@@ -198,5 +211,6 @@ export function useCanvas(props?: IProps) {
         toDataURL,
         getImageData,
         putImageData,
+        floodFill,
     }
 }
