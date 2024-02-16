@@ -12,6 +12,11 @@ enum ToolStage {
 }
 
 
+enum MouseEvent {
+    MOUSE_DOWN, MOUSE_UP, MOUSE_MOVE
+}
+
+
 export function Canvas() {
     const data = useCanvas();
 
@@ -131,20 +136,19 @@ function useCanvas() {
 
     let mainCanvasZoom = useRef(15);
     let mouseState = useRef({
-        left: false,
-        right: false,
-        middle: false,
+        leftDown: false,
+        rightDown: false,
+        middleDown: false,
         x: 0,
         y: 0,
         movementX: 0,
         movementY: 0,
-        type: 'mousemove'
     });
     let toolState = useRef({
         stage: ToolStage.PREVIEW,
         activePoints: [] as { x: number; y: number; }[],
         selectionArea: {
-            imgData: null,
+            imgData: null as ImageData | null,
             bounderyPoints: [] as { x: number; y: number; }[],
             startPosition: { x: 0, y: 0 },
             currentPosition: { x: 0, y: 0 },
@@ -157,8 +161,8 @@ function useCanvas() {
         "]": () => setBrushSize(1),
     });
     let toolHandlers = {
-        "brush": (x, y) => {
-            if (mouseState.current.left || mouseState.current.right)
+        "brush": (x, y, toolButtonActive) => {
+            if (toolButtonActive)
                 toolState.current.stage = ToolStage.SAVE;
 
             // center the mouse cursor in the brush 
@@ -169,8 +173,8 @@ function useCanvas() {
 
             canvas1.drawPixel(newX, newY, stateCache.current.toolSettings.size);
         },
-        "eraser": (x, y) => {
-            if (mouseState.current.left || mouseState.current.right)
+        "eraser": (x, y, toolButtonActive) => {
+            if (toolButtonActive)
                 toolState.current.stage = ToolStage.SAVE;
 
             // center the mouse cursor in the brush 
@@ -181,8 +185,8 @@ function useCanvas() {
 
             canvas1.erasePixel(newX, newY, stateCache.current.toolSettings.size);
         },
-        "bucket": (x, y) => {
-            if (mouseState.current.left || mouseState.current.right)
+        "bucket": (x, y, toolButtonActive) => {
+            if (toolButtonActive)
                 toolState.current.stage = ToolStage.SAVE;
 
             canvas2.putImageData(activeLayer.image);
@@ -192,30 +196,28 @@ function useCanvas() {
                 canvas1.drawPixel(point[0], point[1]);
             });
         },
-        "line": (x, y) => {
-            console.log(mouseState.current.type);
-
-            if (mouseState.current.type === "mousedown") {
-                // Initialize the line with the start point
+        "line": (x, y, toolButtonActive) => {
+            // Check if we are previewing a new line or adjusting an existing line
+            if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
-            } else if (mouseState.current.type === "mousemove" || mouseState.current.type === "mouseup") {
-                // Calculate line points only if we have a start point
-                if (toolState.current.activePoints.length > 0) {
-                    const startPoint = toolState.current.activePoints[0];
+                toolState.current.stage = ToolStage.ADJUSTING;
+            } else if (toolState.current.stage === ToolStage.ADJUSTING) {
+                const activePoints = toolState.current.activePoints;
+                // Proceed only if there's a starting point
+                if (activePoints.length > 0) {
+                    const startPoint = activePoints[0];
                     const endPoint = { x: Math.floor(x), y: Math.floor(y) };
                     const points = calculateLinePoints(startPoint, endPoint);
 
-                    // Draw each point
-                    points.forEach(point => {
-                        //@ts-ignore
-                        canvas1.getCtx().fillRect(point.x, point.y, 1, 1); // Drawing 1x1 pixel
+                    // Draw each point using the lineThickness
+                    points.forEach((point: { x: number; y: number }) => {
+                        canvas1.drawPixel(point.x, point.y, stateCache.current.toolSettings.size);
                     });
 
-                    if (mouseState.current.type === "mouseup") {
-                        // Finalize the line drawing
+                    // If the tool is no longer active, finalize the drawing
+                    if (!toolButtonActive) {
                         toolState.current.stage = ToolStage.SAVE;
-                        toolState.current.activePoints = []; // Reset for the next line
-                        console.log("mouseup");
+                        toolState.current.activePoints = []; // Prepare for the next use
                     }
                 }
             }
@@ -245,14 +247,14 @@ function useCanvas() {
                 return points;
             }
         },
-        "mirror": (x, y) => {
+        "mirror": (x, y, toolButtonActive) => {
+            if (toolButtonActive)
+                toolState.current.stage = ToolStage.SAVE;
+
             const { size, mirror } = stateCache.current.toolSettings;
             const ctx = canvas1.getCtx();
             const mirrorX = mirror.x;
             const mirrorY = mirror.y;
-
-            if (mouseState.current.left || mouseState.current.right)
-                toolState.current.stage = ToolStage.SAVE;
 
             ctx.fillRect(x, y, size, size);
 
@@ -267,107 +269,112 @@ function useCanvas() {
                 ctx.fillRect(mainCanvas.getWidth() - x - size, mainCanvas.getHeight() - y - size, size, size);
 
         },
-        // "box": (x, y) => {
-        //     let point1 = activePoints[0] ?? { x, y };
-        //     let point2 = activePoints[1] ?? { x, y };
-        //     let lastPoint = activePoints[2] ?? { x, y };
-        //     let minY = Math.min(point1.y, point2.y);
-        //     let maxY = Math.max(point1.y, point2.y);
-        //     let minX = Math.min(point1.x, point2.x);
-        //     let maxX = Math.max(point1.x, point2.x);
-        //     let topLeftPoint = {
-        //         x: minX,
-        //         y: minY
-        //     };
-        //     let bottomRightPoint = {
-        //         x: maxX,
-        //         y: maxY
-        //     };
-        //     let height = selectionArea?.height ?? bottomRightPoint.y - topLeftPoint.y;
-        //     let width = selectionArea?.width ?? bottomRightPoint.x - topLeftPoint.x;
+        "move": (x, y, toolButtonActive) => {
+            if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                // Mark the starting position for the move
+                // toolState.current.selectionArea.startPosition = { x, y };
+                // toolState.current.selectionArea.currentPosition = { x, y };
+                toolState.current.stage = ToolStage.ADJUSTING;
 
-        //     if (!selectionArea) {
-        //         if (mouseState.type == "mouseup") {
-        //             let tempCanvas1 = document.createElement("canvas");
-        //             tempCanvas1.width = activeLayer.image.width;
-        //             tempCanvas1.height = activeLayer.image.height;
-        //             let tempCtx1 = tempCanvas1.getContext("2d")!;
-        //             tempCtx1.putImageData(activeLayer.image, 0, 0);
+                toolState.current.selectionArea.imgData = stateCache.current.activeLayer.image;
+            }
+            if (toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+                // Calculate the displacement
+                toolState.current.selectionArea.currentPosition.x += mouseState.current.movementX / mainCanvasZoom.current;
+                toolState.current.selectionArea.currentPosition.y += mouseState.current.movementY / mainCanvasZoom.current;
 
-        //             let newImage = tempCtx1.getImageData(topLeftPoint.x, topLeftPoint.y, width, height);
-        //             setSelectionArea(newImage);
-        //             setActivePoints([point1, point2]);
-        //         }
-        //         if (mouseState.type == "mousedown") setActivePoints([{ x, y }]);
-        //     }
+                // create a copy of  thats all black
+                // let { width, height } = toolState.current.selectionArea.imgData!;
+                // const blackImageData = new ImageData(width, height);
 
-        //     if (mouseState.type == "mousedown") {
-        //         let insideSelection = x >= lastPoint.x && x <= lastPoint.x + width && y >= lastPoint.y && y <= lastPoint.y + height;
+                // // Fill the new ImageData with black pixels
+                // for (let i = 0; i < blackImageData.data.length; i += 4) {
+                //     let r = toolState.current.selectionArea.imgData!.data[i];
+                //     let g = toolState.current.selectionArea.imgData!.data[i + 1];
+                //     let b = toolState.current.selectionArea.imgData!.data[i + 2];
+                //     let a = toolState.current.selectionArea.imgData!.data[i + 3];
 
-        //         if (!insideSelection) {
-        //             paintState.savePixels = true;
-        //             setSelectionArea(null);
-        //             setActivePoints([]);
+                //     // replace colored pixel with black
+                //     if (r != 0 || g != 0 || b != 0 || a > 1) {
+                //         blackImageData.data[i] = 100;
+                //         blackImageData.data[i + 1] = 100;
+                //         blackImageData.data[i + 2] = 100;
+                //         blackImageData.data[i + 3] = 255;
+                //     }
+                // }
+                // canvas1.putImageData(blackImageData, 0, 0);
+                canvas1.putImageData(
+                    toolState.current.selectionArea.imgData,
+                    toolState.current.selectionArea.currentPosition.x,
+                    toolState.current.selectionArea.currentPosition.y
+                );
+            }
+            if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+                // save and draw
 
-        //             if (toolSettings.leftTool == "box") setToolSettings((t) => ({ ...t, leftTool: "brush" }));
-        //             if (toolSettings.middleTool == "box") setToolSettings((t) => ({ ...t, middleTool: "brush" }));
-        //             if (toolSettings.rightTool == "box") setToolSettings((t) => ({ ...t, rightTool: "brush" }));
+                let { width, height } = toolState.current.selectionArea.imgData!;
+                const eraseImageData = new ImageData(width, height);
 
-        //             canvas1.getCtx().fillStyle = "rgba(255, 255, 255, .004)";
-        //             canvas1.getCtx().fillRect(topLeftPoint.x, topLeftPoint.y, width, height);
-        //         }
-        //     }
-        // },
-        // "move": (x, y) => {
-        //     if (!selectionArea) {
-        //         setActivePoints([{ x: 0, y: 0 }, { x: activeLayer.image.width, y: activeLayer.image.height }]);
-        //         setSelectionArea(activeLayer.image);
-        //     }
+                // Fill the new ImageData with black pixels
+                for (let i = 0; i < eraseImageData.data.length; i += 4) {
+                    let r = toolState.current.selectionArea.imgData!.data[i];
+                    let g = toolState.current.selectionArea.imgData!.data[i + 1];
+                    let b = toolState.current.selectionArea.imgData!.data[i + 2];
+                    let a = toolState.current.selectionArea.imgData!.data[i + 3];
 
-        //     if (mouseState.type == "mousedown" && selectionArea) {
-        //         let point1 = activePoints[0] ?? { x, y };
-        //         let point2 = activePoints[1] ?? { x, y };
-        //         let lastPoint = activePoints[2] ?? { x, y };
-        //         let minY = Math.min(point1.y, point2.y);
-        //         let maxY = Math.max(point1.y, point2.y);
-        //         let minX = Math.min(point1.x, point2.x);
-        //         let maxX = Math.max(point1.x, point2.x);
-        //         let topLeftPoint = {
-        //             x: minX,
-        //             y: minY
-        //         };
-        //         let bottomRightPoint = {
-        //             x: maxX,
-        //             y: maxY
-        //         };
-        //         let height = selectionArea?.height ?? bottomRightPoint.y - topLeftPoint.y;
-        //         let width = selectionArea?.width ?? bottomRightPoint.x - topLeftPoint.x;
-        //         let insideSelection = x >= lastPoint.x && x <= lastPoint.x + width && y >= lastPoint.y && y <= lastPoint.y + height;
+                    // replace colored pixel with black
+                    if (r != 0 || g != 0 || b != 0 || a > 1) {
+                        eraseImageData.data[i] = 255;
+                        eraseImageData.data[i + 1] = 255;
+                        eraseImageData.data[i + 2] = 255;
+                        eraseImageData.data[i + 3] = 1;
+                    }
+                }
+                canvas1.putImageData(
+                    eraseImageData,
+                    toolState.current.selectionArea.startPosition.x,
+                    toolState.current.selectionArea.startPosition.y,
+                );
+                canvas1.putImageData(
+                    toolState.current.selectionArea.imgData,
+                    toolState.current.selectionArea.currentPosition.x,
+                    toolState.current.selectionArea.currentPosition.y
+                );
 
-        //         if (!insideSelection) {
-        //             paintState.savePixels = true;
-        //             setSelectionArea(null);
-        //             setActivePoints([]);
-
-        //             if (toolSettings.leftTool == "move") setToolSettings((t) => ({ ...t, leftTool: "brush" }));
-        //             if (toolSettings.middleTool == "move") setToolSettings((t) => ({ ...t, middleTool: "brush" }));
-        //             if (toolSettings.rightTool == "move") setToolSettings((t) => ({ ...t, rightTool: "brush" }));
-
-        //             canvas1.getCtx().fillStyle = "rgba(255, 255, 255, .004)";
-        //             canvas1.getCtx().fillRect(topLeftPoint.x, topLeftPoint.y, width, height);
-        //         }
-        //     }
-        // },
-        "eyedropper": (x, y) => {
-            let image = mainCanvas.getImageData();
-            let current = {
-                r: image.data[(((y * image.width) + x) * 4)],
-                g: image.data[(((y * image.width) + x) * 4) + 1],
-                b: image.data[(((y * image.width) + x) * 4) + 2],
-                a: image.data[(((y * image.width) + x) * 4) + 3]
-            };
-            if (mouseState.current.left || mouseState.current.right) setActiveColor(current);
+                toolState.current.stage = ToolStage.SAVE;
+                toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
+                toolState.current.selectionArea.currentPosition = { x: 0, y: 0 };
+            }
         },
+        "eyedropper": (x, y, toolButtonActive) => {
+            if (toolButtonActive) {
+                let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
+                reversedLayers.forEach((layer) => {
+                    let imageData = layer.image;
+                    for (let i = 3; i < imageData.data.length; i += 4) {
+                        imageData.data[i] *= layer.opacity / 255;
+                    }
+
+                    canvas1.putImageData(imageData, 0, 0);
+                    canvas2.drawImage(canvas1.getElement(), 0, 0);
+                });
+
+                let frameData = canvas2.getImageData();
+                let current = {
+                    r: frameData.data[(((y * frameData.width) + x) * 4)],
+                    g: frameData.data[(((y * frameData.width) + x) * 4) + 1],
+                    b: frameData.data[(((y * frameData.width) + x) * 4) + 2],
+                    a: frameData.data[(((y * frameData.width) + x) * 4) + 3]
+                };
+
+                setActiveColor(current);
+            }
+        },
+        "shape": () => { },
+        "light": () => { },
+        "box": () => { },
+        "wand": () => { },
+        "laso": () => { },
     };
 
     // animation loop
@@ -381,30 +388,30 @@ function useCanvas() {
     // mouse event listeners
     useEffect(() => {
         const setMouseState = e => {
-            // Standardize button detection across different event types
-            const isLeftButtonDown = e.buttons === 1 || e.button === 0;
-            const isMiddleButtonDown = e.buttons === 4 || e.button === 1;
-            const isRightButtonDown = e.buttons === 2 || e.button === 2;
-
             mouseState.current = {
+                ...mouseState.current,
                 x: e.clientX,
                 y: e.clientY,
                 movementX: e.movementX,
                 movementY: e.movementY,
-                left: isLeftButtonDown,
-                middle: isMiddleButtonDown,
-                right: isRightButtonDown,
-                type: e.type,
-            };
+            }
+
+            if (e.type === "mousedown") {
+                if (e.button === 0) mouseState.current.leftDown = true;
+                if (e.button === 1) mouseState.current.middleDown = true;
+                if (e.button === 2) mouseState.current.rightDown = true;
+            }
+            if (e.type === "mouseup") {
+                if (e.button === 0) mouseState.current.leftDown = false;
+                if (e.button === 1) mouseState.current.middleDown = false;
+                if (e.button === 2) mouseState.current.rightDown = false;
+            }
         };
 
         // Add passive: false if you need to call preventDefault for these events
         document.addEventListener('mousedown', setMouseState, { passive: true });
         document.addEventListener('mouseup', setMouseState, { passive: true });
         document.addEventListener('mousemove', setMouseState, { passive: true });
-        document.addEventListener('pointerdown', setMouseState, { passive: true });
-        document.addEventListener('pointerup', setMouseState, { passive: true });
-        document.addEventListener('pointermove', setMouseState, { passive: true });
 
         const canvasContainer = document.querySelector(".p-app__canvas-container");
         if (canvasContainer) {
@@ -419,9 +426,6 @@ function useCanvas() {
             document.removeEventListener('mousedown', setMouseState);
             document.removeEventListener('mouseup', setMouseState);
             document.removeEventListener('mousemove', setMouseState);
-            document.removeEventListener('pointerdown', setMouseState);
-            document.removeEventListener('pointerup', setMouseState);
-            document.removeEventListener('pointermove', setMouseState);
         };
     }, []);
 
@@ -484,23 +488,26 @@ function useCanvas() {
         mainCanvas.drawGrid();
 
         // color related operations
-        let existingColor = stateCache.current.activeColorPalette.colors
-            .find(color => JSON.stringify(color) === JSON.stringify(stateCache.current.activeColor));
-
-        if (!existingColor && (mouseState.current.left || mouseState.current.right || mouseState.current.middle)) {
-            let newColorPallete = { ...stateCache.current.activeColorPalette };
-            newColorPallete.colors.push(stateCache.current.activeColor);
-            setActiveColorPalette(newColorPallete);
+        const isMouseDown = mouseState.current.leftDown || mouseState.current.rightDown || mouseState.current.middleDown;
+        const existingColor = stateCache.current.activeColorPalette.colors
+            .find(color => color === stateCache.current.activeColor);
+        if (!existingColor && isMouseDown) {
+            const newColors = [...stateCache.current.activeColorPalette.colors, stateCache.current.activeColor];
+            setActiveColorPalette({ ...stateCache.current.activeColorPalette, colors: newColors });
         }
-        if ((mouseState.current.left || mouseState.current.right || mouseState.current.middle)) {
+        if (isMouseDown) {
             let { r, g, b, a } = stateCache.current.activeColor;
             let colorString = `${r},${g},${b},${a}`;
+
+            // Access the colorStats object once to avoid repeated lookups
+            const currentColorStats = stateCache.current.colorStats[colorString] || { count: 0 };
+
             setColorStats({
                 ...stateCache.current.colorStats,
                 [colorString]: {
-                    count: (stateCache.current.colorStats[colorString]?.count ?? 0) + 1,
+                    count: currentColorStats.count + 1,
                     lastUsed: (new Date()).toUTCString()
-                }
+                },
             });
         }
 
@@ -511,43 +518,24 @@ function useCanvas() {
 
         const { leftTool, rightTool, middleTool } = stateCache.current.toolSettings;
         const tool =
-            mouseState.current.left ? leftTool :
-                mouseState.current.right ? rightTool :
-                    mouseState.current.middle ? middleTool : leftTool;
+            mouseState.current.leftDown ? leftTool :
+                mouseState.current.rightDown ? rightTool :
+                    mouseState.current.middleDown ? middleTool : leftTool;
+        const toolButtonActive =
+            tool === leftTool ? mouseState.current.leftDown :
+                tool === rightTool ? mouseState.current.rightDown :
+                    tool === middleTool ? mouseState.current.middleDown : false;
 
         let { r, g, b, a } = stateCache.current.activeColor;
         canvas1.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
 
         //* draw a preview of the selected tool
-        toolHandlers[tool]?.(x, y);
+        toolHandlers[tool]?.(x, y, toolButtonActive);
 
-        // draw selection widget
-        // if (!paintState.savePixels && (tool == "box" || tool == "move")) {
-        //     let localTopLeft = activePoints[2] ?? activePoints[0] ?? { x, y };
-        //     let localBottomRight = (activePoints[2] && selectionArea) ? { x: activePoints[2].x + selectionArea?.width, y: activePoints[2].y + selectionArea?.height } : activePoints[1] ?? { x, y };
+        const canvas1Img = canvas1.getImageData();
+        canvas1.clear();
 
-        //     canvas1.getCtx().lineWidth = 1;
-        //     canvas1.getCtx().strokeRect(Math.max(localTopLeft.x - 0.5, 0), Math.max(localTopLeft.y - 0.5, 0), localBottomRight.x - localTopLeft.x, localBottomRight.y - localTopLeft.y);
-        // }
-
-        // if were currently selecting an area
-        // if (selectionArea) {
-        //     let offsetX = mouseState.current.movementX;
-        //     let offsetY = mouseState.current.movementY;
-        //     let lastPoint = (activePoints.length <= 2) ? activePoints[0] : activePoints[activePoints.length - 1];
-
-        //     if (mouseState.current.left) {
-        //         lastPoint.x += offsetX;
-        //         lastPoint.y += offsetY;
-        //         setActivePoints(p => [p[0], p[1], { ...lastPoint }]);
-        //     }
-
-        //     canvas1.putImageData(selectionArea, lastPoint.x, lastPoint.y);
-        // }
-
-        let canvas1Img = canvas1.getImageData();
-
-        // save pixels to layer
+        // save pixels from canvas1 to active layer
         if (toolState.current.stage === ToolStage.SAVE) {
             for (let i = 0; i < canvas1Img.data.length; i += 4) {
                 let r = canvas1Img.data[i];
@@ -575,6 +563,7 @@ function useCanvas() {
             toolState.current.stage = ToolStage.PREVIEW;
         }
 
+        // update the main canvas with contents of canvas1
         let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
         reversedLayers.forEach((layer) => {
             // apply layer opacity

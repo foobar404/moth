@@ -9,7 +9,7 @@ interface IProps {
 
 export function useCanvas(props?: IProps) {
     let canvas = useRef<HTMLCanvasElement>(makeCanvas());
-    let { current: ctx } = useRef<CanvasRenderingContext2D>(canvas.current.getContext('2d')!);
+    let ctx = useRef<CanvasRenderingContext2D>(canvas.current.getContext('2d')!);
 
     function makeCanvas() {
         let canvas = document.createElement('canvas');
@@ -37,11 +37,11 @@ export function useCanvas(props?: IProps) {
     }
 
     function getCtx() {
-        return ctx;
+        return ctx.current;
     }
 
     function clear(x = 0, y = 0, w = canvas.current.width, h = canvas.current.height) {
-        ctx.clearRect(x, y, w, h);
+        ctx.current.clearRect(x, y, w, h);
     }
 
     function toDataURL() {
@@ -54,63 +54,63 @@ export function useCanvas(props?: IProps) {
     }
 
     function putImageData(imageData, x = 0, y = 0) {
-        ctx.putImageData(imageData, x, y);
+        ctx.current.putImageData(imageData, x, y);
     }
 
     function drawImage(source, dx = 0, dy = 0, dWidth = canvas.current.width, dHeight = canvas.current.height) {
-        ctx.drawImage(source, dx, dy, dWidth, dHeight);
+        ctx.current.drawImage(source, dx, dy, dWidth, dHeight);
     }
 
     function getImageData(x = 0, y = 0, width = canvas.current.width, height = canvas.current.height) {
-        return ctx.getImageData(x, y, width, height);
+        return ctx.current.getImageData(x, y, width, height);
     }
 
     function drawGrid(color1 = "#fff", color2 = "#ddd", size = 1) {
         let rows = Math.floor(canvas.current.height / size);
         let cols = Math.floor(canvas.current.width / size);
 
-        ctx.fillStyle = color1;
+        ctx.current.fillStyle = color1;
         for (let y = 0; y < rows; y++) {
             for (let x = (y % 2); x < cols; x += 2) { // Adjust starting index based on row number
-                ctx.fillRect(x * size, y * size, size, size);
+                ctx.current.fillRect(x * size, y * size, size, size);
             }
         }
 
-        ctx.fillStyle = color2;
+        ctx.current.fillStyle = color2;
         for (let y = 0; y < rows; y++) {
             for (let x = (y % 2 === 0 ? 1 : 0); x < cols; x += 2) { // Adjust starting index based on row number
-                ctx.fillRect(x * size, y * size, size, size);
+                ctx.current.fillRect(x * size, y * size, size, size);
             }
         }
     }
 
     const drawLine = (x0, y0, x1, y1, color = 'black') => {
-        ctx.beginPath();
-        ctx.moveTo(x0, y0);
-        ctx.lineTo(x1, y1);
-        ctx.strokeStyle = color;
-        ctx.stroke();
+        ctx.current.beginPath();
+        ctx.current.moveTo(x0, y0);
+        ctx.current.lineTo(x1, y1);
+        ctx.current.strokeStyle = color;
+        ctx.current.stroke();
     };
 
     const drawRect = (x, y, width, height, color = 'black', fill = false) => {
         if (fill) {
-            ctx.fillStyle = color;
-            ctx.fillRect(x, y, width, height);
+            ctx.current.fillStyle = color;
+            ctx.current.fillRect(x, y, width, height);
         } else {
-            ctx.strokeStyle = color;
-            ctx.strokeRect(x, y, width, height);
+            ctx.current.strokeStyle = color;
+            ctx.current.strokeRect(x, y, width, height);
         }
     };
 
     const drawCircle = (x, y, radius, color = 'black', fill = false) => {
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.current.beginPath();
+        ctx.current.arc(x, y, radius, 0, 2 * Math.PI);
         if (fill) {
-            ctx.fillStyle = color;
-            ctx.fill();
+            ctx.current.fillStyle = color;
+            ctx.current.fill();
         } else {
-            ctx.strokeStyle = color;
-            ctx.stroke();
+            ctx.current.strokeStyle = color;
+            ctx.current.stroke();
         }
     };
 
@@ -119,28 +119,28 @@ export function useCanvas(props?: IProps) {
     };
 
     const drawOval = (x, y, radiusX, radiusY, color = 'black', fill = false) => {
-        ctx.beginPath();
-        ctx.ellipse(x, y, radiusX, radiusY, 0, 0, 2 * Math.PI);
+        ctx.current.beginPath();
+        ctx.current.ellipse(x, y, radiusX, radiusY, 0, 0, 2 * Math.PI);
         if (fill) {
-            ctx.fillStyle = color;
-            ctx.fill();
+            ctx.current.fillStyle = color;
+            ctx.current.fill();
         } else {
-            ctx.strokeStyle = color;
-            ctx.stroke();
+            ctx.current.strokeStyle = color;
+            ctx.current.stroke();
         }
     };
 
     function drawPixel(x, y, size = 1, color?) {
         if (color) {
             let { r, b, g, a } = color;
-            ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+            ctx.current.fillStyle = `rgba(${r},${g},${b},${a})`;
         }
-        ctx.fillRect(x, y, size, size);
+        ctx.current.fillRect(x, y, size, size);
     }
 
     function erasePixel(x, y, size = 1) {
-        ctx.fillStyle = "rgba(0, 0, 0, .004)";
-        ctx.fillRect(x, y, size, size);
+        ctx.current.fillStyle = "rgba(0, 0, 0, .004)";
+        ctx.current.fillRect(x, y, size, size);
     }
 
     function floodFill(
@@ -186,7 +186,7 @@ export function useCanvas(props?: IProps) {
         }
 
         function getColorAtPixel(x, y) {
-            const imageData = ctx.getImageData(x, y, 1, 1).data;
+            const imageData = ctx.current.getImageData(x, y, 1, 1).data;
             return [imageData[0], imageData[1], imageData[2], imageData[3]]; // RGBA
         }
     }

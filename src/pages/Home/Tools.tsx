@@ -1,3 +1,4 @@
+import { ITool } from '../../types';
 import ReactTooltip from 'react-tooltip';
 import { IoMdMove } from "react-icons/io";
 import { AiFillFire } from "react-icons/ai";
@@ -5,9 +6,8 @@ import { BsBucketFill } from "react-icons/bs";
 import { GiMirrorMirror } from "react-icons/gi";
 import { IoBandageSharp } from "react-icons/io5";
 import React, { useEffect, useState } from 'react';
-import { useShortcuts, useCanvas, useGlobalStore } from '../../utils';
-import { ITool, IToolSettings, ILayer } from '../../types';
 import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
+import { useShortcuts, useCanvas, useGlobalStore } from '../../utils';
 import { FaEyeDropper, FaBrush, FaTools, FaBox, FaLightbulb, FaShapes } from "react-icons/fa";
 import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } from "react-icons/bi";
 import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
@@ -275,7 +275,7 @@ function useTools() {
         "x": () => updateTool(null, "box", 0),
         "w": () => updateTool(null, "wand", 0),
         "o": () => updateTool(null, "laso", 0),
-        "n": () => updateTool(null, "bone", 0),
+        // "n": () => updateTool(null, "bone", 0),
         "l": () => updateTool(null, "line", 0),
         "r": () => updateTool(null, "mirror", 0),
         "shift+h": actions.flipHorizontal,
