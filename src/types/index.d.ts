@@ -58,7 +58,7 @@ export interface IColorPalette {
 export interface IColorStats { [color: string]: { count: number, lastUsed: string } }
 
 
-export type ITool = "brush" | "eraser" | "shape" | "light" | "eyedropper" | "bucket" | "move" | "wand" | "box" | "laso" | "bone" | "line" | "mirror";
+export type ITool = "brush" | "eraser" | "shape" | "light" | "eyedropper" | "bucket" | "recolor" | "move" | "wand" | "box" | "laso" | "bone" | "line" | "mirror";
 
 
 export interface IToolSettings {
@@ -69,12 +69,15 @@ export interface IToolSettings {
 	mirror: {
 		x: boolean;
 		y: boolean;
-	}
+	};
+	shape: "rect" | "circle" | "oval" | "square",
+	lightMode: "dark" | "light";
 }
 
 
 export interface IPreview {
 	fps: number;
+	playing: boolean;
 }
 
 

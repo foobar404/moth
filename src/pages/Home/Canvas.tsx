@@ -3,12 +3,14 @@ import ReactTooltip from 'react-tooltip';
 import { IMouseState } from "../../types";
 import { BiPlusMedical } from "react-icons/bi";
 import React, { useEffect, useRef } from 'react';
-import { FaUndoAlt, FaRedoAlt } from "react-icons/fa";
+import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun } from "react-icons/fa";
+import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
+import tinycolor from "tinycolor2";
 
 
 enum ToolStage {
-    PREVIEW, ADJUSTING, SAVE
+    PREVIEW, ADJUSTING, MOVING, SAVE
 }
 
 
@@ -55,6 +57,81 @@ export function Canvas() {
                             onClick={() => data.setToolSettings({ ...data.toolSettings, mirror: { x: false, y: true } })} />
                     </label>
                 </>)}
+
+                {data.toolSettings.leftTool === "shape" && (<>
+                    <label data-tip=""
+                        data-for="tooltip"
+                        className="mr-2 flex">
+                        <TbSquareFilled className="c-icon" />
+                        <input type="radio"
+                            name="shape"
+                            className="c-input"
+                            value="square"
+                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, shape: e.currentTarget.value as any })}
+                        />
+                    </label>
+                    <label data-tip=""
+                        data-for="tooltip"
+                        className="mr-2 flex">
+                        <TbRectangleFilled className="c-icon" />
+                        <input type="radio"
+                            name="shape"
+                            className="c-input"
+                            value="rect"
+                            defaultChecked={true}
+                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, shape: e.currentTarget.value as any })}
+                        />
+                    </label>
+                    <label data-tip=""
+                        data-for="tooltip"
+                        className="mr-2 flex">
+                        <TbCircleFilled className="c-icon" />
+                        <input type="radio"
+                            name="shape"
+                            className="c-input"
+                            value="circle"
+                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, shape: e.currentTarget.value as any })}
+                        />
+                    </label>
+                    <label data-tip=""
+                        data-for="tooltip"
+                        className="mr-2 flex">
+                        <TbOvalFilled className="c-icon" />
+                        <input type="radio"
+                            name="shape"
+                            className="c-input"
+                            value="oval"
+                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, shape: e.currentTarget.value as any })}
+                        />
+                    </label>
+                </>)}
+
+                {data.toolSettings.leftTool === "light" && (<>
+                    <label data-tip=""
+                        data-for="tooltip"
+                        className="mr-2 flex">
+                        <FaSun className="c-icon" />
+                        <input type="radio"
+                            name="light"
+                            className="c-input"
+                            value="light"
+                            defaultChecked={true}
+                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: e.currentTarget.value as any })}
+                        />
+                    </label>
+                    <label data-tip=""
+                        data-for="tooltip"
+                        className="mr-2 flex">
+                        <FaMoon className="c-icon" />
+                        <input type="radio"
+                            name="light"
+                            className="c-input"
+                            value="dark"
+                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: e.currentTarget.value as any })}
+                        />
+                    </label>
+                </>)}
+
                 <button data-tip="decrease brush size ( [ )"
                     data-for="tooltip"
                     className="c-button --xs --fourth mr-2"
@@ -74,6 +151,13 @@ export function Canvas() {
             </nav>
 
             <nav className="p-app__canvas-controls">
+                <input type="range" min="1" max="50" step="1"
+                    data-tip="grid zoom"
+                    data-for="tooltip"
+                    className="c-input --xs mr-2"
+                    style={{ width: "100px" }}
+                    defaultValue={10}
+                    onChange={(e) => data.setZoom(parseInt(e.target.value))} />
                 <label>
                     <p hidden>height</p>
                     <input data-tip="grid height"
@@ -92,18 +176,6 @@ export function Canvas() {
                         value={data.canvasSize.width}
                         onChange={e => data.resizeHandler({ width: e.currentTarget.valueAsNumber })} />
                 </label>
-                <button data-tip="zoom out"
-                    data-for="tooltip"
-                    onClick={() => data.setZoom(-5)}
-                    className="c-button --xs --fourth mr-2">
-                    <ImMinus />
-                </button>
-                <button data-tip="zoom in"
-                    data-for="tooltip"
-                    onClick={() => data.setZoom(5)}
-                    className="c-button --xs --fourth mr-2">
-                    <BiPlusMedical />
-                </button>
                 <button data-tip="undo ( ctrl + z )"
                     data-for="tooltip"
                     onClick={data.undo}
@@ -133,6 +205,8 @@ function useCanvas() {
     const mainCanvas = useCanvasHook();
     const canvas1 = useCanvasHook();
     const canvas2 = useCanvasHook();
+    const undoStack = useRef<{ frameID: any, layerID: any; image: any }[]>([]);
+    const redoStack = useRef<{ frameID: any, layerID: any; image: any }[]>([]);
 
     let mainCanvasZoom = useRef(15);
     let mouseState = useRef({
@@ -147,6 +221,7 @@ function useCanvas() {
     let toolState = useRef({
         stage: ToolStage.PREVIEW,
         activePoints: [] as { x: number; y: number; }[],
+        modifiedPoints: new Set(),
         selectionArea: {
             imgData: null as ImageData | null,
             bounderyPoints: [] as { x: number; y: number; }[],
@@ -186,8 +261,12 @@ function useCanvas() {
             canvas1.erasePixel(newX, newY, stateCache.current.toolSettings.size);
         },
         "bucket": (x, y, toolButtonActive) => {
-            if (toolButtonActive)
-                toolState.current.stage = ToolStage.SAVE;
+            if (!toolButtonActive) {
+                canvas1.drawPixel(x, y);
+                return;
+            }
+
+            toolState.current.stage = ToolStage.SAVE;
 
             canvas2.putImageData(activeLayer.image);
             let points = canvas2.floodFill(x, y);
@@ -203,48 +282,18 @@ function useCanvas() {
                 toolState.current.stage = ToolStage.ADJUSTING;
             } else if (toolState.current.stage === ToolStage.ADJUSTING) {
                 const activePoints = toolState.current.activePoints;
-                // Proceed only if there's a starting point
+
                 if (activePoints.length > 0) {
                     const startPoint = activePoints[0];
                     const endPoint = { x: Math.floor(x), y: Math.floor(y) };
-                    const points = calculateLinePoints(startPoint, endPoint);
 
-                    // Draw each point using the lineThickness
-                    points.forEach((point: { x: number; y: number }) => {
-                        canvas1.drawPixel(point.x, point.y, stateCache.current.toolSettings.size);
-                    });
+                    canvas1.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
 
-                    // If the tool is no longer active, finalize the drawing
                     if (!toolButtonActive) {
                         toolState.current.stage = ToolStage.SAVE;
                         toolState.current.activePoints = []; // Prepare for the next use
                     }
                 }
-            }
-
-            function calculateLinePoints(start, end) {
-                let points = [];
-                let x0 = start.x;
-                let y0 = start.y;
-                let x1 = end.x;
-                let y1 = end.y;
-
-                let dx = Math.abs(x1 - x0);
-                let dy = -Math.abs(y1 - y0);
-                let sx = x0 < x1 ? 1 : -1;
-                let sy = y0 < y1 ? 1 : -1;
-                let err = dx + dy, e2; // error value e_xy
-
-                while (true) {
-                    //@ts-ignore
-                    points.push({ x: x0, y: y0 });
-                    if (x0 === x1 && y0 === y1) break;
-                    e2 = 2 * err;
-                    if (e2 >= dy) { err += dy; x0 += sx; } // e_xy+e_x > 0
-                    if (e2 <= dx) { err += dx; y0 += sy; } // e_xy+e_y < 0
-                }
-
-                return points;
             }
         },
         "mirror": (x, y, toolButtonActive) => {
@@ -271,38 +320,16 @@ function useCanvas() {
         },
         "move": (x, y, toolButtonActive) => {
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                // Mark the starting position for the move
-                // toolState.current.selectionArea.startPosition = { x, y };
-                // toolState.current.selectionArea.currentPosition = { x, y };
                 toolState.current.stage = ToolStage.ADJUSTING;
 
-                toolState.current.selectionArea.imgData = stateCache.current.activeLayer.image;
+                canvas2.putImageData(stateCache.current.activeLayer.image);
+                toolState.current.selectionArea.imgData = canvas2.getImageData();
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
                 // Calculate the displacement
                 toolState.current.selectionArea.currentPosition.x += mouseState.current.movementX / mainCanvasZoom.current;
                 toolState.current.selectionArea.currentPosition.y += mouseState.current.movementY / mainCanvasZoom.current;
 
-                // create a copy of  thats all black
-                // let { width, height } = toolState.current.selectionArea.imgData!;
-                // const blackImageData = new ImageData(width, height);
-
-                // // Fill the new ImageData with black pixels
-                // for (let i = 0; i < blackImageData.data.length; i += 4) {
-                //     let r = toolState.current.selectionArea.imgData!.data[i];
-                //     let g = toolState.current.selectionArea.imgData!.data[i + 1];
-                //     let b = toolState.current.selectionArea.imgData!.data[i + 2];
-                //     let a = toolState.current.selectionArea.imgData!.data[i + 3];
-
-                //     // replace colored pixel with black
-                //     if (r != 0 || g != 0 || b != 0 || a > 1) {
-                //         blackImageData.data[i] = 100;
-                //         blackImageData.data[i + 1] = 100;
-                //         blackImageData.data[i + 2] = 100;
-                //         blackImageData.data[i + 3] = 255;
-                //     }
-                // }
-                // canvas1.putImageData(blackImageData, 0, 0);
                 canvas1.putImageData(
                     toolState.current.selectionArea.imgData,
                     toolState.current.selectionArea.currentPosition.x,
@@ -322,6 +349,7 @@ function useCanvas() {
                     let b = toolState.current.selectionArea.imgData!.data[i + 2];
                     let a = toolState.current.selectionArea.imgData!.data[i + 3];
 
+
                     // replace colored pixel with black
                     if (r != 0 || g != 0 || b != 0 || a > 1) {
                         eraseImageData.data[i] = 255;
@@ -330,16 +358,18 @@ function useCanvas() {
                         eraseImageData.data[i + 3] = 1;
                     }
                 }
-                canvas1.putImageData(
+                canvas2.putImageData(
                     eraseImageData,
                     toolState.current.selectionArea.startPosition.x,
                     toolState.current.selectionArea.startPosition.y,
                 );
-                canvas1.putImageData(
+                canvas1.drawImage(canvas2.getElement());
+                canvas2.putImageData(
                     toolState.current.selectionArea.imgData,
                     toolState.current.selectionArea.currentPosition.x,
                     toolState.current.selectionArea.currentPosition.y
                 );
+                canvas1.drawImage(canvas2.getElement());
 
                 toolState.current.stage = ToolStage.SAVE;
                 toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
@@ -370,11 +400,172 @@ function useCanvas() {
                 setActiveColor(current);
             }
         },
-        "shape": () => { },
-        "light": () => { },
-        "box": () => { },
-        "wand": () => { },
-        "laso": () => { },
+        "shape": (x, y, toolButtonActive) => {
+            if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                toolState.current.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
+                toolState.current.stage = ToolStage.ADJUSTING;
+            } else if (toolState.current.stage === ToolStage.ADJUSTING) {
+                const activePoints = toolState.current.activePoints;
+                if (activePoints.length > 0) {
+                    const start = activePoints[0];
+                    const end = { x: Math.floor(x), y: Math.floor(y) };
+
+                    if (stateCache.current.toolSettings.shape == "square" || stateCache.current.toolSettings.shape == "rect") {
+                        const width = stateCache.current.toolSettings.shape == "square" ?
+                            Math.max(Math.abs(end.x - start.x), Math.abs(end.y - start.y)) :
+                            Math.abs(end.x - start.x);
+                        const height = stateCache.current.toolSettings.shape == "square" ?
+                            width :
+                            Math.abs(end.y - start.y);
+                        const left = Math.min(start.x, end.x);
+                        const top = Math.min(start.y, end.y);
+
+                        canvas1.drawRect(left, top, width, height);
+                    } else if (stateCache.current.toolSettings.shape == "circle" || stateCache.current.toolSettings.shape == "oval") {
+                        const radiusX = stateCache.current.toolSettings.shape == "circle" ?
+                            Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)) :
+                            Math.abs(end.x - start.x) / 2;
+                        const radiusY = stateCache.current.toolSettings.shape == "circle" ?
+                            radiusX :
+                            Math.abs(end.y - start.y) / 2;
+                        const centerX = (start.x + end.x) / 2;
+                        const centerY = (start.y + end.y) / 2;
+
+                        canvas1.drawOval(centerX, centerY, radiusX, radiusY);
+                    }
+
+                    if (!toolButtonActive) {
+                        toolState.current.stage = ToolStage.SAVE;
+                        toolState.current.activePoints = []; // Prepare for the next use
+                    }
+                }
+            }
+        },
+        "light": (x, y, toolButtonActive) => {
+            // Put the active layer image onto canvas2 for manipulation
+            canvas2.putImageData(stateCache.current.activeLayer.image);
+            const brushSize = stateCache.current.toolSettings.size;
+            const lightAdjustmentPercentage = stateCache.current.toolSettings.lightMode === "light" ? 15 : -15;
+
+            // Calculate start and end points, ensuring they are within canvas bounds
+            const startX = Math.max(0, x - Math.floor(brushSize / 2));
+            const startY = Math.max(0, y - Math.floor(brushSize / 2));
+            const endX = Math.min(canvas2.getWidth(), startX + brushSize);
+            const endY = Math.min(canvas2.getHeight(), startY + brushSize);
+
+            // Get the image data for the brush area
+            let imgData = canvas2.getImageData(startX, startY, endX - startX, endY - startY);
+            let data = imgData.data;
+
+            // Iterate over each pixel in the brush area
+            for (let j = startY; j < endY; j++) {
+                for (let i = startX; i < endX; i++) {
+                    // Calculate the index for the pixel data array
+                    let index = (j - startY) * (endX - startX) * 4 + (i - startX) * 4;
+                    let pixelKey = `${i},${j}`;
+
+                    // Check if the pixel has not been modified or if the tool button is not active
+                    if (!toolState.current.modifiedPoints.has(pixelKey) || !toolButtonActive) {
+                        let pixelColor = `rgba(${data[index]}, ${data[index + 1]}, ${data[index + 2]}, ${data[index + 3] / 255})`;
+                        let color = tinycolor(pixelColor);
+                        let hsl = color.toHsl();
+
+                        // Adjust lightness, hue, and saturation
+                        hsl.l += lightAdjustmentPercentage / 100;
+                        hsl.l = Math.min(1, Math.max(0, hsl.l));
+                        if (lightAdjustmentPercentage > 0) {
+                            hsl.h = Math.max(20, hsl.h - 10); // Towards orange for brightness
+                            hsl.s = Math.min(1, hsl.s + 0.1); // Increase saturation
+                        } else {
+                            hsl.h = Math.min(250, hsl.h + 10); // Towards blue for darkness
+                            hsl.s = Math.min(1, hsl.s + 0.1); // Increase saturation
+                        }
+
+                        // Convert back to RGB and update the pixel data
+                        let newColor = tinycolor(hsl).toRgb();
+                        data[index] = newColor.r;
+                        data[index + 1] = newColor.g;
+                        data[index + 2] = newColor.b;
+
+                        // Add the pixel to the set of modified points
+                        toolState.current.modifiedPoints.add(pixelKey);
+                    }
+                }
+            }
+
+            // Put the modified image data back onto canvas1
+            canvas1.putImageData(imgData, startX, startY);
+
+            // Save the state when the tool button is active, clear modified points otherwise
+            if (toolButtonActive) {
+                toolState.current.stage = ToolStage.SAVE;
+            } else {
+                toolState.current.modifiedPoints.clear();
+            }
+        },
+        "recolor": (x, y, toolButtonActive) => {
+            if (!toolButtonActive) {
+                canvas1.drawPixel(x, y);
+                return;
+            }
+
+            toolState.current.stage = ToolStage.SAVE;
+
+            const imgData = activeLayer.image;
+            const data = imgData.data;
+
+            // Step 2: Get the color of the pixel at the current point
+            const index = (x + y * imgData.width) * 4;
+            const targetColor = { r: data[index], g: data[index + 1], b: data[index + 2], a: data[index + 3] };
+
+            // Assume activeColor is an object { r: number, g: number, b: number, a: number }
+            const activeColor = stateCache.current.activeColor; // You need to implement this based on how active color is set
+
+            // Step 3 & 4: Loop through all pixels to find and replace the target color
+            for (let i = 0; i < data.length; i += 4) {
+                // Using a simple color match; for more complex scenarios, consider a tolerance
+                if (data[i] === targetColor.r && data[i + 1] === targetColor.g && data[i + 2] === targetColor.b && data[i + 3] === targetColor.a) {
+                    // Replace with active color
+                    data[i] = activeColor.r;
+                    data[i + 1] = activeColor.g;
+                    data[i + 2] = activeColor.b;
+                    data[i + 3] = activeColor.a;
+                }
+            }
+
+            // Step 5: Apply the modified image data back to the canvas
+            canvas1.putImageData(imgData, 0, 0);
+        },
+        "box": (x, y, toolButtonActive) => {
+            // if toolButtonActive and in preview mode 
+            // set start position, current possition, and first boundery point
+            // change to adjusting mode
+            // if in adjusting mode
+            // update current position 
+            // draw rect from start to current position
+            // if !toolButtonActive and in adjusting mode
+            // update current position
+            // add final point to boundery
+            // save image data to slection area image
+            // reset current position to start position
+            // change mode to MOVING
+            // draw rect
+            // if in moving mode
+            // if clicked outside of the selection boundery
+            // update current position by mouse movement
+            // paint selection img to canvas1 at current position
+            // change mode to SAVE
+
+            // clear selection img
+            // reset current position to start position
+            // change mode to PREVIEW
+            // else 
+            // update current position by mouse movement
+            // paint selection img to canvas1 at current position
+            // draw rect 
+        },
+        "wand": (x, y, toolButtonActive) => { },
+        "laso": (x, y, toolButtonActive) => { },
     };
 
     // animation loop
@@ -408,22 +599,22 @@ function useCanvas() {
             }
         };
 
+        const canvasContainer = document.querySelector(".p-app__canvas-container");
+
         // Add passive: false if you need to call preventDefault for these events
-        document.addEventListener('mousedown', setMouseState, { passive: true });
+        canvasContainer!.addEventListener('mousedown', setMouseState, { passive: true });
         document.addEventListener('mouseup', setMouseState, { passive: true });
         document.addEventListener('mousemove', setMouseState, { passive: true });
 
-        const canvasContainer = document.querySelector(".p-app__canvas-container");
-        if (canvasContainer) {
-            canvasContainer.addEventListener('wheel', (e: any) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setZoom(e.deltaY > 0 ? -0.2 : 0.2);
-            }, { passive: false });
-        }
+        canvasContainer!.addEventListener('wheel', (e: any) => {
+            e.preventDefault();
+            e.stopPropagation();
+            let delta = e.deltaY > 0 ? -0.3 : 0.3;
+            setZoom(mainCanvasZoom.current + delta);
+        }, { passive: false });
 
         return () => {
-            document.removeEventListener('mousedown', setMouseState);
+            canvasContainer!.removeEventListener('mousedown', setMouseState);
             document.removeEventListener('mouseup', setMouseState);
             document.removeEventListener('mousemove', setMouseState);
         };
@@ -442,7 +633,7 @@ function useCanvas() {
         canvas1.getCtx().imageSmoothingEnabled = false;
         canvas2.getCtx().imageSmoothingEnabled = false;
 
-        setZoom();
+        setZoom(mainCanvasZoom.current);
     }, []);
 
     // resize canvas
@@ -467,8 +658,21 @@ function useCanvas() {
 
     function redo() { }
 
-    function setZoom(zoomDelta = 1) {
-        mainCanvasZoom.current = Math.max(1, mainCanvasZoom.current + zoomDelta);
+    function saveCanvasState() {
+        canvas2.putImageData(stateCache.current.activeLayer.image);
+        let data = {
+            frameID: stateCache.current.activeFrame.symbol,
+            layerID: stateCache.current.activeLayer.symbol,
+            image: canvas2.getImageData()
+        };
+        undoStack.current.push(data);
+        canvas2.clear();
+
+        if (undoStack.current.length > 100) undoStack.current.shift();
+    }
+
+    function setZoom(zoom = 1) {
+        mainCanvasZoom.current = Math.max(1, zoom);
         mainCanvas.getElement().style.transform = `scale(${mainCanvasZoom.current})`;
     }
 
@@ -589,6 +793,7 @@ function useCanvas() {
         setZoom,
         canvasSize,
         toolSettings,
+        mainCanvasZoom,
         setBrushSize,
         resizeHandler,
         setToolSettings,

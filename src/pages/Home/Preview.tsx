@@ -1,71 +1,61 @@
-import React, { useRef } from 'react';
 import { IPreview } from '../../types';
-import { useGlobalStore } from '../../utils';
+import React, { useEffect, useRef } from 'react';
+import { useCanvas, useGlobalStore } from '../../utils';
 
 
-interface IProps {
-    preview: IPreview;
-}
-
-
-export function Preview(props: IProps) {
+export function Preview(props: IPreview) {
     const data = usePreview(props);
 
     return (
-        <canvas ref={data.canvasRef}
-            className="p-app__preview"
-            height={data.canvasSize?.height}
-            width={data.canvasSize?.width}></canvas>
+        <section ref={data.canvasContainerRef}></section>
     )
 }
 
 
-function usePreview(props: IProps) {
-    const { canvasSize } = useGlobalStore();
-    let canvasRef = useRef<HTMLCanvasElement>(null);
+function usePreview(props: IPreview) {
+    const frameCount = useRef(0);
+    const loopRef = useRef<any>(null);
+    const canvas1 = useCanvas();
+    const { canvasSize, frames } = useGlobalStore();
+    let canvasContainerRef = useRef<HTMLCanvasElement>(null);
 
-    // function play() {
-    //     canvas2.resize(canvasSize.width, canvasSize.height);
+    useEffect(() => {
+        canvasContainerRef.current?.appendChild(canvas1.getElement());
+        canvas1.getElement().classList.add("p-app__preview");
+    }, []);
 
-    //     let i = 0;
-    //     let previewElm = document.querySelector(".p-app__preview");
-    //     if (previewElm) previewElm.scrollIntoView({ behavior: "smooth", block: "end" });
+    useEffect(() => {
+        canvas1.resize(canvasSize.width, canvasSize.height);
+    }, [canvasSize]);
 
-    //     setPlaying(true);
-    //     setLoopRef(setInterval(() => {
-    //         if (i >= props.frames.length) i = 0;
+    useEffect(() => {
+        if (!props.playing) {
+            clearInterval(loopRef.current);
+            return;
+        }
 
-    //         let frame = props.frames[i];
-    //         props.preview.ctx!.clearRect(0, 0, canvasSize.width ?? 0, canvasSize.height ?? 0);
-    //         let reversedLayers = frame.layers.slice().reverse();
-    //         reversedLayers.forEach(layer => {
-    //             tempCtx!.putImageData(layer.image, 0, 0);
-    //             props.preview.ctx!.drawImage(tempCanvas, 0, 0);
-    //         })
-    //         i++;
-    //     }, 1000 / props.preview.fps));
-    // }
+        canvas1.resize(canvasSize.width, canvasSize.height)
 
-    // function stop() {
-    //     if (!loopRef) return;
+        loopRef.current = setInterval(() => {
+            if (frameCount.current >= frames.length)
+                frameCount.current = 0;
 
-    //     setPlaying(false);
-    //     clearInterval(loopRef!);
-    // }
+            canvas1.clear();
 
-    // function togglePlay() {
-    //     if (playing) stop();
-    //     else play();
-    // }
+            let frame = frames[frameCount.current];
+            let reversedLayers = frame.layers.slice().reverse();
+            reversedLayers.forEach(layer => {
+                canvas1.putImageData(layer.image)
+            })
+            frameCount.current += 1;
+        }, 1000 / props.fps);
 
-    // function setFps(fps: number) {
-    //     props.setPreview({ ...props.preview, fps });
-    //     stop();
-    //     play();
-    // }
+        return () => {
+            clearInterval(loopRef.current);
+        }
+    }, [props.playing]);
 
     return {
-        canvasRef,
-        canvasSize,
+        canvasContainerRef,
     }
 }

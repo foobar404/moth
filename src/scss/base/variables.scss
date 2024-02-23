@@ -1,13 +1,18 @@
+// move to css variables
 $color-first: rgb(206, 59, 158);
 $color-second: rgb(233, 193, 55);
 $color-third: rgb(59, 206, 107);
-$color-fourth: rgb(55, 95, 233);
+$color-fourth:rgb(55, 95, 233);
 $color-white: #eff;
 $color-black: #222;
 $color-gray: #eee;
-$color-gray-dark: #989dab;
+$color-gray-dark: #cecece; // replace with background color
 $color-gray-darker: #474c57;
 $color-red: rgb(233 55 75);
+
+$color-background: $color-gray-dark; 
+// primary (color & background)
+// secondary (color & background)
 
 $border-radius-round: 100px;
 $border-radius-rounded: 10px;

@@ -49,7 +49,7 @@ export function Home() {
 
 					{/* color panel */}
 					<TabPanel>
-						<Colors />	
+						<Colors />
 					</TabPanel>
 
 					{/* layers panel */}
@@ -71,6 +71,8 @@ function useHome() {
 	useEffect(() => {
 		document.addEventListener('contextmenu', event => event.preventDefault());
 	}, []);
+
+	useEffect(() => { ReactTooltip.rebuild() }, [tabIndex]);
 
 	function loadProject(projectName: string = "default") {
 		if (!localStorage.getItem(projectName)) return;

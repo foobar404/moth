@@ -5,12 +5,15 @@ import { HiStar } from "react-icons/hi";
 import { ImCross } from "react-icons/im";
 import { Modal } from "../../components";
 import pngEncode from "png-chunks-encode";
+import { PiGifFill } from "react-icons/pi";
 import pngExtract from "png-chunks-extract";
 import { Buffer as pngBuffer } from "buffer";
 import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
 import { useCanvas, useModal, useGlobalStore } from '../../utils';
 import { IoImage, IoLayers, IoColorPalette } from "react-icons/io5";
+import GIF from "gif.js";
+
 
 
 interface IProps {
@@ -39,6 +42,11 @@ export function Nav(props: IProps) {
         <Modal {...data.modal}>
             <main className="flex flex-col p-10">
                 <section className="flex flex-col items-center mr-10">
+                    <button className="c-button --second mb-2"
+                        onClick={() => data.createGif()}>
+                        <i className="c-button__icon --first"><PiGifFill /></i>
+                        Export as GIF
+                    </button>
                     <button className="c-button --second mb-2"
                         onClick={() => data.exportProject()}>
                         <i className="c-button__icon --first"><MdMovieFilter /></i>
@@ -161,47 +169,6 @@ function useNav(props: IProps) {
         setProjectList(cachedList);
     }, []);
 
-    // useEffect(() => {
-    //     // save project locally
-    //     const interval = setInterval(() => {
-    //         let localProject = props.getProject();
-
-    //         // if the project doesint have any changes yet dont save it
-    //         if (localProject.frames?.length === 1 && localProject.frames[0].layers?.length === 1) {
-    //             let anyNewPixels = localProject.frames[0].layers[0].image.data?.some(p => p !== 0);
-    //             if (!anyNewPixels) return;
-    //         }
-
-    //         let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
-    //         if (!currentProjectList.includes(props.project.name)) {
-    //             currentProjectList.push(props.project.name);
-    //             localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
-    //         }
-
-    //         if (currentProjectList.length > 10) {
-    //             let front = currentProjectList.shift();
-    //             localStorage.removeItem(front);
-    //             localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
-    //         }
-
-    //         let projectName = props.project.name.startsWith("moth-") ? props.project.name + " " : props.project.name;
-    //         localStorage.setItem(projectName, JSON.stringify(localProject));
-    //     }, 1000);
-    //     return () => clearInterval(interval);
-    // }, [props.frames, props.project, props.colorPalettes]);
-
-    // function getProject(): IProject {
-    // 	return {
-    // 		name: project.name,
-    // 		frames: frames,
-    // 		colorPalettes: colorPalettes,
-    // 		canvas: {
-    // 			width: canvasSize.width,
-    // 			height: canvasSize.height
-    // 		}
-    // 	}
-    // }
-
     function getProject(): IProject {
         return {
             name: projectName,
@@ -311,10 +278,38 @@ function useNav(props: IProps) {
         anchor.click();
     }
 
+    function createGif() {
+        var gif = new GIF({
+            workerScript: '/moth/js/gif.worker.js',
+            workers: 2,
+            quality: 10
+        });
+
+        frames.forEach(frame => {
+            let layersRevered = frame.layers.slice().reverse();
+            layersRevered.forEach(layer => {
+                canvas3.resize(canvasSize.width, canvasSize.height);
+                canvas3.putImageData(layer.image);
+                canvas2.drawImage(canvas3.getElement());
+            });
+            gif.addFrame(canvas2.getElement(), { delay: 200 });
+        })
+
+        gif.on('finished', function (blob) {
+            let anchor = document.createElement("a");
+            anchor.href = URL.createObjectURL(blob);
+            anchor.download = projectName;
+            anchor.click();
+        });
+
+        gif.render();
+    }
+
     return {
         modal,
         projectName,
         projectList,
+        createGif,
         deleteProject,
         exportProject,
         importProject,

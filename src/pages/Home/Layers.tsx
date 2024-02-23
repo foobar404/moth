@@ -80,8 +80,13 @@ export function Layers() {
             <section className="p-app__layer-container mb-2">
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
                     <div className={`p-app__layer ${layer.symbol === data.activeLayer.symbol ? "--active" : ""}`}
-                        onClick={() => data.updateLayer(layer)}
+                        draggable
+                        onDragStart={(e) => data.handleDragStart(e, layer)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => data.handleDrop(e, layer)}
+                        onDragEnd={data.handleDragEnd}
                         key={i}>
+
                         <img src={data.imageMap[layer.symbol]} className="p-app__layer-img" />
                         <input type="text"
                             className="c-input --xs !w-9/12"
@@ -92,10 +97,12 @@ export function Layers() {
                                     ...data.activeLayer,
                                     name: value
                                 })
-                            }} />
+                            }}
+                        />
                     </div>
                 ))}
             </section>
+
         </section>
     )
 }
@@ -104,12 +111,12 @@ export function Layers() {
 function useLayers() {
     let [imageMap, setImageMap] = useState<any>({});
     let [layerOpacity, setLayerOpacity] = useState(255);
+    let [draggedLayer, setDraggedLayer] = useState<ILayer | null>(null);
 
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const layersAreVisible = layerOpacity === 255;
-    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
-
+    const { setFrames, frames, activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
 
     useEffect(() => {
         let map: any = {};
@@ -124,44 +131,64 @@ function useLayers() {
         onionSkinHandler(layerOpacity);
     }, [layerOpacity, activeLayer]);
 
+    // resize layers when canvas is resized
+    useEffect(() => {
+        const centerImageData = (oldImageData, newWidth, newHeight) => {
+            const startX = Math.max(0, Math.floor((newWidth - oldImageData.width) / 2));
+            const startY = Math.max(0, Math.floor((newHeight - oldImageData.height) / 2));
+            canvas1.resize(newWidth, newHeight);
+            canvas1.putImageData(oldImageData, startX, startY);
+            return canvas1.getImageData();
+        };
+
+        // Use the helper function to update frames with the new canvas size
+        const updatedFrames = frames.map(frame => ({
+            ...frame,
+            layers: frame.layers.map(layer => ({
+                ...layer,
+                image: centerImageData(layer.image, canvasSize.width, canvasSize.height),
+            }))
+        }));
+
+        setFrames(updatedFrames);
+        setActiveFrame(updatedFrames.find(frame => frame.symbol === activeFrame.symbol)!);
+        setActiveLayer(updatedFrames.find(frame => frame.symbol === activeFrame.symbol)?.layers[0]!);
+    }, [canvasSize]);
+
+    const handleDragStart = (e: React.DragEvent, layer: ILayer) => {
+        setDraggedLayer(layer);
+        // Optionally, you can add effects or styling here to indicate dragging
+    };
+
+    const handleDrop = (e: React.DragEvent, targetLayer: ILayer) => {
+        e.preventDefault();
+        if (!draggedLayer || draggedLayer === targetLayer) return;
+
+        // Find indexes
+        const draggedIndex = activeFrame.layers.findIndex(l => l.symbol === draggedLayer!.symbol);
+        const targetIndex = activeFrame.layers.findIndex(l => l.symbol === targetLayer.symbol);
+
+        // Reorder layers
+        let newLayers = [...activeFrame.layers];
+        newLayers.splice(draggedIndex, 1); // Remove dragged layer
+        newLayers.splice(targetIndex, 0, draggedLayer); // Insert dragged layer before the target layer
+
+        // Update frame with new layers order
+        let newFrame = { ...activeFrame, layers: newLayers };
+        setActiveFrame(newFrame);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedLayer(null); // Reset draggedLayer state
+        // Optionally, reset any drag effects or styling here
+    };
+
     function getImage(data?: ImageData) {
         if (!data) return "";
 
         canvas1.resize(data.width, data.height);
         canvas1.putImageData(data);
         return canvas1.toDataURL();
-    }
-
-    function updateLayer(layer: ILayer) {
-        setActiveLayer(layer);
-    }
-
-    function addNewLayer() {
-        let newLayer: ILayer = {
-            opacity: 255,
-            symbol: Symbol(),
-            name: "New Layer",
-            image: new ImageData(canvasSize.width ?? 1, canvasSize.height ?? 1),
-        };
-
-        setActiveLayer(newLayer);
-    }
-
-    function deleteLayer() {
-        if (!window.confirm("Are you sure you want to delete this layer?")) return;
-
-        let newLayers = activeFrame.layers.filter(layer => layer.symbol !== activeLayer.symbol);
-        if (newLayers.length === 0) {
-            newLayers.push({
-                opacity: 255,
-                symbol: Symbol(),
-                name: "New Layer",
-                image: new ImageData(canvasSize.width ?? 1, canvasSize.height ?? 1),
-            })
-        }
-        let newFrame = { ...activeFrame, layers: newLayers };
-        setActiveFrame(newFrame);
-        setActiveLayer(newFrame.layers[0]);
     }
 
     function onionSkinHandler(opacity: number) {
@@ -201,6 +228,38 @@ function useLayers() {
             newFrame.layers[index + 1] = temp;
         }
         setActiveFrame(newFrame);
+    }
+
+    function deleteLayer() {
+        if (!window.confirm("Are you sure you want to delete this layer?")) return;
+
+        let newLayers = activeFrame.layers.filter(layer => layer.symbol !== activeLayer.symbol);
+        if (newLayers.length === 0) {
+            newLayers.push({
+                opacity: 255,
+                symbol: Symbol(),
+                name: "New Layer",
+                image: new ImageData(canvasSize.width ?? 1, canvasSize.height ?? 1),
+            })
+        }
+        let newFrame = { ...activeFrame, layers: newLayers };
+        setActiveFrame(newFrame);
+        setActiveLayer(newFrame.layers[0]);
+    }
+
+    function updateLayer(layer: ILayer) {
+        setActiveLayer(layer);
+    }
+
+    function addNewLayer() {
+        let newLayer: ILayer = {
+            opacity: 255,
+            symbol: Symbol(),
+            name: "New Layer",
+            image: new ImageData(canvasSize.width ?? 1, canvasSize.height ?? 1),
+        };
+
+        setActiveLayer(newLayer);
     }
 
     function mergeLayer() {
@@ -244,6 +303,9 @@ function useLayers() {
         activeFrame,
         activeLayer,
         setActiveLayer,
+        handleDragStart,
+        handleDragEnd,
+        handleDrop,
         mergeLayer,
         updateLayer,
         addNewLayer,

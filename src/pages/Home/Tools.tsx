@@ -4,6 +4,7 @@ import { IoMdMove } from "react-icons/io";
 import { AiFillFire } from "react-icons/ai";
 import { BsBucketFill } from "react-icons/bs";
 import { GiMirrorMirror } from "react-icons/gi";
+import { MdInvertColors } from "react-icons/md";
 import { IoBandageSharp } from "react-icons/io5";
 import React, { useEffect, useState } from 'react';
 import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
@@ -48,6 +49,12 @@ export function Tools() {
                     onMouseDown={(e) => data.updateTool(e, "bucket")}>
                     <BsBucketFill />
                 </button>
+                <button data-tip={`recolor tool ( r​ ) ${data.getButtonTooltip("recolor")}`}
+                    data-for="tooltip"
+                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("recolor")}`}
+                    onMouseDown={(e) => data.updateTool(e, "recolor")}>
+                    <MdInvertColors />
+                </button>
                 <button data-tip={`shape tool ( s​ ) ${data.getButtonTooltip("shape")}`}
                     data-for="tooltip"
                     className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("shape")}`}
@@ -66,7 +73,7 @@ export function Tools() {
                     onMouseDown={(e) => data.updateTool(e, "eyedropper")}>
                     <FaEyeDropper />
                 </button>
-                <button data-tip={`move tool ( m​ ) ${data.getButtonTooltip("move")}`}
+                <button data-tip={`move tool ( v​ ) ${data.getButtonTooltip("move")}`}
                     data-for="tooltip"
                     className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("move")}`}
                     onMouseDown={(e) => data.updateTool(e, "move")}>
@@ -102,7 +109,7 @@ export function Tools() {
                     onMouseDown={(e) => data.updateTool(e, "line")}>
                     <TbArrowsDiagonal2 />
                 </button>
-                <button data-tip={`mirror tool ( r​ ) ${data.getButtonTooltip("mirror")}`}
+                <button data-tip={`mirror tool ( m​ ) ${data.getButtonTooltip("mirror")}`}
                     data-for="tooltip"
                     className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("mirror")}`}
                     onMouseDown={(e) => data.updateTool(e, "mirror")}>
@@ -269,15 +276,16 @@ function useTools() {
         "e": () => updateTool(null, "eraser", 0),
         "s": () => updateTool(null, "shape", 0),
         "g": () => updateTool(null, "bucket", 0),
+        "r": () => updateTool(null, "recolor", 0),
         "t": () => updateTool(null, "light", 0),
         "i": () => updateTool(null, "eyedropper", 0),
-        "m": () => updateTool(null, "move", 0),
+        "v": () => updateTool(null, "move", 0),
         "x": () => updateTool(null, "box", 0),
         "w": () => updateTool(null, "wand", 0),
         "o": () => updateTool(null, "laso", 0),
         // "n": () => updateTool(null, "bone", 0),
         "l": () => updateTool(null, "line", 0),
-        "r": () => updateTool(null, "mirror", 0),
+        "m": () => updateTool(null, "mirror", 0),
         "shift+h": actions.flipHorizontal,
         "shift+v": actions.flipVertical,
         "shift+~": actions.centerHorizontal,

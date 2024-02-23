@@ -27,7 +27,7 @@ interface IGlobalStore {
 }
 
 
-export const useGlobalStore = create<IGlobalStore>((set) => {
+export const useGlobalStore = create<IGlobalStore>((set, get) => {
     const initialFrames: IFrame[] = [{
         layers: [{ image: new ImageData(32, 32), opacity: 255, symbol: Symbol(), name: "New Layer" }],
         symbol: Symbol()
@@ -55,18 +55,45 @@ export const useGlobalStore = create<IGlobalStore>((set) => {
             rightTool: "eraser" as ITool,
             middleTool: "eyedropper" as ITool,
             mirror: { x: true, y: false },
+            shape: "rect" as any,
+            lightMode: "light" as any,
         },
         // Action methods...
         setProjectName: (projectName: string) => set({ projectName }),
         setCanvasSize: (canvasSize: { height: number; width: number }) => set({ canvasSize }),
         setFrames: (frames: IFrame[]) => set({ frames }),
-        setActiveFrame: (activeFrame: IFrame) => set({ activeFrame }),
-        setActiveLayer: (activeLayer: ILayer) => set({ activeLayer }),
         setColorPalettes: (colorPalettes: IColorPalette[]) => set({ colorPalettes }),
         setActiveColorPalette: (activeColorPalette: IColorPalette) => set({ activeColorPalette }),
         setActiveColor: (activeColor: { r: number, g: number, b: number, a: number }) => set({ activeColor }),
         setColorStats: (colorStats: IColorStats) => set({ colorStats }),
         setToolSettings: (toolSettings: IToolSettings) => set({ toolSettings }),
+        setActiveFrame: (activeFrame: IFrame) => {
+            let index = get().frames.findIndex(frame => frame.symbol === activeFrame.symbol);
+            if (index === -1) { // if frame is new add
+                let newFrames = [...get().frames, activeFrame];
+                set({ frames: newFrames });
+                set({ activeLayer: activeFrame.layers[0] });
+            }
+            else { // if frame exists update
+                let newFrames = [...get().frames];
+                newFrames[index] = activeFrame;
+                set({ frames: newFrames });
+            }
+            set({ activeFrame });
+        },
+        setActiveLayer: (activeLayer: ILayer) => {
+            let index = get().activeFrame.layers.findIndex(layer => layer.symbol === activeLayer.symbol);
+            if (index === -1) { // if layer is new add
+                let newLayers = [...get().activeFrame.layers, activeLayer];
+                useGlobalStore.getState().setActiveFrame({ ...get().activeFrame, layers: newLayers })
+            }
+            else { // if layer exists update
+                let newLayers = [...get().activeFrame.layers];
+                newLayers[index] = activeLayer;
+                useGlobalStore.getState().setActiveFrame({ ...get().activeFrame, layers: newLayers })
+            }
+            set({ activeLayer });
+        },
     };
 
     return initialState;

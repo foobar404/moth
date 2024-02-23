@@ -1,14 +1,14 @@
 import { Preview } from './Preview';
-import { useCanvas, useGlobalStore } from '../../utils';
-import { IoCopy } from "react-icons/io5";
 import { IFrame, IPreview } from '../../types';
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useCanvas, useGlobalStore } from '../../utils';
+import { IoCopy, IoPlay, IoStop } from "react-icons/io5";
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
 
 
 export function Frames() {
-    const data = useLayers();
+    const data = useFrames();
 
     return (<section className="p-app__frames p-app__block">
         <section>
@@ -48,18 +48,18 @@ export function Frames() {
                 </section>
 
                 <section className="p-app__frame-controls-section flex items-center">
-                    {/* <label data-tip="FPS" data-for="tooltip">
+                    <label data-tip="FPS" data-for="tooltip">
                         <input type="number"
-                            value={preview.fps}
+                            value={data.preview.fps}
                             className="c-input --xs mr-2"
                             onChange={e => data.setFps(Number(e.target.value))} />
                     </label>
-                    <button data-tip={`${data.playing ? "stop" : "play"} animation`}
+                    <button data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
                         data-for="tooltip"
                         onClick={data.togglePlay}
                         className="c-button --xs --fourth">
-                        {data.playing ? <IoStop /> : <IoPlay />}
-                    </button> */}
+                        {data.preview.playing ? <IoStop /> : <IoPlay />}
+                    </button>
                 </section>
 
                 <section className="p-app__frame-controls-section flex items-center">
@@ -79,6 +79,11 @@ export function Frames() {
             <section className="p-app__frames-container">
                 {data.frames.map((frame, i) => (
                     <img key={i}
+                        draggable
+                        onDragStart={(e) => data.handleDragStart(e, frame)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => data.handleDrop(e, frame)}
+                        onDragEnd={data.handleDragEnd}
                         className={`p-app__frame ${frame.symbol === data.activeFrame.symbol ? "--active" : ""}`}
                         src={data.imageMap[frame.symbol]}
                         onClick={() => {
@@ -89,18 +94,19 @@ export function Frames() {
             </section>
         </section>
 
-        <Preview preview={data.preview} />
+        <Preview {...data.preview} />
     </section>)
 }
 
-function useLayers() {
+function useFrames() {
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
-    const { frames, setFrames, activeFrame, setActiveFrame, setActiveLayer, canvasSize} = useGlobalStore();
-    let [playing, setPlaying] = useState(false);
+    const { frames, setFrames, activeFrame, setActiveFrame, setActiveLayer, canvasSize } = useGlobalStore();
+
     let [onionSkin, setOnionSkin] = useState(false);
     let [imageMap, setImageMap] = useState<any>({});
-    let [preview, setPreview] = useState<IPreview>({ fps: 24 });
+    let [draggedFrame, setDraggedFrame] = useState<IFrame | null>(null);
+    let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false });
 
     useEffect(() => {
         let map: { [s: symbol]: string } = {};
@@ -110,6 +116,30 @@ function useLayers() {
 
         setImageMap(map);
     }, [activeFrame]);
+
+    const handleDragStart = (e, frame) => {
+        setDraggedFrame(frame);
+        // Optional: Add any drag start effects here
+    };
+
+    const handleDrop = (e, targetFrame) => {
+        e.preventDefault();
+        if (!draggedFrame || draggedFrame === targetFrame) return;
+
+        const draggedIndex = frames.findIndex(f => f.symbol === draggedFrame!.symbol);
+        const targetIndex = frames.findIndex(f => f.symbol === targetFrame.symbol);
+
+        let newFrames = [...frames];
+        // Remove the dragged frame and insert it at the position of the target frame
+        newFrames.splice(draggedIndex, 1); // Remove dragged frame
+        newFrames.splice(targetIndex, 0, draggedFrame); // Insert at new position
+
+        setFrames(newFrames);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedFrame(null); // Reset the state
+    };
 
     function getImage(frame?: IFrame) {
         if (!frame) return "";
@@ -145,7 +175,8 @@ function useLayers() {
                 symbol: Symbol(),
             });
         }
-        setActiveLayer(newFrames[0].layers[0]);
+        setFrames(newFrames);
+        setActiveFrame(newFrames[0]);
     }
 
     function duplicateFrame() {
@@ -185,19 +216,30 @@ function useLayers() {
         setFrames(newFrames);
     }
 
+    function togglePlay() {
+        setPreview({ ...preview, playing: !preview.playing });
+    }
+
+    function setFps(fps: number) {
+        setPreview({ ...preview, fps });
+    }
+
     return {
         frames,
         preview,
-        playing,
         imageMap,
         onionSkin,
         activeFrame,
+        setFps,
         addFrame,
-        setPlaying,
+        togglePlay,
         deleteFrame,
         setOnionSkin,
         moveFrameLeft,
         moveFrameRight,
+        handleDrop,
+        handleDragStart,
+        handleDragEnd,
         duplicateFrame,
         setActiveFrame,
         setActiveLayer,

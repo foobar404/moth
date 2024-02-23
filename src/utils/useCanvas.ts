@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import tinycolor from 'tinycolor2';
 
 
 interface IProps {
@@ -84,57 +85,80 @@ export function useCanvas(props?: IProps) {
         }
     }
 
-    const drawLine = (x0, y0, x1, y1, color = 'black') => {
-        ctx.current.beginPath();
-        ctx.current.moveTo(x0, y0);
-        ctx.current.lineTo(x1, y1);
-        ctx.current.strokeStyle = color;
-        ctx.current.stroke();
+    const drawLine = (start, end, size = 1, color?) => {
+        let points = [];
+        let x0 = start.x;
+        let y0 = start.y;
+        let x1 = end.x;
+        let y1 = end.y;
+
+        let dx = Math.abs(x1 - x0);
+        let dy = -Math.abs(y1 - y0);
+        let sx = x0 < x1 ? 1 : -1;
+        let sy = y0 < y1 ? 1 : -1;
+        let err = dx + dy, e2; // error value e_xy
+
+        while (true) {
+            //@ts-ignore
+            points.push({ x: x0, y: y0 });
+            if (x0 === x1 && y0 === y1) break;
+            e2 = 2 * err;
+            if (e2 >= dy) { err += dy; x0 += sx; }
+            if (e2 <= dx) { err += dx; y0 += sy; }
+        }
+
+        points.forEach((point: { x: number; y: number }) => {
+            drawPixel(point.x, point.y, size);
+        });
     };
 
-    const drawRect = (x, y, width, height, color = 'black', fill = false) => {
-        if (fill) {
-            ctx.current.fillStyle = color;
-            ctx.current.fillRect(x, y, width, height);
-        } else {
-            ctx.current.strokeStyle = color;
-            ctx.current.strokeRect(x, y, width, height);
+    const drawRect = (x, y, width, height, color?, fill = false) => {
+        ctx.current.imageSmoothingEnabled = false;
+
+        if (!fill) {
+            for (let i = 0; i <= width; i++) {
+                drawPixel(x + i, y, 1, color); // Top
+                drawPixel(x + i, y + height, 1, color); // Bottom
+            }
+            for (let i = 0; i <= height; i++) {
+                drawPixel(x, y + i, 1, color); // Left
+                drawPixel(x + width, y + i, 1, color); // Right
+            }
         }
     };
 
-    const drawCircle = (x, y, radius, color = 'black', fill = false) => {
-        ctx.current.beginPath();
-        ctx.current.arc(x, y, radius, 0, 2 * Math.PI);
-        if (fill) {
-            ctx.current.fillStyle = color;
-            ctx.current.fill();
-        } else {
-            ctx.current.strokeStyle = color;
-            ctx.current.stroke();
-        }
-    };
-
-    const drawSquare = (x, y, sideLength, color = 'black', fill = false) => {
+    const drawSquare = (x, y, sideLength, color?, fill = false) => {
         drawRect(x, y, sideLength, sideLength, color, fill);
     };
 
-    const drawOval = (x, y, radiusX, radiusY, color = 'black', fill = false) => {
-        ctx.current.beginPath();
-        ctx.current.ellipse(x, y, radiusX, radiusY, 0, 0, 2 * Math.PI);
-        if (fill) {
-            ctx.current.fillStyle = color;
-            ctx.current.fill();
-        } else {
-            ctx.current.strokeStyle = color;
-            ctx.current.stroke();
+    function drawCircle(centerX, centerY, radius, color?, fill = false) {
+        ctx.current.imageSmoothingEnabled = false;
+
+        for (let y = -radius; y <= radius; y++) {
+            for (let x = -radius; x <= radius; x++) {
+                if (x * x + y * y <= radius * radius) {
+                    if (fill || x * x + y * y >= (radius - 1) * (radius - 1)) {
+                        drawPixel(centerX + x, centerY + y, 1, color);
+                    }
+                }
+            }
         }
-    };
+    }
+
+    function drawOval(centerX, centerY, radiusX, radiusY, color?, fill = false) {
+        ctx.current.imageSmoothingEnabled = false;
+        const step = 0.01; // Adjust step for more or less detail
+
+        for (let theta = 0; theta < 2 * Math.PI; theta += step) {
+            const x = centerX + radiusX * Math.cos(theta);
+            const y = centerY + radiusY * Math.sin(theta);
+            drawPixel(Math.round(x), Math.round(y), 1, color);
+        }
+    }
 
     function drawPixel(x, y, size = 1, color?) {
-        if (color) {
-            let { r, b, g, a } = color;
-            ctx.current.fillStyle = `rgba(${r},${g},${b},${a})`;
-        }
+        if (color) ctx.current.fillStyle = color;
+
         ctx.current.fillRect(x, y, size, size);
     }
 
