@@ -12,6 +12,8 @@ export function useCanvas(props?: IProps) {
     let canvas = useRef<HTMLCanvasElement>(makeCanvas());
     let ctx = useRef<CanvasRenderingContext2D>(canvas.current.getContext('2d')!);
 
+    ctx.current.imageSmoothingEnabled = false;
+
     function makeCanvas() {
         let canvas = document.createElement('canvas');
         canvas.width = props?.width ?? 8;
@@ -96,25 +98,31 @@ export function useCanvas(props?: IProps) {
         let dy = -Math.abs(y1 - y0);
         let sx = x0 < x1 ? 1 : -1;
         let sy = y0 < y1 ? 1 : -1;
-        let err = dx + dy, e2; // error value e_xy
+        let err = dx + dy; // error value e_xy
 
         while (true) {
             //@ts-ignore
-            points.push({ x: x0, y: y0 });
-            if (x0 === x1 && y0 === y1) break;
-            e2 = 2 * err;
-            if (e2 >= dy) { err += dy; x0 += sx; }
-            if (e2 <= dx) { err += dx; y0 += sy; }
+            points.push({ x: x0, y: y0 }); // Plot the current point
+            if (x0 === x1 && y0 === y1) break; // Check if the line has reached its end
+            let e2 = 2 * err;
+            if (e2 >= dy) {
+                err += dy; // Update the error term
+                x0 += sx; // Move in the x direction
+            }
+            if (e2 <= dx) {
+                err += dx; // Update the error term
+                y0 += sy; // Move in the y direction
+            }
         }
 
-        points.forEach((point: { x: number; y: number }) => {
-            drawPixel(point.x, point.y, size);
+        // Draw pixels for all calculated points
+        points.forEach((point: { x: any, y: any }) => {
+            drawPixel(point.x, point.y, size, color); // Assuming drawPixel is defined elsewhere
         });
     };
 
-    const drawRect = (x, y, width, height, color?, fill = false) => {
-        ctx.current.imageSmoothingEnabled = false;
 
+    const drawRect = (x, y, width, height, color?, fill = false) => {
         if (!fill) {
             for (let i = 0; i <= width; i++) {
                 drawPixel(x + i, y, 1, color); // Top
@@ -132,8 +140,6 @@ export function useCanvas(props?: IProps) {
     };
 
     function drawCircle(centerX, centerY, radius, color?, fill = false) {
-        ctx.current.imageSmoothingEnabled = false;
-
         for (let y = -radius; y <= radius; y++) {
             for (let x = -radius; x <= radius; x++) {
                 if (x * x + y * y <= radius * radius) {
@@ -146,7 +152,6 @@ export function useCanvas(props?: IProps) {
     }
 
     function drawOval(centerX, centerY, radiusX, radiusY, color?, fill = false) {
-        ctx.current.imageSmoothingEnabled = false;
         const step = 0.01; // Adjust step for more or less detail
 
         for (let theta = 0; theta < 2 * Math.PI; theta += step) {
@@ -154,6 +159,13 @@ export function useCanvas(props?: IProps) {
             const y = centerY + radiusY * Math.sin(theta);
             drawPixel(Math.round(x), Math.round(y), 1, color);
         }
+    }
+
+    function drawPolygon(points, close = false, color?) {
+        for (let i = 1; i < points.length; i++) {
+            drawLine(points[i - 1], points[i], 1, color);
+        }
+        if (close) drawLine(points[points.length - 1], points[0], 1, color);
     }
 
     function drawPixel(x, y, size = 1, color?) {
@@ -174,17 +186,17 @@ export function useCanvas(props?: IProps) {
         tolerance = 0
     ) {
         const startColor = getColorAtPixel(startX, startY);
-        let pointsToCheck: [number, number][] = [[startX, startY]];
-        let matchingPoints: [number, number][] = [];
+        let pointsToCheck: { x: number, y: number }[] = [{ x: startX, y: startY }];
+        let matchingPoints: { x: number, y: number }[] = [];
         let checkedPoints = new Set();
 
         while (pointsToCheck.length > 0) {
-            let [x, y] = pointsToCheck.pop()!;
+            let { x, y } = pointsToCheck.pop()!;
             if (!isValidPoint(x, y) || checkedPoints.has(`${x},${y}`) || !colorMatches(x, y, startColor, tolerance)) {
                 continue;
             }
 
-            matchingPoints.push([x, y]);
+            matchingPoints.push({ x, y });
             checkedPoints.add(`${x},${y}`);
 
             if (callback) {
@@ -192,15 +204,16 @@ export function useCanvas(props?: IProps) {
             }
 
             // Add neighboring points to check
-            pointsToCheck.push([x + 1, y]);
-            pointsToCheck.push([x - 1, y]);
-            pointsToCheck.push([x, y + 1]);
-            pointsToCheck.push([x, y - 1]);
+            pointsToCheck.push({ x: x + 1, y: y });
+            pointsToCheck.push({ x: x - 1, y: y });
+            pointsToCheck.push({ x: x, y: y + 1 });
+            pointsToCheck.push({ x: x, y: y - 1 });
         }
 
         return matchingPoints;
 
         function isValidPoint(x, y) {
+            // Assuming canvas and ctx are accessible in the current scope
             return x >= 0 && y >= 0 && x < canvas.current.width && y < canvas.current.height;
         }
 
@@ -210,9 +223,33 @@ export function useCanvas(props?: IProps) {
         }
 
         function getColorAtPixel(x, y) {
+            // Assuming ctx is the context of your canvas and is accessible in the current scope
             const imageData = ctx.current.getImageData(x, y, 1, 1).data;
             return [imageData[0], imageData[1], imageData[2], imageData[3]]; // RGBA
         }
+    }
+
+    function getBoundary(points) {
+        let minX = points[0].x;
+        let maxX = points[0].x;
+        let minY = points[0].y;
+        let maxY = points[0].y;
+
+        // Iterate through all points to find the min and max of x and y
+        points.forEach(point => {
+            minX = Math.min(minX, point.x);
+            maxX = Math.max(maxX, point.x);
+            minY = Math.min(minY, point.y);
+            maxY = Math.max(maxY, point.y);
+        });
+
+        // Return the four corners of the bounding box
+        return [
+            { x: minX, y: minY }, // Top left
+            { x: maxX, y: minY }, // Top right
+            { x: maxX, y: maxY }, // Bottom right
+            { x: minX, y: maxY }, // Bottom left
+        ];
     }
 
     return {
@@ -228,6 +265,7 @@ export function useCanvas(props?: IProps) {
         drawCircle,
         drawSquare,
         drawRect,
+        drawPolygon,
         drawPixel,
         erasePixel,
         drawOval,
@@ -236,5 +274,6 @@ export function useCanvas(props?: IProps) {
         getImageData,
         putImageData,
         floodFill,
+        getBoundary,
     }
 }

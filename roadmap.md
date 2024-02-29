@@ -1,19 +1,17 @@
 # Doing
+- wand selection 
+- tilemap mode 
 
 # Bugs 
 - issues with resizing the canvas (active layer)
+- onion skinning doesint work
+- layer opacity doesint work
+- local saves arnt showing up
 
 # MVP
 - box selection tools
-    - rotate and scale selection areas
-    - copy selection 
-    - move selection to new layer new layer 
-
-- wand selection 
 
 - laso selection
-
-- tilemap mode 
 
 - undo / redo 
 
@@ -24,6 +22,7 @@
 
 - import/export 
     - Asprites export settings
+    - import png/jpg as a layer 
     - import project file
     - export selected frame 
         - all
@@ -33,6 +32,7 @@
     - save as project file 
     - recommend local saved projects
     - delete local saved projects  
+    - paste reference image url 
 
 - light/dark theme
 
@@ -43,21 +43,22 @@
 - site domain 
 - login page
 - payment page
+- effects
   
 # Stretch 
-- themes, grid colors, custom layout, custom shortcut
+- themes, grid colors
+    - you can theme it
+- custom layout, custom shortcut
 - perfect mode for brush
 - fonts
 - online gallery 
 - custom brushes 
 - mesh deformation tool (points, weights)
-- color pallette recommendations 
-- recommend colors based on current pallete and AI 
-- recommend better color alternatives based on AI 
-- you can theme it
-- import png/jpg as a layer
-- generate tweening frame via AI
-- paste reference image url     
+- generate tweening frame via AI    
+- selection areas
+    - rotate and scale selection areas
+    - duplicate selection 
+    - move selection to new layer new layer 
 - rig system 
     - bones arnt visible in final render 
     - one bone per layer 
@@ -76,6 +77,9 @@
     - hold shift to imitate mouse pressed (for trackpad users)
     - custom shortcuts 
 - colors
+    - color pallette recommendations 
+    - recommend colors based on current pallete and AI 
+    - recommend better color alternatives based on AI 
     - pallette 
         - import/paste and export/copy a color pallette 
         - import pallette from image 
@@ -83,7 +87,8 @@
             - start with most common colors
             - squash similer colors?
     - deleting a color from the pallette doesint effect layers
-- non-destructive "Effects"     
+- non-destructive "Effects"    
+    - color filter
     - outline effect        
     - The "sun" effect is a ball, that is placed somewhere on the canvas, and affects the colors of the sprites with a specific falloff
         - light source tool, creates highlights and shadows for you 

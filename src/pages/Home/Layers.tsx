@@ -50,42 +50,36 @@ export function Layers() {
                     className="c-button --xs --fourth">
                     <RiGitMergeFill />
                 </button>
-
                 <button data-tip="duplicate layer"
                     data-for="tooltip"
                     onClick={data.duplicateLayer}
                     className="c-button --xs --fourth">
                     <IoCopy />
                 </button>
-
                 <label data-tip="change non-active layers opacity"
                     data-for="tooltip"
                     className="w-full">
                     <p hidden>layers opacity lever</p>
-                    <input onChange={e => data.onionSkinHandler(e.target.valueAsNumber)}
-                        className="c-input w-full"
-                        type="range"
-                        min="1"
-                        max="255"
+                    <input min="1"
                         step="1"
-                        value={
-                            data.activeFrame.layers.reduce((acc, v) => {
-                                if (v.symbol !== data.activeLayer.symbol) return v.opacity;
-                                else return acc;
-                            }, 255)
-                        } />
+                        max="255"
+                        type="range"
+                        className="c-input w-full"
+                        value={data.layerOpacity}
+                        onChange={e => data.setLayerOpacity(e.currentTarget.valueAsNumber)} />
                 </label>
             </nav>
 
             <section className="p-app__layer-container mb-2">
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
-                    <div className={`p-app__layer ${layer.symbol === data.activeLayer.symbol ? "--active" : ""}`}
+                    <div key={i}
                         draggable
-                        onDragStart={(e) => data.handleDragStart(e, layer)}
+                        onDragEnd={data.handleDragEnd}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => data.handleDrop(e, layer)}
-                        onDragEnd={data.handleDragEnd}
-                        key={i}>
+                        onClick={() => data.setActiveLayer(layer)}
+                        onDragStart={(e) => data.handleDragStart(e, layer)}
+                        className={`p-app__layer ${layer.symbol === data.activeLayer.symbol ? "--active" : ""}`}>
 
                         <img src={data.imageMap[layer.symbol]} className="p-app__layer-img" />
                         <input type="text"
@@ -129,7 +123,7 @@ function useLayers() {
 
     useEffect(() => {
         onionSkinHandler(layerOpacity);
-    }, [layerOpacity, activeLayer]);
+    }, [layerOpacity]);
 
     // resize layers when canvas is resized
     useEffect(() => {
@@ -194,13 +188,11 @@ function useLayers() {
     function onionSkinHandler(opacity: number) {
         let newLayers = activeFrame.layers
             .map(layer => {
-                let newOpacity = layer.symbol === activeLayer.symbol ? 255 : opacity;
-                layer.opacity = newOpacity;
+                layer.opacity = layer.symbol === activeLayer.symbol ? 255 : opacity;
                 return layer;
             });
         activeFrame.layers = newLayers;
         setActiveFrame({ ...activeFrame });
-        setLayerOpacity(opacity);
     }
 
     function toggleLayerVisibility() {
@@ -302,9 +294,8 @@ function useLayers() {
         imageMap,
         activeFrame,
         activeLayer,
-        setActiveLayer,
-        handleDragStart,
-        handleDragEnd,
+        layerOpacity,
+        layersAreVisible,
         handleDrop,
         mergeLayer,
         updateLayer,
@@ -312,8 +303,11 @@ function useLayers() {
         deleteLayer,
         moveLayerUp,
         moveLayerDown,
+        handleDragEnd,
+        setActiveLayer,
         duplicateLayer,
-        layersAreVisible,
+        setLayerOpacity,
+        handleDragStart,
         onionSkinHandler,
         toggleLayerVisibility,
     }

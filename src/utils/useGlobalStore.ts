@@ -5,6 +5,7 @@ import { IColorPalette, IColorStats, IFrame, ILayer, ITool, IToolSettings } from
 interface IGlobalStore {
     projectName: string;
     canvasSize: { height: number; width: number };
+    onionSkin: number;
     frames: IFrame[];
     activeFrame: IFrame;
     activeLayer: ILayer;
@@ -16,6 +17,7 @@ interface IGlobalStore {
 
     setProjectName: (projectName: string) => void;
     setCanvasSize: (canvasSize: { height: number; width: number }) => void;
+    setOnionSkin: (onionSkin: number) => void;
     setFrames: (frames: IFrame[]) => void;
     setActiveFrame: (activeFrame: IFrame) => void;
     setActiveLayer: (activeLayer: ILayer) => void;
@@ -42,6 +44,7 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
     const initialState = {
         projectName: new Date().toLocaleString(),
         canvasSize: { height: 32, width: 32 },
+        onionSkin: 0,
         frames: initialFrames,
         activeFrame: initialFrames[0],
         activeLayer: initialFrames[0].layers[0],
@@ -61,6 +64,7 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
         // Action methods...
         setProjectName: (projectName: string) => set({ projectName }),
         setCanvasSize: (canvasSize: { height: number; width: number }) => set({ canvasSize }),
+        setOnionSkin: (onionSkin: number) => set({ onionSkin }),
         setFrames: (frames: IFrame[]) => set({ frames }),
         setColorPalettes: (colorPalettes: IColorPalette[]) => set({ colorPalettes }),
         setActiveColorPalette: (activeColorPalette: IColorPalette) => set({ activeColorPalette }),

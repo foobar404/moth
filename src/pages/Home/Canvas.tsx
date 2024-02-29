@@ -1,12 +1,13 @@
+import tinycolor from "tinycolor2";
 import { ImMinus } from "react-icons/im";
 import ReactTooltip from 'react-tooltip';
 import { IMouseState } from "../../types";
+import { FaMap } from "react-icons/fa6";
 import { BiPlusMedical } from "react-icons/bi";
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun } from "react-icons/fa";
 import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
-import tinycolor from "tinycolor2";
 
 
 enum ToolStage {
@@ -107,7 +108,7 @@ export function Canvas() {
                 </>)}
 
                 {data.toolSettings.leftTool === "light" && (<>
-                    <label data-tip=""
+                    <label data-tip="lighten"
                         data-for="tooltip"
                         className="mr-2 flex">
                         <FaSun className="c-icon" />
@@ -119,7 +120,7 @@ export function Canvas() {
                             onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: e.currentTarget.value as any })}
                         />
                     </label>
-                    <label data-tip=""
+                    <label data-tip="darken"
                         data-for="tooltip"
                         className="mr-2 flex">
                         <FaMoon className="c-icon" />
@@ -188,6 +189,15 @@ export function Canvas() {
                     className="c-button --xs --fourth mr-2">
                     <FaRedoAlt />
                 </button>
+                <label data-tip="toggle tilemode"
+                    data-for="tooltip"
+                    className="mr-2 flex">
+                    <FaMap className="c-icon mr-2" />
+                    <input type="checkbox"
+                        className="c-input "
+                        checked={data.tilemode}
+                        onChange={e => data.setTilemode(e.currentTarget.checked)} />
+                </label>
             </nav>
 
             <section className="p-app__canvas-container" ref={data.mainCanvasContainer}></section>
@@ -199,7 +209,7 @@ function useCanvas() {
     const { toolSettings, setActiveColor, setToolSettings,
         activeColor, activeColorPalette, setActiveColorPalette,
         colorStats, setColorStats, activeLayer, setActiveLayer,
-        activeFrame, canvasSize, setCanvasSize,
+        activeFrame, canvasSize, setCanvasSize, onionSkin, frames
     } = useGlobalStore();
     const mainCanvasContainer = useRef<HTMLElement>(null);
     const mainCanvas = useCanvasHook();
@@ -208,6 +218,7 @@ function useCanvas() {
     const undoStack = useRef<{ frameID: any, layerID: any; image: any }[]>([]);
     const redoStack = useRef<{ frameID: any, layerID: any; image: any }[]>([]);
 
+    let [tilemode, setTilemode] = useState(false);
     let mainCanvasZoom = useRef(15);
     let mouseState = useRef({
         leftDown: false,
@@ -224,12 +235,12 @@ function useCanvas() {
         modifiedPoints: new Set(),
         selectionArea: {
             imgData: null as ImageData | null,
-            bounderyPoints: [] as { x: number; y: number; }[],
+            points: [] as { x: number; y: number; }[],
             startPosition: { x: 0, y: 0 },
             currentPosition: { x: 0, y: 0 },
         }
     });
-    let stateCache = useRef({ activeColorPalette, activeColor, activeFrame, colorStats, toolSettings, activeLayer });
+    let stateCache = useRef({ activeColorPalette, activeColor, activeFrame, colorStats, toolSettings, activeLayer, canvasSize, onionSkin, frames });
     let keys = useShortcuts({
         "control+z": undo,
         "[": () => setBrushSize(-1),
@@ -272,7 +283,7 @@ function useCanvas() {
             let points = canvas2.floodFill(x, y);
 
             points.forEach(point => {
-                canvas1.drawPixel(point[0], point[1]);
+                canvas1.drawPixel(point.x, point.y);
             });
         },
         "line": (x, y, toolButtonActive) => {
@@ -338,7 +349,6 @@ function useCanvas() {
             }
             if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
                 // save and draw
-
                 let { width, height } = toolState.current.selectionArea.imgData!;
                 const eraseImageData = new ImageData(width, height);
 
@@ -348,7 +358,6 @@ function useCanvas() {
                     let g = toolState.current.selectionArea.imgData!.data[i + 1];
                     let b = toolState.current.selectionArea.imgData!.data[i + 2];
                     let a = toolState.current.selectionArea.imgData!.data[i + 3];
-
 
                     // replace colored pixel with black
                     if (r != 0 || g != 0 || b != 0 || a > 1) {
@@ -537,34 +546,120 @@ function useCanvas() {
             canvas1.putImageData(imgData, 0, 0);
         },
         "box": (x, y, toolButtonActive) => {
-            // if toolButtonActive and in preview mode 
-            // set start position, current possition, and first boundery point
-            // change to adjusting mode
-            // if in adjusting mode
-            // update current position 
-            // draw rect from start to current position
-            // if !toolButtonActive and in adjusting mode
-            // update current position
-            // add final point to boundery
-            // save image data to slection area image
-            // reset current position to start position
-            // change mode to MOVING
-            // draw rect
-            // if in moving mode
-            // if clicked outside of the selection boundery
-            // update current position by mouse movement
-            // paint selection img to canvas1 at current position
-            // change mode to SAVE
+            if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                toolState.current.stage = ToolStage.ADJUSTING;
+            }
+            if (toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+                // draw rect from start to current position
 
-            // clear selection img
-            // reset current position to start position
-            // change mode to PREVIEW
-            // else 
-            // update current position by mouse movement
-            // paint selection img to canvas1 at current position
-            // draw rect 
+            }
+            if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+                toolState.current.selectionArea.startPosition = { x, y };
+                toolState.current.selectionArea.currentPosition = { x, y };
+
+                // add final point
+                // save image data to slection area image
+                toolState.current.stage = ToolStage.MOVING;
+                // draw rect
+            }
+            if (toolState.current.stage === ToolStage.MOVING) {
+                toolState.current.selectionArea.currentPosition.x += mouseState.current.movementX;
+                toolState.current.selectionArea.currentPosition.y += mouseState.current.movementY;
+                // paint selection img to canvas1 at current position
+
+                // if clicked outside of the selection boundery
+                // change mode to SAVE
+            }
         },
-        "wand": (x, y, toolButtonActive) => { },
+        "wand": (x, y, toolButtonActive) => {
+            if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                canvas1.drawPixel(x, y);
+                return;
+            }
+            if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                canvas2.putImageData(activeLayer.image);
+                let points = canvas2.floodFill(x, y);
+
+                toolState.current.selectionArea.points = points;
+                toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
+                toolState.current.selectionArea.currentPosition = { x: 0, y: 0 };
+
+                let { height, width } = stateCache.current.activeLayer.image;
+                let img = new ImageData(width, height);
+                points.forEach(point => {
+                    let index = (point.y * width + point.x) * 4;
+                    let r = stateCache.current.activeLayer.image.data[index];
+                    let g = stateCache.current.activeLayer.image.data[index + 1];
+                    let b = stateCache.current.activeLayer.image.data[index + 2];
+                    let a = stateCache.current.activeLayer.image.data[index + 3];
+
+                    img.data[index] = r;
+                    img.data[index + 1] = g;
+                    img.data[index + 2] = b;
+                    img.data[index + 3] = a;
+                });
+                toolState.current.selectionArea.imgData = img;
+
+                toolState.current.stage = ToolStage.MOVING;
+            }
+            if (toolState.current.stage === ToolStage.MOVING) {
+                let newPoints: { x: number, y: number }[] = [];
+                toolState.current.selectionArea.points.forEach(point => {
+                    let currentX = toolState.current.selectionArea.currentPosition.x;
+                    let currentY = toolState.current.selectionArea.currentPosition.y;
+                    let newPoint = { x: Math.floor(point.x + currentX), y: Math.floor(point.y + currentY) };
+
+                    newPoints.push(newPoint);
+                });
+
+                let boundery = canvas1.getBoundary(newPoints);
+                let pointIsInsideBoundery = x >= boundery[0].x
+                    && x <= boundery[1].x
+                    && y >= boundery[0].y
+                    && y <= boundery[3].y;
+
+                if (pointIsInsideBoundery && toolButtonActive) {
+                    toolState.current.selectionArea.currentPosition.x += mouseState.current.movementX / mainCanvasZoom.current;
+                    toolState.current.selectionArea.currentPosition.y += mouseState.current.movementY / mainCanvasZoom.current;
+                }
+                if (!(pointIsInsideBoundery) && toolButtonActive) {
+                    toolState.current.stage = ToolStage.SAVE;
+
+                    let { width, height } = toolState.current.selectionArea.imgData!;
+                    const eraseImageData = new ImageData(width, height);
+
+                    for (let i = 0; i < eraseImageData.data.length; i += 4) {
+                        let r = toolState.current.selectionArea.imgData!.data[i];
+                        let g = toolState.current.selectionArea.imgData!.data[i + 1];
+                        let b = toolState.current.selectionArea.imgData!.data[i + 2];
+                        let a = toolState.current.selectionArea.imgData!.data[i + 3];
+
+                        if (r != 0 || g != 0 || b != 0 || a > 1) {
+                            eraseImageData.data[i] = 255;
+                            eraseImageData.data[i + 1] = 255;
+                            eraseImageData.data[i + 2] = 255;
+                            eraseImageData.data[i + 3] = 1;
+                        }
+                    }
+
+                    canvas2.putImageData(eraseImageData);
+                    canvas1.drawImage(canvas2.getElement());
+                }
+
+                canvas2.putImageData(
+                    toolState.current.selectionArea.imgData,
+                    toolState.current.selectionArea.currentPosition.x,
+                    toolState.current.selectionArea.currentPosition.y,
+                );
+                canvas1.drawImage(canvas2.getElement());
+
+                if (toolState.current.stage != ToolStage.SAVE) {
+                    // draw box outline 
+                    canvas1.drawPolygon(canvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
+                }
+            }
+
+        },
         "laso": (x, y, toolButtonActive) => { },
     };
 
@@ -643,11 +738,20 @@ function useCanvas() {
         canvas2.resize(canvasSize.width, canvasSize.height);
     }, [canvasSize]);
 
+    // update state cache
     useEffect(() => {
-        stateCache.current = { activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame };
-    }, [activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame]);
+        stateCache.current = { activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames };
+    }, [activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames]);
 
+    // rebuild tooltip
     useEffect(() => { ReactTooltip.rebuild() }, [toolSettings]);
+
+    // tilemode
+    useEffect(() => {
+        let height = tilemode ? canvasSize.height * 3 : canvasSize.height;
+        let width = tilemode ? canvasSize.width * 3 : canvasSize.width;
+        mainCanvas.resize(width, height);
+    }, [tilemode]);
 
     //! move to tools
     function setBrushSize(delta: number) {
@@ -767,7 +871,32 @@ function useCanvas() {
             toolState.current.stage = ToolStage.PREVIEW;
         }
 
-        // update the main canvas with contents of canvas1
+        // render previous frame
+        // if (stateCache.current.onionSkin != 0) {
+        //     // find activeframe and get the previous one
+        //     const activeFrame = stateCache.current.activeFrame;
+        //     const previousFrame = stateCache.current.frames.find(frame => frame.symbol === activeFrame.symbol);
+
+        //     let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
+        //     reversedLayers.forEach((layer) => {
+        //         // apply layer opacity
+        //         let imageData = layer.image;
+        //         for (let i = 3; i < imageData.data.length; i += 4) {
+        //             imageData.data[i] *= stateCache.current.onionSkin / 255;
+        //         }
+
+        //         canvas1.putImageData(imageData, 0, 0);
+        //         mainCanvas.drawImage(canvas1.getElement(), 0, 0);
+
+        //         // Paint new pixels if the layer matches the active layer
+        //         if (layer.symbol === stateCache.current.activeLayer.symbol) {
+        //             canvas1.putImageData(canvas1Img, 0, 0); // Overwrite the off-screen canvas with new pixels
+        //             mainCanvas.drawImage(canvas1.getElement(), 0, 0); // Copy the new pixels to the main canvas
+        //         }
+        //     });
+        // }
+
+        // render active frame
         let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
         reversedLayers.forEach((layer) => {
             // apply layer opacity
@@ -791,6 +920,8 @@ function useCanvas() {
         undo,
         redo,
         setZoom,
+        tilemode,
+        setTilemode,
         canvasSize,
         toolSettings,
         mainCanvasZoom,

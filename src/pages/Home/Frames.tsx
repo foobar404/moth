@@ -65,13 +65,19 @@ export function Frames() {
                 <section className="p-app__frame-controls-section flex items-center">
                     <button data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
                         data-for="tooltip"
-                        onClick={() => data.setOnionSkin(x => !x)}
-                        className="c-button --xs --fourth mr-2">
+                        className="c-button --xs --fourth mr-2"
+                        onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
                         {data.onionSkin ? <MdLayersClear /> : <MdLayers />}
                     </button>
                     <label data-tip="onion skin opacity" data-for="tooltip">
                         <p hidden>onion skin slider</p>
-                        <input type="range" className="c-input --xs --wide"></input>
+                        <input type="range"
+                            min="0"
+                            max="255"
+                            value={data.onionSkin}
+                            className="c-input --xs --wide"
+                            onChange={e => data.setOnionSkin(e.target.valueAsNumber)}
+                        ></input>
                     </label>
                 </section>
             </nav>
@@ -101,9 +107,11 @@ export function Frames() {
 function useFrames() {
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
-    const { frames, setFrames, activeFrame, setActiveFrame, setActiveLayer, canvasSize } = useGlobalStore();
+    const {
+        frames, setFrames, activeFrame, setActiveFrame,
+        setActiveLayer, canvasSize, onionSkin, setOnionSkin,
+    } = useGlobalStore();
 
-    let [onionSkin, setOnionSkin] = useState(false);
     let [imageMap, setImageMap] = useState<any>({});
     let [draggedFrame, setDraggedFrame] = useState<IFrame | null>(null);
     let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false });
