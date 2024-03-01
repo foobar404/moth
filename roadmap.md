@@ -4,21 +4,14 @@
 
 # Bugs 
 - issues with resizing the canvas (active layer)
-- onion skinning doesint work
-- layer opacity doesint work
 - local saves arnt showing up
 
-# MVP
+# Pre-Launch
 - box selection tools
 
 - laso selection
 
 - undo / redo 
-
-- previous 2 color switch
-    - just as a quick reference, does no effect the pallete
- - colors used in pallette  
-        - when changing color in pallete, update all instances of that color in all layers 
 
 - import/export 
     - Asprites export settings
@@ -34,17 +27,22 @@
     - delete local saved projects  
     - paste reference image url 
 
+- previous 2 color switch
+    - just as a quick reference, does no effect the pallete
+ - colors used in pallette  
+        - when changing color in pallete, update all instances of that color in all layers 
+
 - light/dark theme
 
 - minimize UI
 
-# After Launch
-- user accounts
 - site domain 
+
+# Launch
+- user accounts
 - login page
 - payment page
-- effects
-  
+
 # Stretch 
 - themes, grid colors
     - you can theme it

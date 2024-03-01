@@ -2,7 +2,7 @@ import { ILayer } from "../../types";
 import { MdDelete } from "react-icons/md";
 import { RiGitMergeFill } from "react-icons/ri";
 import { IoEye, IoCopy } from "react-icons/io5";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useCanvas, useGlobalStore } from "../../utils";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
@@ -111,6 +111,7 @@ function useLayers() {
     const canvas2 = useCanvas();
     const layersAreVisible = layerOpacity === 255;
     const { setFrames, frames, activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
+    const previousActiveLayer = useRef<Symbol>(activeLayer.symbol);
 
     useEffect(() => {
         let map: any = {};
@@ -124,6 +125,13 @@ function useLayers() {
     useEffect(() => {
         onionSkinHandler(layerOpacity);
     }, [layerOpacity]);
+
+    useEffect(() => {
+        if (previousActiveLayer.current !== activeLayer.symbol) {
+            previousActiveLayer.current = activeLayer.symbol;
+            onionSkinHandler(layerOpacity);
+        }
+    }, [activeLayer]);
 
     // resize layers when canvas is resized
     useEffect(() => {

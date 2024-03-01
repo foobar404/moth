@@ -67,7 +67,7 @@ export function Frames() {
                         data-for="tooltip"
                         className="c-button --xs --fourth mr-2"
                         onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
-                        {data.onionSkin ? <MdLayersClear /> : <MdLayers />}
+                        {data.onionSkin ? <MdLayers /> : <MdLayersClear />}
                     </button>
                     <label data-tip="onion skin opacity" data-for="tooltip">
                         <p hidden>onion skin slider</p>

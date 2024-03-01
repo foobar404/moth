@@ -790,6 +790,8 @@ function useCanvas() {
     }
 
     function paint() {
+        canvas1.getCtx().globalAlpha = 1;
+        canvas2.getCtx().globalAlpha = 1;
         canvas1.clear();
         canvas2.clear();
         mainCanvas.clear();
@@ -872,40 +874,30 @@ function useCanvas() {
         }
 
         // render previous frame
-        // if (stateCache.current.onionSkin != 0) {
-        //     // find activeframe and get the previous one
-        //     const activeFrame = stateCache.current.activeFrame;
-        //     const previousFrame = stateCache.current.frames.find(frame => frame.symbol === activeFrame.symbol);
+        if (stateCache.current.onionSkin != 0) {
+            // find activeframe and get the previous one
+            const frameIndex = stateCache.current.frames.findIndex(frame => frame.symbol === stateCache.current.activeFrame.symbol);
+            const previousFrame = stateCache.current.frames[frameIndex - 1];
 
-        //     let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
-        //     reversedLayers.forEach((layer) => {
-        //         // apply layer opacity
-        //         let imageData = layer.image;
-        //         for (let i = 3; i < imageData.data.length; i += 4) {
-        //             imageData.data[i] *= stateCache.current.onionSkin / 255;
-        //         }
+            if (previousFrame) {
+                let reversedLayers = previousFrame.layers.slice().reverse();
+                canvas1.getCtx().globalAlpha = stateCache.current.onionSkin / 255;
 
-        //         canvas1.putImageData(imageData, 0, 0);
-        //         mainCanvas.drawImage(canvas1.getElement(), 0, 0);
-
-        //         // Paint new pixels if the layer matches the active layer
-        //         if (layer.symbol === stateCache.current.activeLayer.symbol) {
-        //             canvas1.putImageData(canvas1Img, 0, 0); // Overwrite the off-screen canvas with new pixels
-        //             mainCanvas.drawImage(canvas1.getElement(), 0, 0); // Copy the new pixels to the main canvas
-        //         }
-        //     });
-        // }
+                reversedLayers.forEach((layer) => {
+                    canvas2.putImageData(layer.image);
+                    canvas1.drawImage(canvas2.getElement());
+                    mainCanvas.drawImage(canvas1.getElement());
+                });
+            }
+        }
 
         // render active frame
         let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
         reversedLayers.forEach((layer) => {
-            // apply layer opacity
-            let imageData = layer.image;
-            for (let i = 3; i < imageData.data.length; i += 4) {
-                imageData.data[i] *= layer.opacity / 255;
-            }
+            canvas2.putImageData(layer.image);
+            canvas1.getCtx().globalAlpha = layer.opacity / 255;
+            canvas1.drawImage(canvas2.getElement());
 
-            canvas1.putImageData(imageData, 0, 0);
             mainCanvas.drawImage(canvas1.getElement(), 0, 0);
 
             // Paint new pixels if the layer matches the active layer
