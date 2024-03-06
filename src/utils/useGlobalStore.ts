@@ -60,6 +60,7 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
             mirror: { x: true, y: false },
             shape: "rect" as any,
             lightMode: "light" as any,
+            eraseAll: false,
         },
         // Action methods...
         setProjectName: (projectName: string) => set({ projectName }),

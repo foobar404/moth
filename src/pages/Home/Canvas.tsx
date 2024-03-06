@@ -4,10 +4,11 @@ import ReactTooltip from 'react-tooltip';
 import { IMouseState } from "../../types";
 import { FaMap } from "react-icons/fa6";
 import { BiPlusMedical } from "react-icons/bi";
+import { BsCircleHalf } from "react-icons/bs";
 import React, { useEffect, useRef, useState } from 'react';
 import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun } from "react-icons/fa";
-import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
+import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
 
 
 enum ToolStage {
@@ -26,8 +27,19 @@ export function Canvas() {
     return (
         <section className="p-app__canvas p-app__block">
             <nav className="p-app__brush-controls">
+                {data.toolSettings.leftTool === "eraser" && (<>
+                    <label data-tip="erase all"
+                        data-for="tooltip"
+                        className="flex mr-2">
+                        <BsCircleHalf className="mr-2 c-icon" />
+                        <input type="checkbox"
+                            className="checkbox"
+                            onChange={e => data.setToolSettings({ ...data.toolSettings, eraseAll: e.currentTarget.checked })} />
+                    </label>
+                </>)}
+
                 {data.toolSettings.leftTool === "mirror" && (<>
-                    <label className="mr-2 flex"
+                    <label className="flex mr-2"
                         data-tip="mirror x & y axis"
                         data-for="tooltip">
                         <span className="mr-1">X & Y</span>
@@ -37,7 +49,7 @@ export function Canvas() {
                             checked={data.toolSettings.mirror.x && data.toolSettings.mirror.y}
                             onClick={() => data.setToolSettings({ ...data.toolSettings, mirror: { x: true, y: true } })} />
                     </label>
-                    <label className="mr-2 flex"
+                    <label className="flex mr-2"
                         data-tip="mirror x axis"
                         data-for="tooltip">
                         <span className="mr-1">X</span>
@@ -47,7 +59,7 @@ export function Canvas() {
                             checked={data.toolSettings.mirror.x && !data.toolSettings.mirror.y}
                             onClick={() => data.setToolSettings({ ...data.toolSettings, mirror: { x: true, y: false } })} />
                     </label>
-                    <label className="mr-2 flex"
+                    <label className="flex mr-2"
                         data-tip="mirror y axis"
                         data-for="tooltip">
                         <span className="mr-1">Y</span>
@@ -62,7 +74,7 @@ export function Canvas() {
                 {data.toolSettings.leftTool === "shape" && (<>
                     <label data-tip=""
                         data-for="tooltip"
-                        className="mr-2 flex">
+                        className="flex mr-2">
                         <TbSquareFilled className="c-icon" />
                         <input type="radio"
                             name="shape"
@@ -73,7 +85,7 @@ export function Canvas() {
                     </label>
                     <label data-tip=""
                         data-for="tooltip"
-                        className="mr-2 flex">
+                        className="flex mr-2">
                         <TbRectangleFilled className="c-icon" />
                         <input type="radio"
                             name="shape"
@@ -85,7 +97,7 @@ export function Canvas() {
                     </label>
                     <label data-tip=""
                         data-for="tooltip"
-                        className="mr-2 flex">
+                        className="flex mr-2">
                         <TbCircleFilled className="c-icon" />
                         <input type="radio"
                             name="shape"
@@ -96,7 +108,7 @@ export function Canvas() {
                     </label>
                     <label data-tip=""
                         data-for="tooltip"
-                        className="mr-2 flex">
+                        className="flex mr-2">
                         <TbOvalFilled className="c-icon" />
                         <input type="radio"
                             name="shape"
@@ -110,7 +122,7 @@ export function Canvas() {
                 {data.toolSettings.leftTool === "light" && (<>
                     <label data-tip="lighten"
                         data-for="tooltip"
-                        className="mr-2 flex">
+                        className="flex mr-2">
                         <FaSun className="c-icon" />
                         <input type="radio"
                             name="light"
@@ -122,7 +134,7 @@ export function Canvas() {
                     </label>
                     <label data-tip="darken"
                         data-for="tooltip"
-                        className="mr-2 flex">
+                        className="flex mr-2">
                         <FaMoon className="c-icon" />
                         <input type="radio"
                             name="light"
@@ -135,13 +147,13 @@ export function Canvas() {
 
                 <button data-tip="decrease brush size ( [ )"
                     data-for="tooltip"
-                    className="c-button --xs --fourth mr-2"
+                    className="mr-2 c-button --xs --fourth"
                     onClick={() => data.setBrushSize(-1)}>
                     <ImMinus />
                 </button>
                 <button data-tip="increase brush size ( ] )"
                     data-for="tooltip"
-                    className="c-button --xs --fourth mr-2"
+                    className="mr-2 c-button --xs --fourth"
                     onClick={() => data.setBrushSize(1)}>
                     <BiPlusMedical />
                 </button>
@@ -155,7 +167,7 @@ export function Canvas() {
                 <input type="range" min="1" max="50" step="1"
                     data-tip="grid zoom"
                     data-for="tooltip"
-                    className="c-input --xs mr-2"
+                    className="mr-2 c-input --xs"
                     style={{ width: "100px" }}
                     defaultValue={10}
                     onChange={(e) => data.setZoom(parseInt(e.target.value))} />
@@ -164,7 +176,7 @@ export function Canvas() {
                     <input data-tip="grid height"
                         data-for="tooltip"
                         type="number"
-                        className="c-input --xs mr-2"
+                        className="mr-2 c-input --xs"
                         value={data.canvasSize.height}
                         onChange={e => data.resizeHandler({ height: e.currentTarget.valueAsNumber })} />
                 </label>
@@ -173,30 +185,29 @@ export function Canvas() {
                     <input data-tip="grid width"
                         data-for="tooltip"
                         type="number"
-                        className="c-input --xs mr-2"
+                        className="mr-2 c-input --xs"
                         value={data.canvasSize.width}
                         onChange={e => data.resizeHandler({ width: e.currentTarget.valueAsNumber })} />
                 </label>
                 <button data-tip="undo ( ctrl + z )"
                     data-for="tooltip"
                     onClick={data.undo}
-                    className="c-button --xs --fourth mr-2">
+                    className="mr-2 c-button --xs --fourth">
                     <FaUndoAlt />
                 </button>
                 <button data-tip="redo ( ctrl + shift + z )"
                     data-for="tooltip"
                     onClick={data.redo}
-                    className="c-button --xs --fourth mr-2">
+                    className="mr-2 c-button --xs --fourth">
                     <FaRedoAlt />
                 </button>
                 <label data-tip="toggle tilemode"
                     data-for="tooltip"
-                    className="mr-2 flex">
-                    <FaMap className="c-icon mr-2" />
+                    className="flex mr-2">
+                    <FaMap className="mr-2 c-icon" />
                     <input type="checkbox"
-                        className="c-input "
-                        checked={data.tilemode}
-                        onChange={e => data.setTilemode(e.currentTarget.checked)} />
+                        className="checkbox"
+                        onChange={e => data.tilemode.current = e.currentTarget.checked} />
                 </label>
             </nav>
 
@@ -209,7 +220,8 @@ function useCanvas() {
     const { toolSettings, setActiveColor, setToolSettings,
         activeColor, activeColorPalette, setActiveColorPalette,
         colorStats, setColorStats, activeLayer, setActiveLayer,
-        activeFrame, canvasSize, setCanvasSize, onionSkin, frames
+        activeFrame, canvasSize, setCanvasSize, onionSkin, frames,
+        setActiveFrame,
     } = useGlobalStore();
     const mainCanvasContainer = useRef<HTMLElement>(null);
     const mainCanvas = useCanvasHook();
@@ -218,7 +230,7 @@ function useCanvas() {
     const undoStack = useRef<{ frameID: any, layerID: any; image: any }[]>([]);
     const redoStack = useRef<{ frameID: any, layerID: any; image: any }[]>([]);
 
-    let [tilemode, setTilemode] = useState(false);
+    let tilemode = useRef(false);
     let mainCanvasZoom = useRef(15);
     let mouseState = useRef({
         leftDown: false,
@@ -260,16 +272,30 @@ function useCanvas() {
             canvas1.drawPixel(newX, newY, stateCache.current.toolSettings.size);
         },
         "eraser": (x, y, toolButtonActive) => {
-            if (toolButtonActive)
-                toolState.current.stage = ToolStage.SAVE;
-
-            // center the mouse cursor in the brush 
-            let width = stateCache.current.toolSettings.size;
-            let height = stateCache.current.toolSettings.size;
+            let size = stateCache.current.toolSettings.eraseAll
+                ? 1 : stateCache.current.toolSettings.size;
+            let width = size;
+            let height = size;
             let newX = x == 0 ? 0 : x - Math.floor(width / 2);
             let newY = y == 0 ? 0 : y - Math.floor(height / 2);
 
-            canvas1.erasePixel(newX, newY, stateCache.current.toolSettings.size);
+            if (!toolButtonActive) {
+                canvas1.drawPixel(newX, newY, size, "rgba(255,0,0,1)");
+                return;
+            }
+
+            if (stateCache.current.toolSettings.eraseAll) {
+                canvas2.putImageData(activeLayer.image);
+                let points = canvas2.floodFill(x, y);
+
+                points.forEach(point => {
+                    canvas1.drawPixel(point.x, point.y, 1, "rgba(255,255,255,.004)");
+                });
+            } else {
+                canvas1.erasePixel(newX, newY, stateCache.current.toolSettings.size);
+            }
+
+            toolState.current.stage = ToolStage.SAVE;
         },
         "bucket": (x, y, toolButtonActive) => {
             if (!toolButtonActive) {
@@ -671,6 +697,13 @@ function useCanvas() {
         })();
     }, []);
 
+    // update frames and layers preview image
+    useEffect(() => {
+        setInterval(() => {
+            setActiveLayer(stateCache.current.activeLayer);
+        }, 500);
+    }, []);
+
     // mouse event listeners
     useEffect(() => {
         const setMouseState = e => {
@@ -731,11 +764,25 @@ function useCanvas() {
         setZoom(mainCanvasZoom.current);
     }, []);
 
-    // resize canvas
+    // resize canvas and layers
     useEffect(() => {
         mainCanvas.resize(canvasSize.width, canvasSize.height);
         canvas1.resize(canvasSize.width, canvasSize.height);
         canvas2.resize(canvasSize.width, canvasSize.height);
+
+        const centerImageData = (oldImageData, newWidth, newHeight) => {
+            const startX = Math.max(0, Math.floor((newWidth - oldImageData.width) / 2));
+            const startY = Math.max(0, Math.floor((newHeight - oldImageData.height) / 2));
+            canvas1.resize(newWidth, newHeight);
+            canvas1.putImageData(oldImageData, startX, startY);
+            return canvas1.getImageData();
+        };
+
+        frames.forEach(frame => {
+            frame.layers.forEach(layer => {
+                layer.image = centerImageData(layer.image, canvasSize.width, canvasSize.height);
+            });
+        });
     }, [canvasSize]);
 
     // update state cache
@@ -745,13 +792,6 @@ function useCanvas() {
 
     // rebuild tooltip
     useEffect(() => { ReactTooltip.rebuild() }, [toolSettings]);
-
-    // tilemode
-    useEffect(() => {
-        let height = tilemode ? canvasSize.height * 3 : canvasSize.height;
-        let width = tilemode ? canvasSize.width * 3 : canvasSize.width;
-        mainCanvas.resize(width, height);
-    }, [tilemode]);
 
     //! move to tools
     function setBrushSize(delta: number) {
@@ -781,8 +821,9 @@ function useCanvas() {
     }
 
     function resizeHandler(size: { height?: number, width?: number }) {
-        let newHeight = Math.max(1, size.height ?? canvasSize.height);
-        let newWidth = Math.max(1, size.width ?? canvasSize.width);
+        let newHeight = Number.isFinite(size.height) ? Math.max(1, size.height!) : canvasSize.height;
+        let newWidth = Number.isFinite(size.width) ? Math.max(1, size.width!) : canvasSize.width;
+
         setCanvasSize({
             height: newHeight,
             width: newWidth
@@ -839,7 +880,7 @@ function useCanvas() {
         let { r, g, b, a } = stateCache.current.activeColor;
         canvas1.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
 
-        //* draw a preview of the selected tool
+        //* draw a preview of the selected tool into canvas1
         toolHandlers[tool]?.(x, y, toolButtonActive);
 
         const canvas1Img = canvas1.getImageData();
@@ -869,7 +910,6 @@ function useCanvas() {
                     stateCache.current.activeLayer.image!.data[i + 3] = 0;
                 }
             }
-            setActiveLayer({ ...stateCache.current.activeLayer });
             toolState.current.stage = ToolStage.PREVIEW;
         }
 
@@ -906,6 +946,15 @@ function useCanvas() {
                 mainCanvas.drawImage(canvas1.getElement(), 0, 0); // Copy the new pixels to the main canvas
             }
         });
+
+        if (tilemode.current) {
+            let width = stateCache.current.canvasSize.width * mainCanvasZoom.current;
+            let height = stateCache.current.canvasSize.height * mainCanvasZoom.current;
+            mainCanvasContainer.current!.style.background = `url(${mainCanvas.getElement().toDataURL()}) repeat center`;
+            mainCanvasContainer.current!.style.backgroundSize = `${width}px ${height}px`;
+        } else {
+            mainCanvasContainer.current!.style.background = `transparent`;
+        }
     }
 
     return {
@@ -913,7 +962,6 @@ function useCanvas() {
         redo,
         setZoom,
         tilemode,
-        setTilemode,
         canvasSize,
         toolSettings,
         mainCanvasZoom,

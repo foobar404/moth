@@ -2,9 +2,9 @@ import { ITool } from '../../types';
 import ReactTooltip from 'react-tooltip';
 import { IoMdMove } from "react-icons/io";
 import { AiFillFire } from "react-icons/ai";
-import { BsBucketFill } from "react-icons/bs";
+import { BsBucketFill, BsEraserFill } from "react-icons/bs";
 import { GiMirrorMirror } from "react-icons/gi";
-import { MdInvertColors } from "react-icons/md";
+import { MdInvertColors, MdOutlineCallReceived } from "react-icons/md";
 import { IoBandageSharp } from "react-icons/io5";
 import React, { useEffect, useState } from 'react';
 import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
@@ -41,7 +41,7 @@ export function Tools() {
                     data-for="tooltip"
                     className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("eraser")}`}
                     onMouseDown={(e) => data.updateTool(e, "eraser")}>
-                    <IoBandageSharp />
+                    <BsEraserFill />
                 </button>
                 <button data-tip={`bucket tool ( g​ ) ${data.getButtonTooltip("bucket")}`}
                     data-for="tooltip"
@@ -107,7 +107,7 @@ export function Tools() {
                     data-for="tooltip"
                     className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("line")}`}
                     onMouseDown={(e) => data.updateTool(e, "line")}>
-                    <TbArrowsDiagonal2 />
+                    <MdOutlineCallReceived />
                 </button>
                 <button data-tip={`mirror tool ( m​ ) ${data.getButtonTooltip("mirror")}`}
                     data-for="tooltip"
@@ -123,43 +123,43 @@ export function Tools() {
                 <button data-tip="flip layer horizontally ( shift + h )"
                     data-for="tooltip"
                     onClick={() => data.actions["flipHorizontal"]()}
-                    className="c-button --sm --second mb-2">
+                    className="mb-2 c-button --sm --second">
                     <TbFlipHorizontal />
                 </button>
                 <button data-tip="flip layer vertically ( shift + v ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["flipVertical"]()}
-                    className="c-button --sm --second mb-2">
+                    className="mb-2 c-button --sm --second">
                     <TbFlipVertical />
                 </button>
                 <button data-tip="center layer horizontally ( shift + ~ )"
                     data-for="tooltip"
                     onClick={() => data.actions["centerHorizontal"]()}
-                    className="c-button --sm --second mb-2">
+                    className="mb-2 c-button --sm --second">
                     <BiHorizontalCenter />
                 </button>
                 <button data-tip="center layer vertically ( shift + | ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["centerVertical"]()}
-                    className="c-button --sm --second mb-2">
+                    className="mb-2 c-button --sm --second">
                     <BiVerticalCenter />
                 </button>
                 <button data-tip="rotate layer 90° right ( shift + r ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["rotateRight"]()}
-                    className="c-button --sm --second mb-2">
+                    className="mb-2 c-button --sm --second">
                     <BiRotateRight />
                 </button>
                 <button data-tip="rotate layer 90° left ( shift + l ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["rotateLeft"]()}
-                    className="c-button --sm --second mb-2">
+                    className="mb-2 c-button --sm --second">
                     <BiRotateLeft />
                 </button>
                 <button data-tip="clear current layer ( shift + c​ )"
                     data-for="tooltip"
                     onClick={() => data.actions["clear"]()}
-                    className="c-button --sm --second mb-2">
+                    className="mb-2 c-button --sm --second">
                     <IoNuclear />
                 </button>
             </section>

@@ -4,10 +4,10 @@
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    grid-template-rows: 60px 1fr 130px;
+    grid-template-rows: 70px 1fr 130px;
     grid-template-columns: 60px 1fr 285px;
     grid-template-areas:
-        "header header header"
+        "left header right"
         "left content right"
         "left footer right";
 
@@ -21,15 +21,7 @@
     }
 
     &__nav {
-        align-items: center;
-        display: flex;
         grid-area: header;
-        overflow-x: auto;
-        overflow-y: hidden;
-
-        &::-webkit-scrollbar {
-            display: none;
-        }
     }
 
     &__canvas {
@@ -49,10 +41,10 @@
 
     &__canvas-container {
         display: flex;
-        height: calc(100% - 50px);
+        height: 100%;
         overflow: auto;
-        margin-top: 50px;
         width: 100%;
+        image-rendering: pixelated;
     }
 
     &__canvas-controls {

@@ -1,40 +1,16 @@
 # Doing
-- wand selection 
-- tilemap mode 
-
-# Bugs 
-- issues with resizing the canvas (active layer)
-- local saves arnt showing up
-
-# Pre-Launch
+- create modal for import
+- import/export 
+    - Asprites export settings
 - box selection tools
 
+# Bugs 
+- animation preview not showing all layers
+
+# Pre-Launch
 - laso selection
 
 - undo / redo 
-
-- import/export 
-    - Asprites export settings
-    - import png/jpg as a layer 
-    - import project file
-    - export selected frame 
-        - all
-    - export selected layer
-        - all 
-    - upscale/downscale exports
-    - save as project file 
-    - recommend local saved projects
-    - delete local saved projects  
-    - paste reference image url 
-
-- previous 2 color switch
-    - just as a quick reference, does no effect the pallete
- - colors used in pallette  
-        - when changing color in pallete, update all instances of that color in all layers 
-
-- light/dark theme
-
-- minimize UI
 
 - site domain 
 
@@ -44,6 +20,10 @@
 - payment page
 
 # Stretch 
+- previous 2 color switch
+- light/dark theme
+- minimize UI
+- node based editor?
 - themes, grid colors
     - you can theme it
 - custom layout, custom shortcut
@@ -79,6 +59,7 @@
     - recommend colors based on current pallete and AI 
     - recommend better color alternatives based on AI 
     - pallette 
+        - when changing color in pallete, update all instances of that color in all layers 
         - import/paste and export/copy a color pallette 
         - import pallette from image 
             - limit pallette to x colors

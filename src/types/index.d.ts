@@ -72,6 +72,7 @@ export interface IToolSettings {
 	};
 	shape: "rect" | "circle" | "oval" | "square",
 	lightMode: "dark" | "light";
+	eraseAll: boolean;
 }
 
 

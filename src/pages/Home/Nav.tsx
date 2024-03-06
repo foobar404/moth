@@ -1,3 +1,4 @@
+import GIF from "gif.js";
 import { Base64 } from 'js-base64';
 import pngText from "png-chunk-text";
 import { IProject } from '../../types';
@@ -12,12 +13,9 @@ import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
 import { useCanvas, useModal, useGlobalStore } from '../../utils';
 import { IoImage, IoLayers, IoColorPalette } from "react-icons/io5";
-import GIF from "gif.js";
-
 
 
 interface IProps {
-    loadProject: (projectName: string) => void;
     setShowMobilePanel: (show: boolean) => void;
 }
 
@@ -39,144 +37,147 @@ export function Nav(props: IProps) {
     const data = useNav(props);
 
     return (<>
-        <Modal {...data.modal}>
-            <main className="flex flex-col p-10">
-                <section className="flex flex-col items-center mr-10">
-                    <button className="c-button --second mb-2"
-                        onClick={() => data.createGif()}>
-                        <i className="c-button__icon --first"><PiGifFill /></i>
-                        Export as GIF
-                    </button>
-                    <button className="c-button --second mb-2"
-                        onClick={() => data.exportProject()}>
-                        <i className="c-button__icon --first"><MdMovieFilter /></i>
-                        Export as Spritesheet
-                    </button>
-                    <button className="c-button --second mb-2"
-                        onClick={() => data.exportProject({ frameOnly: true })}>
-                        <i className="c-button__icon"><IoImage /></i>
-                        Export Current Frame
-                    </button>
-                    <button className="c-button --second mb-2"
+        <Modal {...data.modalExport}>
+            <main className="p-12">
+                <section className="space-y-2 col">
+                    <button className="btn min-w-[250px] text-left"
                         onClick={() => data.exportProject({ layerOnly: true })}>
                         <i className="c-button__icon"><IoLayers /></i>
                         Export Current Layer
                     </button>
-                </section>
-                <section className="flex flex-wrap">
-                    <label className="mr-4">
-                        <p>scale</p>
-                        <input type="number" className="c-input --sm" />
-                    </label>
-                    <label className="mr-4">
-                        <p>rows</p>
-                        <input type="number" className="c-input --sm" />
-                    </label>
-                    <label className="mr-4">
-                        <p>columns</p>
-                        <input type="number" className="c-input --sm" />
-                    </label>
-                    <label className="mr-4">
-                        <p>offset X</p>
-                        <input type="number" className="c-input --sm" />
-                    </label>
-                    <label className="mr-4">
-                        <p>offset Y</p>
-                        <input type="number" className="c-input --sm" />
-                    </label>
-                    <label className="mr-4">
-                        <p>gap</p>
-                        <input type="number" className="c-input --sm" />
-                    </label>
+                    <button className="btn min-w-[250px]"
+                        onClick={() => data.exportProject({ frameOnly: true })}>
+                        <i className="c-button__icon"><IoImage /></i>
+                        Export Current Frame
+                    </button>
+                    <button className="btn min-w-[250px]"
+                        onClick={() => data.createGif()}>
+                        <i className="c-button__icon --first"><PiGifFill /></i>
+                        Export as GIF
+                    </button>
+                    <section className="p-4 rounded-lg shadow-inner col bg-slate-400">
+                        <button className="btn btn-accent min-w-[250px]"
+                            onClick={() => data.exportProject()}>
+                            <i className="c-button__icon --first"><MdMovieFilter /></i>
+                            Export as Spritesheet
+                        </button>
+
+                        <section className="flex flex-wrap">
+                            <label className="mr-4">
+                                <p>scale</p>
+                                <input type="number" className="c-input --sm" value={1} />
+                            </label>
+                        </section>
+                    </section>
                 </section>
             </main>
         </Modal>
 
-        <section className="p-app__nav p-app__block flex items-center justify-between">
-            <section className="flex items-center">
-                <nav className="flex mr-3">
-                    <button onClick={() => data.importProject()}
-                        className="c-button --secondary mr-2 !hidden md:!inline-flex">
-                        <i className="c-button__icon"> <IoImage /></i> Import
+        <Modal {...data.modalImport}>
+            <main className="p-12">
+                <section className="space-y-2 col">
+                    <button className="px-14 btn btn-accent">
+                        Import Project
                     </button>
-                    <button onClick={() => data.modal.setIsOpen(true)}
-                        className="c-button --primary !hidden md:!inline-flex">
-                        <i className="c-button__icon"><HiStar /></i> Export
+                    <button className="px-14 btn btn-outline">
+                        Import Image
                     </button>
 
-                    {/* mobile buttons */}
-                    <button className="c-button --secondary --sm mr-2 md:!hidden">
-                        <IoImage />
-                    </button>
-                    <button onClick={() => data.modal.setIsOpen(true)}
-                        className="c-button --primary --sm md:!hidden">
-                        <HiStar />
-                    </button>
-                </nav>
+                    <div className="divider">Local Projects</div>
 
-                <label>
-                    <p hidden>project name</p>
-                    <input data-tip="project name (press enter to save)"
-                        data-for="tooltip"
-                        type="text"
-                        className="c-input mr-2"
-                        placeholder="Enter Name"
-                        value={data.projectName}
-                        onChange={e => data.saveProjectName(e.target.value)} />
-                </label>
+                    <ul className="w-56 rounded-lg menu bg-base-200">
+                        {data.projectList.map((project) => (
+                            <li key={project}
+                                onClick={() => data.loadProjectFromLocalStorage(project)}
+                                className="p-1 text-center rounded-md cursor-pointer hover:bg-slate-400 hover:text-white">
+                                {project}
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            </main>
+        </Modal>
 
-                {/* mobile buttons */}
-                <button className="c-button --secondary --sm md:!hidden"
-                    onClick={() => props.setShowMobilePanel(true)}>
-                    <IoColorPalette />
+        <section className="row-left p-app__nav p-app__block w-max">
+            <nav className="flex mr-3">
+                <button onClick={() => data.modalImport.setIsOpen(true)}
+                    className="btn btn-primary rounded-xl mr-2 !hidden md:!inline-flex">
+                    <i className="c-button__icon"> <IoImage /></i> Import
+                </button>
+                <button onClick={() => data.modalExport.setIsOpen(true)}
+                    className="btn btn-secondary rounded-xl !hidden md:!inline-flex">
+                    <i className="c-button__icon"><HiStar /></i> Export
                 </button>
 
-                <section className="flex items-center">
-                    {data.projectList.filter(p => p !== data.projectName).reverse().map((project) => (
-                        <span key={project} className="c-token" onClick={() => props.loadProject(project)}>
-                            {project}
+                {/* mobile buttons */}
+                <button onClick={() => data.modalImport.setIsOpen(true)}
+                    className="c-button --secondary --sm mr-2 md:!hidden">
+                    <IoImage />
+                </button>
+                <button onClick={() => data.modalExport.setIsOpen(true)}
+                    className="c-button --primary --sm md:!hidden">
+                    <HiStar />
+                </button>
+            </nav>
 
-                            <button className="c-button --danger --xs ml-2"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    data.deleteProject(project);
-                                }}>
-                                <ImCross />
-                            </button>
-                        </span>
-                    ))}
-                </section>
-            </section>
+            <label>
+                <p hidden>project name</p>
+                <input data-tip="project name (press enter to save)"
+                    data-for="tooltip"
+                    type="text"
+                    className="input shadow-lg min-w-[250px]"
+                    placeholder="Enter Name"
+                    value={data.projectName}
+                    onChange={e => data.saveProjectName(e.target.value)} />
+            </label>
 
-            <section className="flex items-center"></section>
+            {/* mobile buttons */}
+            <button className="c-button --secondary --sm md:!hidden"
+                onClick={() => props.setShowMobilePanel(true)}>
+                <IoColorPalette />
+            </button>
         </section>
     </>)
 }
 
 function useNav(props: IProps) {
-    const modal = useModal();
+    const modalExport = useModal();
+    const modalImport = useModal();
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const canvas3 = useCanvas();
     const {
-        projectName, setProjectName, frames, activeFrame,
-        activeLayer, canvasSize, colorPalettes
+        projectName, frames, activeFrame,
+        activeLayer, canvasSize, colorPalettes,
+        setProjectName, setFrames, setColorPalettes,
+        setCanvasSize, setActiveLayer, setActiveColorPalette
     } = useGlobalStore();
     let [projectList, setProjectList] = useState<string[]>([]);
 
+    // load local projects
     useEffect(() => {
         let cachedList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
         setProjectList(cachedList);
     }, []);
 
-    function getProject(): IProject {
-        return {
-            name: projectName,
-            frames: frames,
-            colorPalettes: colorPalettes,
-            canvas: canvasSize
-        };
-    }
+    // save project locally
+    useEffect(() => {
+        let localProject = getProject();
+
+        let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
+        if (!currentProjectList.includes(localProject.name)) {
+            currentProjectList.push(localProject.name);
+            localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+        }
+
+        if (currentProjectList.length > 10) {
+            let front = currentProjectList.shift();
+            localStorage.removeItem(front);
+            localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+        }
+
+        localStorage.setItem(localProject.name, JSON.stringify(localProject));
+    }, [activeLayer]);
 
     function saveProjectName(name) {
         let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
@@ -190,27 +191,49 @@ function useNav(props: IProps) {
         setProjectName(name);
     }
 
-    function deleteProject(project: string) {
-        if (!window.confirm("Are you sure you want to delete this project?")) return;
+    function getProject(): IProject {
+        return {
+            name: projectName,
+            frames: frames,
+            colorPalettes: colorPalettes,
+            canvas: canvasSize,
+        };
+    }
 
-        let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
-        currentProjectList = currentProjectList.filter((p: string) => p !== project);
-        let projectListWithoutCurrent = currentProjectList.filter((p: string) => p !== projectName);
+    function loadProject(project) {
+        project.frames.forEach((frame) => {
+            frame.symbol = Symbol();
+            frame.layers.forEach((layer) => {
+                layer.image = new ImageData(new Uint8ClampedArray(Object.values(layer.image.data)), project.canvas.width, project.canvas.height);
+                layer.symbol = Symbol();
+            });
+        });
+        project.colorPalettes.forEach((palette) => {
+            palette.symbol = Symbol();
+        })
 
-        localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
-        localStorage.removeItem(project);
-        setProjectList(projectListWithoutCurrent);
+        setProjectName(project.name);
+        setCanvasSize(project.canvas);
+        setFrames(project.frames);
+        setColorPalettes(project.colorPalettes);
+        setActiveColorPalette(project.colorPalettes[0])
+        setActiveLayer(project.frames[0].layers[0]);
+    }
+
+    function loadProjectFromLocalStorage(projectName) {
+        let project = JSON.parse(localStorage.getItem(projectName) ?? "{}");
+        loadProject(project);
     }
 
     async function importProject() {
         let [fileHandle] = await (window as any).showOpenFilePicker({
-            types: [{ accept: { 'image/*': ['.png'] } }],
+            types: [{ accept: { 'image/*': [".png"] } }],
         });
 
         let file = await fileHandle.getFile();
         let fileReader = new FileReader();
         fileReader.readAsArrayBuffer(file);
-        fileReader.onload = () => {
+        fileReader.onload = async () => {
             let data = new Uint8Array(fileReader.result as ArrayBuffer);
             let chunks = pngExtract(data);
 
@@ -222,10 +245,46 @@ function useNav(props: IProps) {
                 return chunk.keyword === "moth";
             })[0];
 
-            if (mothChunk) {
-                //! do something with this
-                JSON.parse(Base64.decode(mothChunk.text));
+            if (mothChunk) { // load project
+                let project = JSON.parse(Base64.decode(mothChunk.text));
+                loadProject(project);
             }
+        }
+    }
+
+    async function importImage() {
+        let [fileHandle] = await (window as any).showOpenFilePicker({
+            types: [{ accept: { 'image/*': [".png", ".jpg", ".jpeg"] } }],
+        });
+
+        let file = await fileHandle.getFile();
+        let fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(file);
+        fileReader.onload = async () => {
+            let data = new Uint8Array(fileReader.result as ArrayBuffer);
+            let blob = new Blob([data], { type: file.type });
+            let url = URL.createObjectURL(blob);
+            let img = new Image();
+            img.src = url;
+
+            await img.decode();
+            let canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            let ctx = canvas.getContext('2d');
+            ctx!.drawImage(img, 0, 0);
+
+            let imageData = ctx!.getImageData(0, 0, canvas.width, canvas.height);
+            let layer = {
+                name: "Layer 1",
+                image: imageData,
+                symbol: Symbol(),
+                opacity: 255,
+            };
+            setActiveLayer(layer);
+            setCanvasSize({ width: img.width, height: img.height });
+            setProjectName(file.name);
         }
     }
 
@@ -235,24 +294,23 @@ function useNav(props: IProps) {
             canvasSize.width :
             canvasSize.width * frames.length;
         canvas1.resize(width, height);
+        canvas2.resize(canvasSize.width, canvasSize.height);
+        canvas3.resize(canvasSize.width, canvasSize.height);
 
         let newFrames = (settings?.frameOnly || settings?.layerOnly) ?
             [activeFrame] : frames;
 
         newFrames.forEach((frame, i) => {
-            canvas2.resize(canvasSize.width, canvasSize.height);
-
             let layersRevered = frame.layers.slice().reverse();
             let layers = (settings?.layerOnly) ? [activeLayer] : layersRevered;
 
             layers.forEach(layer => {
-                canvas3.resize(canvasSize.width, canvasSize.height);
-
                 canvas3.putImageData(layer.image);
                 canvas2.drawImage(canvas3.getElement());
             });
 
-            canvas1.drawImage(canvas2.getElement(), (i * canvasSize.width), 0);
+            canvas1.drawImage(canvas2.getElement(), (width / newFrames.length) * i, 0, canvasSize.width, canvasSize.height);
+            canvas2.clear();
         });
 
         // get current project as png
@@ -276,6 +334,18 @@ function useNav(props: IProps) {
         anchor.href = url;
         anchor.download = projectName;
         anchor.click();
+    }
+
+    function deleteProject(project: string) {
+        if (!window.confirm("Are you sure you want to delete this project?")) return;
+
+        let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
+        currentProjectList = currentProjectList.filter((p: string) => p !== project);
+        let projectListWithoutCurrent = currentProjectList.filter((p: string) => p !== projectName);
+
+        localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+        localStorage.removeItem(project);
+        setProjectList(projectListWithoutCurrent);
     }
 
     function createGif() {
@@ -306,13 +376,16 @@ function useNav(props: IProps) {
     }
 
     return {
-        modal,
+        modalExport,
+        modalImport,
         projectName,
         projectList,
         createGif,
         deleteProject,
         exportProject,
         importProject,
+        importImage,
         saveProjectName,
+        loadProjectFromLocalStorage,
     }
 }

@@ -2,9 +2,9 @@ import { ILayer } from "../../types";
 import { MdDelete } from "react-icons/md";
 import { RiGitMergeFill } from "react-icons/ri";
 import { IoEye, IoCopy } from "react-icons/io5";
-import React, { useEffect, useRef, useState } from 'react';
 import { useCanvas, useGlobalStore } from "../../utils";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
+import React, { useEffect, useRef, useState } from 'react';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 
 
@@ -13,7 +13,7 @@ export function Layers() {
 
     return (
         <section>
-            <nav className="p-app__layer-controls mb-2">
+            <nav className="mb-2 p-app__layer-controls">
                 <button data-tip="add new layer"
                     data-for="tooltip"
                     onClick={data.addNewLayer}
@@ -64,13 +64,13 @@ export function Layers() {
                         step="1"
                         max="255"
                         type="range"
-                        className="c-input w-full"
+                        className="w-full c-input"
                         value={data.layerOpacity}
                         onChange={e => data.setLayerOpacity(e.currentTarget.valueAsNumber)} />
                 </label>
             </nav>
 
-            <section className="p-app__layer-container mb-2">
+            <section className="mb-2 p-app__layer-container">
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
                     <div key={i}
                         draggable
@@ -96,7 +96,6 @@ export function Layers() {
                     </div>
                 ))}
             </section>
-
         </section>
     )
 }
@@ -110,7 +109,7 @@ function useLayers() {
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const layersAreVisible = layerOpacity === 255;
-    const { setFrames, frames, activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
+    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
     const previousActiveLayer = useRef<Symbol>(activeLayer.symbol);
 
     useEffect(() => {
@@ -120,11 +119,7 @@ function useLayers() {
             map[layer.symbol] = img;
         });
         setImageMap(map);
-    }, [activeLayer, activeFrame]);
-
-    useEffect(() => {
-        onionSkinHandler(layerOpacity);
-    }, [layerOpacity]);
+    }, [activeFrame]);
 
     useEffect(() => {
         if (previousActiveLayer.current !== activeLayer.symbol) {
@@ -133,29 +128,9 @@ function useLayers() {
         }
     }, [activeLayer]);
 
-    // resize layers when canvas is resized
     useEffect(() => {
-        const centerImageData = (oldImageData, newWidth, newHeight) => {
-            const startX = Math.max(0, Math.floor((newWidth - oldImageData.width) / 2));
-            const startY = Math.max(0, Math.floor((newHeight - oldImageData.height) / 2));
-            canvas1.resize(newWidth, newHeight);
-            canvas1.putImageData(oldImageData, startX, startY);
-            return canvas1.getImageData();
-        };
-
-        // Use the helper function to update frames with the new canvas size
-        const updatedFrames = frames.map(frame => ({
-            ...frame,
-            layers: frame.layers.map(layer => ({
-                ...layer,
-                image: centerImageData(layer.image, canvasSize.width, canvasSize.height),
-            }))
-        }));
-
-        setFrames(updatedFrames);
-        setActiveFrame(updatedFrames.find(frame => frame.symbol === activeFrame.symbol)!);
-        setActiveLayer(updatedFrames.find(frame => frame.symbol === activeFrame.symbol)?.layers[0]!);
-    }, [canvasSize]);
+        onionSkinHandler(layerOpacity);
+    }, [layerOpacity]);
 
     const handleDragStart = (e: React.DragEvent, layer: ILayer) => {
         setDraggedLayer(layer);

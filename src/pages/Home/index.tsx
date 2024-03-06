@@ -4,7 +4,6 @@ import { Canvas } from './Canvas';
 import { Colors } from './Colors';
 import { Frames } from './Frames';
 import { Layers } from './Layers';
-import { IProject } from "../../types";
 import ReactTooltip from 'react-tooltip';
 import { ImCross } from "react-icons/im";
 import { IoLayers } from "react-icons/io5";
@@ -20,8 +19,7 @@ export function Home() {
 		<main className="p-app">
 			<ReactTooltip id="tooltip" />
 
-			<Nav loadProject={data.loadProject}
-				setShowMobilePanel={data.setShowMobilePanel} />
+			<Nav setShowMobilePanel={data.setShowMobilePanel} />
 
 			<section className="p-app__sidebar-left p-app__block">
 				<Tools />
@@ -72,46 +70,13 @@ function useHome() {
 		document.addEventListener('contextmenu', event => event.preventDefault());
 	}, []);
 
-	useEffect(() => { ReactTooltip.rebuild() }, [tabIndex]);
-
-	function loadProject(projectName: string = "default") {
-		if (!localStorage.getItem(projectName)) return;
-		let existingProject: IProject = JSON.parse(localStorage.getItem(projectName) ?? "{}");
-		setProject(existingProject);
-	}
-
-	function setProject(projectParam: IProject) {
-		// if (projectParam.frames && JSON.stringify(projectParam.frames) !== JSON.stringify(getProject().frames)) {
-		// 	projectParam.frames.forEach((frame, i) => {
-		// 		frame.symbol = Symbol();
-		// 		frame.layers.forEach((layer, j) => {
-		// 			layer.symbol = Symbol();
-		// 			layer.image = new ImageData(new Uint8ClampedArray(Object.values(layer.image.data)), projectParam.canvas!.width, projectParam.canvas!.height);
-		// 		});
-		// 	});
-
-		// 	setFrames(projectParam.frames);
-		// 	setTimeout(() => {
-		// 		setActiveLayer({ ...projectParam.frames![0].layers[0] }, projectParam.frames![0], projectParam.frames);
-		// 	}, 0);
-		// }
-		// if (projectParam.colorPalettes && JSON.stringify(projectParam.colorPalettes) !== JSON.stringify(getProject().colorPalettes)) {
-		// 	projectParam.colorPalettes.forEach((colorPallete, i) => {
-		// 		colorPallete.symbol = Symbol();
-		// 	});
-
-		// 	setColorPalettes(projectParam.colorPalettes);
-		// 	setActiveColorPallete(projectParam.colorPalettes[0], projectParam.colorPalettes);
-		// }
-
-		// setProjectOriginal(projectParam);
-	}
+	useEffect(() => {
+		ReactTooltip.rebuild()
+	}, [tabIndex]);
 
 	return {
 		tabIndex,
-		setProject,
 		setTabIndex,
-		loadProject,
 		showMobilePanel,
 		setShowMobilePanel,
 	};

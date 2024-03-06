@@ -16,10 +16,10 @@ export function Modal(props: IProps) {
         <Portal>
             <main className="c-modal"
                 onClick={() => props.setIsOpen(false)}>
-                <section className="c-modal__body"
+                <section className="c-modal__body !bg-slate-300"
                     onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
                     <button onClick={() => props.setIsOpen(false)}
-                        className="c-modal__exit c-button --sm --danger">
+                        className="absolute top-2 right-2 btn btn-sm btn-error">
                         <ImCross />
                     </button>
 
