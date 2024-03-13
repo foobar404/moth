@@ -68,6 +68,15 @@ export function useCanvas(props?: IProps) {
         return ctx.current.getImageData(x, y, width, height);
     }
 
+    function getColor(x = 0, y = 0) {
+        return {
+            r: ctx.current.getImageData(x, y, 1, 1).data[0],
+            g: ctx.current.getImageData(x, y, 1, 1).data[1],
+            b: ctx.current.getImageData(x, y, 1, 1).data[2],
+            a: ctx.current.getImageData(x, y, 1, 1).data[3]
+        };
+    }
+
     function drawGrid(color1 = "#fff", color2 = "#ddd", size = 1) {
         let rows = Math.floor(canvas.current.height / size);
         let cols = Math.floor(canvas.current.width / size);
@@ -121,7 +130,6 @@ export function useCanvas(props?: IProps) {
         });
     };
 
-
     const drawRect = (x, y, width, height, color?, fill = false) => {
         if (!fill) {
             for (let i = 0; i <= width; i++) {
@@ -169,7 +177,7 @@ export function useCanvas(props?: IProps) {
     }
 
     function drawPixel(x, y, size = 1, color?) {
-        if (color) ctx.current.fillStyle = color;
+        if (color) ctx.current.fillStyle = tinycolor(color).toRgbString();
 
         ctx.current.fillRect(x, y, size, size);
     }
@@ -252,12 +260,51 @@ export function useCanvas(props?: IProps) {
         ];
     }
 
+    function getPointsInPolygon(points) {
+        // Calculate the bounding box of the polygon
+        let minX = points[0].x, maxX = points[0].x;
+        let minY = points[0].y, maxY = points[0].y;
+        points.forEach(point => {
+            if (point.x < minX) minX = point.x;
+            if (point.x > maxX) maxX = point.x;
+            if (point.y < minY) minY = point.y;
+            if (point.y > maxY) maxY = point.y;
+        });
+
+        // A simple point-in-polygon check using ray-casting algorithm
+        function isPointInsidePolygon(point, polygon) {
+            let intersects = 0;
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                if (((polygon[i].y > point.y) != (polygon[j].y > point.y)) &&
+                    (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x)) {
+                    intersects++;
+                }
+            }
+            // If the number of intersections is odd, the point is inside the polygon
+            return intersects % 2 !== 0;
+        }
+
+        // Generate points within the bounding box and check if they are inside the polygon
+        let allPoints: { x: number, y: number }[] = [];
+        for (let x = minX; x <= maxX; x++) {
+            for (let y = minY; y <= maxY; y++) {
+                let testPoint = { x: x, y: y };
+                if (isPointInsidePolygon(testPoint, points)) {
+                    allPoints.push(testPoint);
+                }
+            }
+        }
+
+        return allPoints;
+    }
+
     return {
         getHeight,
         getWidth,
         getSize,
         getElement,
         getCtx,
+        getColor,
         clear,
         resize,
         drawGrid,
@@ -275,5 +322,6 @@ export function useCanvas(props?: IProps) {
         putImageData,
         floodFill,
         getBoundary,
+        getPointsInPolygon,
     }
 }

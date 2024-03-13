@@ -1,18 +1,17 @@
 import tinycolor from "tinycolor2";
+import { FaMap } from "react-icons/fa6";
 import { ImMinus } from "react-icons/im";
 import ReactTooltip from 'react-tooltip';
-import { IMouseState } from "../../types";
-import { FaMap } from "react-icons/fa6";
 import { BiPlusMedical } from "react-icons/bi";
 import { BsCircleHalf } from "react-icons/bs";
-import React, { useEffect, useRef, useState } from 'react';
-import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun } from "react-icons/fa";
+import React, { useEffect, useRef } from 'react';
+import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV } from "react-icons/fa";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
 import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
 
 
 enum ToolStage {
-    PREVIEW, ADJUSTING, MOVING, SAVE
+    PREVIEW, ADJUSTING, MOVING
 }
 
 
@@ -31,7 +30,7 @@ export function Canvas() {
                     <label data-tip="erase all"
                         data-for="tooltip"
                         className="flex mr-2">
-                        <BsCircleHalf className="mr-2 c-icon" />
+                        <BsCircleHalf className="mr-2 text-lg" />
                         <input type="checkbox"
                             className="checkbox"
                             onChange={e => data.setToolSettings({ ...data.toolSettings, eraseAll: e.currentTarget.checked })} />
@@ -39,32 +38,32 @@ export function Canvas() {
                 </>)}
 
                 {data.toolSettings.leftTool === "mirror" && (<>
-                    <label className="flex mr-2"
+                    <label className="mr-2 row"
                         data-tip="mirror x & y axis"
                         data-for="tooltip">
-                        <span className="mr-1">X & Y</span>
+                        <FaArrowsAlt className="inline mr-1 text-lg" />
                         <input type="radio"
-                            className="c-input"
+                            className="radio radio-xs"
                             name="mirror-type"
                             checked={data.toolSettings.mirror.x && data.toolSettings.mirror.y}
                             onClick={() => data.setToolSettings({ ...data.toolSettings, mirror: { x: true, y: true } })} />
                     </label>
-                    <label className="flex mr-2"
+                    <label className="mr-2 row"
                         data-tip="mirror x axis"
                         data-for="tooltip">
-                        <span className="mr-1">X</span>
+                        <FaArrowsAltH className="inline mr-1 text-lg" />
                         <input type="radio"
-                            className="c-input"
+                            className="radio radio-xs"
                             name="mirror-type"
                             checked={data.toolSettings.mirror.x && !data.toolSettings.mirror.y}
                             onClick={() => data.setToolSettings({ ...data.toolSettings, mirror: { x: true, y: false } })} />
                     </label>
-                    <label className="flex mr-2"
+                    <label className="mr-2 row"
                         data-tip="mirror y axis"
                         data-for="tooltip">
-                        <span className="mr-1">Y</span>
+                        <FaArrowsAltV className="inline mr-1 text-lg" />
                         <input type="radio"
-                            className="c-input"
+                            className="radio radio-xs"
                             name="mirror-type"
                             checked={data.toolSettings.mirror.y && !data.toolSettings.mirror.x}
                             onClick={() => data.setToolSettings({ ...data.toolSettings, mirror: { x: false, y: true } })} />
@@ -74,22 +73,22 @@ export function Canvas() {
                 {data.toolSettings.leftTool === "shape" && (<>
                     <label data-tip=""
                         data-for="tooltip"
-                        className="flex mr-2">
-                        <TbSquareFilled className="c-icon" />
+                        className="flex mr-2 row">
+                        <TbSquareFilled className="mr-1 text-lg" />
                         <input type="radio"
                             name="shape"
-                            className="c-input"
+                            className="radio radio-xs"
                             value="square"
                             onClick={(e) => data.setToolSettings({ ...data.toolSettings, shape: e.currentTarget.value as any })}
                         />
                     </label>
                     <label data-tip=""
                         data-for="tooltip"
-                        className="flex mr-2">
-                        <TbRectangleFilled className="c-icon" />
+                        className="flex mr-2 row">
+                        <TbRectangleFilled className="mr-1 text-lg" />
                         <input type="radio"
                             name="shape"
-                            className="c-input"
+                            className="radio radio-xs"
                             value="rect"
                             defaultChecked={true}
                             onClick={(e) => data.setToolSettings({ ...data.toolSettings, shape: e.currentTarget.value as any })}
@@ -97,22 +96,22 @@ export function Canvas() {
                     </label>
                     <label data-tip=""
                         data-for="tooltip"
-                        className="flex mr-2">
-                        <TbCircleFilled className="c-icon" />
+                        className="flex mr-2 row">
+                        <TbCircleFilled className="mr-1 text-lg" />
                         <input type="radio"
                             name="shape"
-                            className="c-input"
+                            className="radio radio-xs"
                             value="circle"
                             onClick={(e) => data.setToolSettings({ ...data.toolSettings, shape: e.currentTarget.value as any })}
                         />
                     </label>
                     <label data-tip=""
                         data-for="tooltip"
-                        className="flex mr-2">
-                        <TbOvalFilled className="c-icon" />
+                        className="flex mr-2 row">
+                        <TbOvalFilled className="mr-1 text-lg" />
                         <input type="radio"
                             name="shape"
-                            className="c-input"
+                            className="radio radio-xs"
                             value="oval"
                             onClick={(e) => data.setToolSettings({ ...data.toolSettings, shape: e.currentTarget.value as any })}
                         />
@@ -120,54 +119,50 @@ export function Canvas() {
                 </>)}
 
                 {data.toolSettings.leftTool === "light" && (<>
-                    <label data-tip="lighten"
-                        data-for="tooltip"
-                        className="flex mr-2">
-                        <FaSun className="c-icon" />
-                        <input type="radio"
-                            name="light"
-                            className="c-input"
-                            value="light"
-                            defaultChecked={true}
-                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: e.currentTarget.value as any })}
-                        />
-                    </label>
-                    <label data-tip="darken"
-                        data-for="tooltip"
-                        className="flex mr-2">
-                        <FaMoon className="c-icon" />
-                        <input type="radio"
-                            name="light"
-                            className="c-input"
-                            value="dark"
-                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: e.currentTarget.value as any })}
-                        />
-                    </label>
+                    <div className="row !flex-nowrap">
+                        <div className="mr-2 swap swap-rotate"
+                            data-tip="dark/light mode"
+                            data-for="tooltip"
+                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: data.toolSettings.lightMode == "light" ? "dark" : "light" })}>
+
+                            <input type="checkbox" checked={data.toolSettings.lightMode === "light"} />
+
+                            <FaSun className="text-xl swap-on" />
+                            <FaMoon className="text-xl swap-off" />
+                        </div>
+                        <input data-tip="dark/light intensity"
+                            data-for="tooltip"
+                            value={data.toolSettings.lightIntensity}
+                            onChange={(e) => data.setToolSettings({ ...data.toolSettings, lightIntensity: e.currentTarget.valueAsNumber })}
+                            type="range" min="1" max="20" className="mr-2 range range-xs" step=".5" />
+                    </div>
                 </>)}
 
-                <button data-tip="decrease brush size ( [ )"
-                    data-for="tooltip"
-                    className="mr-2 c-button --xs --fourth"
-                    onClick={() => data.setBrushSize(-1)}>
-                    <ImMinus />
-                </button>
-                <button data-tip="increase brush size ( ] )"
-                    data-for="tooltip"
-                    className="mr-2 c-button --xs --fourth"
-                    onClick={() => data.setBrushSize(1)}>
-                    <BiPlusMedical />
-                </button>
-                <span data-tip="brush size"
-                    data-for="tooltip">
-                    {data.toolSettings.size}
-                </span>
+                <div className="space-x-2">
+                    <button data-tip="decrease brush size ( [ )"
+                        data-for="tooltip"
+                        className="btn btn-xs"
+                        onClick={() => data.setBrushSize(-1)}>
+                        <ImMinus />
+                    </button>
+                    <button data-tip="increase brush size ( ] )"
+                        data-for="tooltip"
+                        className="btn btn-xs"
+                        onClick={() => data.setBrushSize(1)}>
+                        <BiPlusMedical />
+                    </button>
+                    <span data-tip="brush size"
+                        data-for="tooltip">
+                        {data.toolSettings.size}
+                    </span>
+                </div>
             </nav>
 
-            <nav className="p-app__canvas-controls">
+            <nav className="space-x-2 p-app__canvas-controls">
                 <input type="range" min="1" max="50" step="1"
                     data-tip="grid zoom"
                     data-for="tooltip"
-                    className="mr-2 c-input --xs"
+                    className="range range-xs"
                     style={{ width: "100px" }}
                     defaultValue={10}
                     onChange={(e) => data.setZoom(parseInt(e.target.value))} />
@@ -176,7 +171,7 @@ export function Canvas() {
                     <input data-tip="grid height"
                         data-for="tooltip"
                         type="number"
-                        className="mr-2 c-input --xs"
+                        className="w-16 input input-xs"
                         value={data.canvasSize.height}
                         onChange={e => data.resizeHandler({ height: e.currentTarget.valueAsNumber })} />
                 </label>
@@ -185,28 +180,28 @@ export function Canvas() {
                     <input data-tip="grid width"
                         data-for="tooltip"
                         type="number"
-                        className="mr-2 c-input --xs"
+                        className="w-16 input input-xs"
                         value={data.canvasSize.width}
                         onChange={e => data.resizeHandler({ width: e.currentTarget.valueAsNumber })} />
                 </label>
                 <button data-tip="undo ( ctrl + z )"
                     data-for="tooltip"
                     onClick={data.undo}
-                    className="mr-2 c-button --xs --fourth">
+                    className="btn btn-xs">
                     <FaUndoAlt />
                 </button>
                 <button data-tip="redo ( ctrl + shift + z )"
                     data-for="tooltip"
                     onClick={data.redo}
-                    className="mr-2 c-button --xs --fourth">
+                    className="btn btn-xs">
                     <FaRedoAlt />
                 </button>
                 <label data-tip="toggle tilemode"
                     data-for="tooltip"
-                    className="flex mr-2">
-                    <FaMap className="mr-2 c-icon" />
+                    className="mr-2 row">
+                    <FaMap className="mr-2 text-lg" />
                     <input type="checkbox"
-                        className="checkbox"
+                        className="checkbox checkbox-xs"
                         onChange={e => data.tilemode.current = e.currentTarget.checked} />
                 </label>
             </nav>
@@ -221,14 +216,15 @@ function useCanvas() {
         activeColor, activeColorPalette, setActiveColorPalette,
         colorStats, setColorStats, activeLayer, setActiveLayer,
         activeFrame, canvasSize, setCanvasSize, onionSkin, frames,
-        setActiveFrame,
     } = useGlobalStore();
     const mainCanvasContainer = useRef<HTMLElement>(null);
     const mainCanvas = useCanvasHook();
-    const canvas1 = useCanvasHook();
-    const canvas2 = useCanvasHook();
-    const undoStack = useRef<{ frameID: any, layerID: any; image: any }[]>([]);
-    const redoStack = useRef<{ frameID: any, layerID: any; image: any }[]>([]);
+    const saveCanvas = useCanvasHook();
+    const previewCanvas = useCanvasHook();
+    const tempCanvas1 = useCanvasHook();
+    const tempCanvas2 = useCanvasHook();
+    const undoStack = useRef<{ layerID: any; image: any; hash: any; }[]>([]);
+    const redoStack = useRef<{ layerID: any; image: any; hash: any; }[]>([]);
 
     let tilemode = useRef(false);
     let mainCanvasZoom = useRef(15);
@@ -243,13 +239,15 @@ function useCanvas() {
     });
     let toolState = useRef({
         stage: ToolStage.PREVIEW,
-        activePoints: [] as { x: number; y: number; }[],
-        modifiedPoints: new Set(),
+        activePoints: [] as { x: number; y: number; }[], //remove 
+        modifiedPoints: new Set(), // add key
         selectionArea: {
             imgData: null as ImageData | null,
             points: [] as { x: number; y: number; }[],
             startPosition: { x: 0, y: 0 },
             currentPosition: { x: 0, y: 0 },
+            rectSelection: { startPoint: { x: 0, y: 0 }, endPoint: { x: 0, y: 0 } },
+            lassoSelection: { points: [] as { x: number; y: number }[] }
         }
     });
     let stateCache = useRef({ activeColorPalette, activeColor, activeFrame, colorStats, toolSettings, activeLayer, canvasSize, onionSkin, frames });
@@ -260,16 +258,17 @@ function useCanvas() {
     });
     let toolHandlers = {
         "brush": (x, y, toolButtonActive) => {
-            if (toolButtonActive)
-                toolState.current.stage = ToolStage.SAVE;
-
             // center the mouse cursor in the brush 
             let width = stateCache.current.toolSettings.size;
             let height = stateCache.current.toolSettings.size;
             let newX = x == 0 ? 0 : x - Math.floor(width / 2);
             let newY = y == 0 ? 0 : y - Math.floor(height / 2);
 
-            canvas1.drawPixel(newX, newY, stateCache.current.toolSettings.size);
+            if (toolButtonActive) {
+                saveCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size);
+            } else {
+                previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size);
+            }
         },
         "eraser": (x, y, toolButtonActive) => {
             let size = stateCache.current.toolSettings.eraseAll
@@ -279,41 +278,34 @@ function useCanvas() {
             let newX = x == 0 ? 0 : x - Math.floor(width / 2);
             let newY = y == 0 ? 0 : y - Math.floor(height / 2);
 
-            if (!toolButtonActive) {
-                canvas1.drawPixel(newX, newY, size, "rgba(255,0,0,1)");
-                return;
-            }
+            if (toolButtonActive) {
+                if (stateCache.current.toolSettings.eraseAll) {
+                    tempCanvas1.putImageData(activeLayer.image);
+                    let points = tempCanvas1.floodFill(x, y);
 
-            if (stateCache.current.toolSettings.eraseAll) {
-                canvas2.putImageData(activeLayer.image);
-                let points = canvas2.floodFill(x, y);
-
-                points.forEach(point => {
-                    canvas1.drawPixel(point.x, point.y, 1, "rgba(255,255,255,.004)");
-                });
+                    points.forEach(point => {
+                        saveCanvas.drawPixel(point.x, point.y, 1, "rgba(255,255,255,.004)");
+                    });
+                } else {
+                    saveCanvas.erasePixel(newX, newY, stateCache.current.toolSettings.size);
+                }
             } else {
-                canvas1.erasePixel(newX, newY, stateCache.current.toolSettings.size);
+                previewCanvas.drawPixel(newX, newY, size, "rgba(255,0,0,.004)");
             }
-
-            toolState.current.stage = ToolStage.SAVE;
         },
         "bucket": (x, y, toolButtonActive) => {
-            if (!toolButtonActive) {
-                canvas1.drawPixel(x, y);
-                return;
+            if (toolButtonActive) {
+                tempCanvas1.putImageData(activeLayer.image);
+                let points = tempCanvas1.floodFill(x, y);
+
+                points.forEach(point => {
+                    saveCanvas.drawPixel(point.x, point.y);
+                });
+            } else {
+                previewCanvas.drawPixel(x, y, 1);
             }
-
-            toolState.current.stage = ToolStage.SAVE;
-
-            canvas2.putImageData(activeLayer.image);
-            let points = canvas2.floodFill(x, y);
-
-            points.forEach(point => {
-                canvas1.drawPixel(point.x, point.y);
-            });
         },
         "line": (x, y, toolButtonActive) => {
-            // Check if we are previewing a new line or adjusting an existing line
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
                 toolState.current.stage = ToolStage.ADJUSTING;
@@ -324,95 +316,90 @@ function useCanvas() {
                     const startPoint = activePoints[0];
                     const endPoint = { x: Math.floor(x), y: Math.floor(y) };
 
-                    canvas1.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
+                    previewCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
 
                     if (!toolButtonActive) {
-                        toolState.current.stage = ToolStage.SAVE;
-                        toolState.current.activePoints = []; // Prepare for the next use
+                        saveCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
+                        toolState.current.stage = ToolStage.PREVIEW;
+                        toolState.current.activePoints = [];
                     }
                 }
             }
         },
         "mirror": (x, y, toolButtonActive) => {
-            if (toolButtonActive)
-                toolState.current.stage = ToolStage.SAVE;
-
             const { size, mirror } = stateCache.current.toolSettings;
-            const ctx = canvas1.getCtx();
             const mirrorX = mirror.x;
             const mirrorY = mirror.y;
 
-            ctx.fillRect(x, y, size, size);
+            tempCanvas1.drawPixel(x, y, size);
 
             if (mirrorX)
-                ctx.fillRect(mainCanvas.getWidth() - x - size, y, size, size);
+                tempCanvas1.drawPixel(mainCanvas.getWidth() - x - size, y, size);
 
             if (mirrorY)
-                ctx.fillRect(x, mainCanvas.getHeight() - y - size, size, size);
+                tempCanvas1.drawPixel(x, mainCanvas.getHeight() - y - size, size);
 
-            // Mirror both X and Y axes
             if (mirrorX && mirrorY)
-                ctx.fillRect(mainCanvas.getWidth() - x - size, mainCanvas.getHeight() - y - size, size, size);
+                tempCanvas1.drawPixel(mainCanvas.getWidth() - x - size, mainCanvas.getHeight() - y - size, size);
 
+            if (toolButtonActive) {
+                saveCanvas.putImageData(tempCanvas1.getImageData());
+            }
+            else {
+                previewCanvas.putImageData(tempCanvas1.getImageData());
+            }
         },
         "move": (x, y, toolButtonActive) => {
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.stage = ToolStage.ADJUSTING;
 
-                canvas2.putImageData(stateCache.current.activeLayer.image);
-                toolState.current.selectionArea.imgData = canvas2.getImageData();
+                tempCanvas1.putImageData(stateCache.current.activeLayer.image);
+                toolState.current.selectionArea.imgData = tempCanvas1.getImageData();
+                toolState.current.selectionArea.startPosition = { x: x, y: y };
+                toolState.current.selectionArea.currentPosition = {
+                    x: x - toolState.current.selectionArea.startPosition.x,
+                    y: y - toolState.current.selectionArea.startPosition.y
+                };
             }
-            if (toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+            if (toolState.current.stage === ToolStage.ADJUSTING) {
                 // Calculate the displacement
-                toolState.current.selectionArea.currentPosition.x += mouseState.current.movementX / mainCanvasZoom.current;
-                toolState.current.selectionArea.currentPosition.y += mouseState.current.movementY / mainCanvasZoom.current;
+                toolState.current.selectionArea.currentPosition.x = x - toolState.current.selectionArea.startPosition.x;
+                toolState.current.selectionArea.currentPosition.y = y - toolState.current.selectionArea.startPosition.y;
 
-                canvas1.putImageData(
-                    toolState.current.selectionArea.imgData,
-                    toolState.current.selectionArea.currentPosition.x,
-                    toolState.current.selectionArea.currentPosition.y
-                );
-            }
-            if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
                 // save and draw
-                let { width, height } = toolState.current.selectionArea.imgData!;
+                let { width, height } = stateCache.current.canvasSize;
                 const eraseImageData = new ImageData(width, height);
 
                 // Fill the new ImageData with black pixels
                 for (let i = 0; i < eraseImageData.data.length; i += 4) {
-                    let r = toolState.current.selectionArea.imgData!.data[i];
-                    let g = toolState.current.selectionArea.imgData!.data[i + 1];
-                    let b = toolState.current.selectionArea.imgData!.data[i + 2];
-                    let a = toolState.current.selectionArea.imgData!.data[i + 3];
-
-                    // replace colored pixel with black
-                    if (r != 0 || g != 0 || b != 0 || a > 1) {
-                        eraseImageData.data[i] = 255;
-                        eraseImageData.data[i + 1] = 255;
-                        eraseImageData.data[i + 2] = 255;
-                        eraseImageData.data[i + 3] = 1;
-                    }
+                    eraseImageData.data[i] = 255;
+                    eraseImageData.data[i + 1] = 255;
+                    eraseImageData.data[i + 2] = 255;
+                    eraseImageData.data[i + 3] = 1;
                 }
-                canvas2.putImageData(
-                    eraseImageData,
-                    toolState.current.selectionArea.startPosition.x,
-                    toolState.current.selectionArea.startPosition.y,
-                );
-                canvas1.drawImage(canvas2.getElement());
-                canvas2.putImageData(
+
+                tempCanvas1.putImageData(
                     toolState.current.selectionArea.imgData,
                     toolState.current.selectionArea.currentPosition.x,
                     toolState.current.selectionArea.currentPosition.y
                 );
-                canvas1.drawImage(canvas2.getElement());
+                tempCanvas2.drawImage(tempCanvas1.getElement());
 
-                toolState.current.stage = ToolStage.SAVE;
-                toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
-                toolState.current.selectionArea.currentPosition = { x: 0, y: 0 };
+                if (toolButtonActive) {
+                    previewCanvas.putImageData(eraseImageData);
+                    previewCanvas.drawImage(tempCanvas2.getElement());
+                } else {
+                    saveCanvas.putImageData(eraseImageData);
+                    saveCanvas.drawImage(tempCanvas2.getElement());
+
+                    toolState.current.stage = ToolStage.PREVIEW;
+                    toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
+                    toolState.current.selectionArea.currentPosition = { x: 0, y: 0 };
+                }
             }
         },
         "eyedropper": (x, y, toolButtonActive) => {
-            if (toolButtonActive) {
+            if (toolState.current.stage === ToolStage.PREVIEW) {
                 let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
                 reversedLayers.forEach((layer) => {
                     let imageData = layer.image;
@@ -420,19 +407,29 @@ function useCanvas() {
                         imageData.data[i] *= layer.opacity / 255;
                     }
 
-                    canvas1.putImageData(imageData, 0, 0);
-                    canvas2.drawImage(canvas1.getElement(), 0, 0);
+                    tempCanvas1.putImageData(imageData, 0, 0);
+                    tempCanvas2.drawImage(tempCanvas1.getElement(), 0, 0);
                 });
 
-                let frameData = canvas2.getImageData();
-                let current = {
+                let frameData = tempCanvas2.getImageData();
+                let currentColor = {
                     r: frameData.data[(((y * frameData.width) + x) * 4)],
                     g: frameData.data[(((y * frameData.width) + x) * 4) + 1],
                     b: frameData.data[(((y * frameData.width) + x) * 4) + 2],
                     a: frameData.data[(((y * frameData.width) + x) * 4) + 3]
                 };
 
-                setActiveColor(current);
+                if (toolButtonActive) {
+                    if (currentColor.a !== 0) setActiveColor(currentColor);
+                    toolState.current.stage = ToolStage.ADJUSTING;
+                } else {
+                    let { width, height } = stateCache.current.canvasSize;
+                    let { r, g, b, a } = currentColor;
+                    previewCanvas.drawRect(0, 0, width - 1, height - 1, `rgba(${r},${g},${b},${a})`);
+                }
+            }
+            if (toolState.current.stage = ToolStage.ADJUSTING) {
+                if (!toolButtonActive) toolState.current.stage = ToolStage.PREVIEW;
             }
         },
         "shape": (x, y, toolButtonActive) => {
@@ -441,6 +438,7 @@ function useCanvas() {
                 toolState.current.stage = ToolStage.ADJUSTING;
             } else if (toolState.current.stage === ToolStage.ADJUSTING) {
                 const activePoints = toolState.current.activePoints;
+
                 if (activePoints.length > 0) {
                     const start = activePoints[0];
                     const end = { x: Math.floor(x), y: Math.floor(y) };
@@ -455,7 +453,7 @@ function useCanvas() {
                         const left = Math.min(start.x, end.x);
                         const top = Math.min(start.y, end.y);
 
-                        canvas1.drawRect(left, top, width, height);
+                        tempCanvas1.drawRect(left, top, width, height, stateCache.current.activeColor);
                     } else if (stateCache.current.toolSettings.shape == "circle" || stateCache.current.toolSettings.shape == "oval") {
                         const radiusX = stateCache.current.toolSettings.shape == "circle" ?
                             Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)) :
@@ -466,30 +464,35 @@ function useCanvas() {
                         const centerX = (start.x + end.x) / 2;
                         const centerY = (start.y + end.y) / 2;
 
-                        canvas1.drawOval(centerX, centerY, radiusX, radiusY);
+                        tempCanvas1.drawOval(centerX, centerY, radiusX, radiusY, stateCache.current.activeColor);
                     }
 
-                    if (!toolButtonActive) {
-                        toolState.current.stage = ToolStage.SAVE;
-                        toolState.current.activePoints = []; // Prepare for the next use
+                    if (toolButtonActive) {
+                        previewCanvas.putImageData(tempCanvas1.getImageData());
+                    } else {
+                        saveCanvas.putImageData(tempCanvas1.getImageData());
+                        toolState.current.stage = ToolStage.PREVIEW;
+                        toolState.current.activePoints = [];
                     }
                 }
             }
         },
         "light": (x, y, toolButtonActive) => {
             // Put the active layer image onto canvas2 for manipulation
-            canvas2.putImageData(stateCache.current.activeLayer.image);
+            tempCanvas1.putImageData(stateCache.current.activeLayer.image);
             const brushSize = stateCache.current.toolSettings.size;
-            const lightAdjustmentPercentage = stateCache.current.toolSettings.lightMode === "light" ? 15 : -15;
+            const lightAdjustmentPercentage = stateCache.current.toolSettings.lightMode === "light"
+                ? stateCache.current.toolSettings.lightIntensity
+                : stateCache.current.toolSettings.lightIntensity * -1;
 
             // Calculate start and end points, ensuring they are within canvas bounds
             const startX = Math.max(0, x - Math.floor(brushSize / 2));
             const startY = Math.max(0, y - Math.floor(brushSize / 2));
-            const endX = Math.min(canvas2.getWidth(), startX + brushSize);
-            const endY = Math.min(canvas2.getHeight(), startY + brushSize);
+            const endX = Math.min(tempCanvas1.getWidth(), startX + brushSize);
+            const endY = Math.min(tempCanvas1.getHeight(), startY + brushSize);
 
             // Get the image data for the brush area
-            let imgData = canvas2.getImageData(startX, startY, endX - startX, endY - startY);
+            let imgData = tempCanvas1.getImageData(startX, startY, endX - startX, endY - startY);
             let data = imgData.data;
 
             // Iterate over each pixel in the brush area
@@ -509,10 +512,12 @@ function useCanvas() {
                         hsl.l += lightAdjustmentPercentage / 100;
                         hsl.l = Math.min(1, Math.max(0, hsl.l));
                         if (lightAdjustmentPercentage > 0) {
-                            hsl.h = Math.max(20, hsl.h - 10); // Towards orange for brightness
+                            let orangeRate = lightAdjustmentPercentage / 20;
+                            hsl.h = Math.max(20, hsl.h - orangeRate); // Towards orange for brightness
                             hsl.s = Math.min(1, hsl.s + 0.1); // Increase saturation
                         } else {
-                            hsl.h = Math.min(250, hsl.h + 10); // Towards blue for darkness
+                            let blueRate = lightAdjustmentPercentage / 20;
+                            hsl.h = Math.min(250, hsl.h + blueRate); // Towards blue for darkness
                             hsl.s = Math.min(1, hsl.s + 0.1); // Increase saturation
                         }
 
@@ -528,87 +533,186 @@ function useCanvas() {
                 }
             }
 
-            // Put the modified image data back onto canvas1
-            canvas1.putImageData(imgData, startX, startY);
-
-            // Save the state when the tool button is active, clear modified points otherwise
             if (toolButtonActive) {
-                toolState.current.stage = ToolStage.SAVE;
+                saveCanvas.putImageData(imgData, startX, startY);
             } else {
                 toolState.current.modifiedPoints.clear();
+                previewCanvas.putImageData(imgData, startX, startY);
             }
         },
         "recolor": (x, y, toolButtonActive) => {
-            if (!toolButtonActive) {
-                canvas1.drawPixel(x, y);
-                return;
-            }
+            if (toolButtonActive) {
+                const imgData = activeLayer.image;
+                const data = imgData.data;
 
-            toolState.current.stage = ToolStage.SAVE;
+                // Step 2: Get the color of the pixel at the current point
+                const index = (x + y * imgData.width) * 4;
+                const targetColor = { r: data[index], g: data[index + 1], b: data[index + 2], a: data[index + 3] };
 
-            const imgData = activeLayer.image;
-            const data = imgData.data;
+                // Assume activeColor is an object { r: number, g: number, b: number, a: number }
+                const activeColor = stateCache.current.activeColor; // You need to implement this based on how active color is set
 
-            // Step 2: Get the color of the pixel at the current point
-            const index = (x + y * imgData.width) * 4;
-            const targetColor = { r: data[index], g: data[index + 1], b: data[index + 2], a: data[index + 3] };
-
-            // Assume activeColor is an object { r: number, g: number, b: number, a: number }
-            const activeColor = stateCache.current.activeColor; // You need to implement this based on how active color is set
-
-            // Step 3 & 4: Loop through all pixels to find and replace the target color
-            for (let i = 0; i < data.length; i += 4) {
-                // Using a simple color match; for more complex scenarios, consider a tolerance
-                if (data[i] === targetColor.r && data[i + 1] === targetColor.g && data[i + 2] === targetColor.b && data[i + 3] === targetColor.a) {
-                    // Replace with active color
-                    data[i] = activeColor.r;
-                    data[i + 1] = activeColor.g;
-                    data[i + 2] = activeColor.b;
-                    data[i + 3] = activeColor.a;
+                // Step 3 & 4: Loop through all pixels to find and replace the target color
+                for (let i = 0; i < data.length; i += 4) {
+                    // Using a simple color match; for more complex scenarios, consider a tolerance
+                    if (data[i] === targetColor.r && data[i + 1] === targetColor.g && data[i + 2] === targetColor.b && data[i + 3] === targetColor.a) {
+                        // Replace with active color
+                        data[i] = activeColor.r;
+                        data[i + 1] = activeColor.g;
+                        data[i + 2] = activeColor.b;
+                        data[i + 3] = activeColor.a;
+                    }
                 }
-            }
 
-            // Step 5: Apply the modified image data back to the canvas
-            canvas1.putImageData(imgData, 0, 0);
+                // Step 5: Apply the modified image data back to the canvas
+                saveCanvas.putImageData(imgData, 0, 0);
+            } else {
+                previewCanvas.drawPixel(x, y);
+            }
         },
         "box": (x, y, toolButtonActive) => {
+            if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                previewCanvas.drawPixel(x, y);
+                return;
+            }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                toolState.current.selectionArea.rectSelection.startPoint = { x, y };
                 toolState.current.stage = ToolStage.ADJUSTING;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
-                // draw rect from start to current position
+                const startX = Math.min(toolState.current.selectionArea.rectSelection.startPoint.x, x);
+                const startY = Math.min(toolState.current.selectionArea.rectSelection.startPoint.y, y);
+                const endX = Math.max(toolState.current.selectionArea.rectSelection.startPoint.x, x);
+                const endY = Math.max(toolState.current.selectionArea.rectSelection.startPoint.y, y);
+                const width = endX - startX;
+                const height = endY - startY;
 
+                previewCanvas.drawRect(startX, startY, width, height, "rgba(0,0,0,1)");
             }
             if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
-                toolState.current.selectionArea.startPosition = { x, y };
-                toolState.current.selectionArea.currentPosition = { x, y };
+                const startX = Math.min(toolState.current.selectionArea.rectSelection.startPoint.x, x);
+                const startY = Math.min(toolState.current.selectionArea.rectSelection.startPoint.y, y);
+                const endX = Math.max(toolState.current.selectionArea.rectSelection.startPoint.x, x);
+                const endY = Math.max(toolState.current.selectionArea.rectSelection.startPoint.y, y);
 
-                // add final point
-                // save image data to slection area image
+                let { height, width } = stateCache.current.activeLayer.image;
+                let img = new ImageData(width, height);
+
+                for (let i = 0; i < img.data.length; i += 4) {
+                    let x = i / 4 % width;
+                    let y = Math.floor(i / 4 / width);
+
+                    if (x >= startX && x <= endX && y >= startY && y <= endY) {
+                        let r = stateCache.current.activeLayer.image.data[i];
+                        let g = stateCache.current.activeLayer.image.data[i + 1];
+                        let b = stateCache.current.activeLayer.image.data[i + 2];
+                        let a = stateCache.current.activeLayer.image.data[i + 3];
+
+                        img.data[i] = r;
+                        img.data[i + 1] = g;
+                        img.data[i + 2] = b;
+                        img.data[i + 3] = a;
+                    }
+                }
+
+                toolState.current.selectionArea.imgData = img;
+                toolState.current.selectionArea.rectSelection.endPoint = { x, y };
                 toolState.current.stage = ToolStage.MOVING;
-                // draw rect
             }
             if (toolState.current.stage === ToolStage.MOVING) {
-                toolState.current.selectionArea.currentPosition.x += mouseState.current.movementX;
-                toolState.current.selectionArea.currentPosition.y += mouseState.current.movementY;
-                // paint selection img to canvas1 at current position
+                // set the inital drag point
+                if (toolButtonActive &&
+                    toolState.current.selectionArea.startPosition.x === 0 &&
+                    toolState.current.selectionArea.startPosition.y === 0
+                ) {
+                    toolState.current.selectionArea.startPosition = { x, y };
+                    toolState.current.selectionArea.currentPosition = {
+                        x: x - toolState.current.selectionArea.startPosition.x,
+                        y: y - toolState.current.selectionArea.startPosition.y
+                    };
+                }
 
-                // if clicked outside of the selection boundery
-                // change mode to SAVE
+                const { startPoint, endPoint } = toolState.current.selectionArea.rectSelection;
+                let currentX = toolState.current.selectionArea.currentPosition.x;
+                let currentY = toolState.current.selectionArea.currentPosition.y;
+                let newStartX = Math.floor(startPoint.x + currentX);
+                let newStartY = Math.floor(startPoint.y + currentY);
+                let newEndX = Math.floor(endPoint.x + currentX);
+                let newEndY = Math.floor(endPoint.y + currentY);
+                let selectionWidth = newEndX - newStartX;
+                let selectionheight = newEndY - newStartY;
+
+                let pointIsInsideBoundery = x >= newStartX && x <= newEndX && y >= newStartY && y <= newEndY;
+
+                let { width, height } = toolState.current.selectionArea.imgData!;
+                const eraseImageData = new ImageData(width, height);
+
+                for (let i = 0; i < eraseImageData.data.length; i += 4) {
+                    let r = toolState.current.selectionArea.imgData!.data[i];
+                    let g = toolState.current.selectionArea.imgData!.data[i + 1];
+                    let b = toolState.current.selectionArea.imgData!.data[i + 2];
+                    let a = toolState.current.selectionArea.imgData!.data[i + 3];
+
+                    if (r != 0 || g != 0 || b != 0 || a > 1) {
+                        eraseImageData.data[i] = 255;
+                        eraseImageData.data[i + 1] = 255;
+                        eraseImageData.data[i + 2] = 255;
+                        eraseImageData.data[i + 3] = 1;
+                    }
+                }
+
+                tempCanvas1.putImageData(
+                    toolState.current.selectionArea.imgData,
+                    toolState.current.selectionArea.currentPosition.x,
+                    toolState.current.selectionArea.currentPosition.y,
+                );
+                tempCanvas2.drawImage(tempCanvas1.getElement());
+
+                previewCanvas.putImageData(eraseImageData);
+                previewCanvas.drawImage(tempCanvas2.getElement());
+                previewCanvas.drawRect(newStartX, newStartY, selectionWidth, selectionheight, "rgba(0,0,0,1)");
+
+                //preview
+                if (pointIsInsideBoundery && toolButtonActive) {
+                    toolState.current.selectionArea.currentPosition.x = x - toolState.current.selectionArea.startPosition.x;
+                    toolState.current.selectionArea.currentPosition.y = y - toolState.current.selectionArea.startPosition.y;
+                }
+
+                let outsideOfCanvas = (x < 0 || y < 0 || x > stateCache.current.canvasSize.width || y > stateCache.current.canvasSize.height);
+                let outsideOfSelection = !(pointIsInsideBoundery) && toolButtonActive;
+
+                //save
+                if (outsideOfCanvas || outsideOfSelection) {
+                    saveCanvas.putImageData(eraseImageData);
+                    saveCanvas.drawImage(tempCanvas2.getElement());
+
+                    toolState.current.stage = ToolStage.PREVIEW;
+                    toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
+                    toolState.current.selectionArea.currentPosition = { x: 0, y: 0 };
+                    toolState.current.selectionArea.rectSelection.startPoint = { x: 0, y: 0 };
+                    toolState.current.selectionArea.rectSelection.endPoint = { x: 0, y: 0 };
+                    toolState.current.selectionArea.imgData = null;
+                }
             }
         },
         "wand": (x, y, toolButtonActive) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                canvas1.drawPixel(x, y);
+                previewCanvas.drawPixel(x, y);
                 return;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                canvas2.putImageData(activeLayer.image);
-                let points = canvas2.floodFill(x, y);
+                tempCanvas1.putImageData(activeLayer.image);
+                let points = tempCanvas1.floodFill(x, y);
+                let color = tempCanvas1.getColor(x, y);
+
+                if (color.a === 0) return;
 
                 toolState.current.selectionArea.points = points;
-                toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
-                toolState.current.selectionArea.currentPosition = { x: 0, y: 0 };
+                toolState.current.selectionArea.startPosition = { x, y };
+                toolState.current.selectionArea.currentPosition = {
+                    x: x - toolState.current.selectionArea.startPosition.x,
+                    y: y - toolState.current.selectionArea.startPosition.y
+                };
 
                 let { height, width } = stateCache.current.activeLayer.image;
                 let img = new ImageData(width, height);
@@ -638,55 +742,178 @@ function useCanvas() {
                     newPoints.push(newPoint);
                 });
 
-                let boundery = canvas1.getBoundary(newPoints);
+                let boundery = tempCanvas1.getBoundary(newPoints);
                 let pointIsInsideBoundery = x >= boundery[0].x
                     && x <= boundery[1].x
                     && y >= boundery[0].y
                     && y <= boundery[3].y;
 
-                if (pointIsInsideBoundery && toolButtonActive) {
-                    toolState.current.selectionArea.currentPosition.x += mouseState.current.movementX / mainCanvasZoom.current;
-                    toolState.current.selectionArea.currentPosition.y += mouseState.current.movementY / mainCanvasZoom.current;
-                }
-                if (!(pointIsInsideBoundery) && toolButtonActive) {
-                    toolState.current.stage = ToolStage.SAVE;
+                let { width, height } = toolState.current.selectionArea.imgData!;
+                const eraseImageData = new ImageData(width, height);
 
-                    let { width, height } = toolState.current.selectionArea.imgData!;
-                    const eraseImageData = new ImageData(width, height);
+                for (let i = 0; i < eraseImageData.data.length; i += 4) {
+                    let r = toolState.current.selectionArea.imgData!.data[i];
+                    let g = toolState.current.selectionArea.imgData!.data[i + 1];
+                    let b = toolState.current.selectionArea.imgData!.data[i + 2];
+                    let a = toolState.current.selectionArea.imgData!.data[i + 3];
 
-                    for (let i = 0; i < eraseImageData.data.length; i += 4) {
-                        let r = toolState.current.selectionArea.imgData!.data[i];
-                        let g = toolState.current.selectionArea.imgData!.data[i + 1];
-                        let b = toolState.current.selectionArea.imgData!.data[i + 2];
-                        let a = toolState.current.selectionArea.imgData!.data[i + 3];
-
-                        if (r != 0 || g != 0 || b != 0 || a > 1) {
-                            eraseImageData.data[i] = 255;
-                            eraseImageData.data[i + 1] = 255;
-                            eraseImageData.data[i + 2] = 255;
-                            eraseImageData.data[i + 3] = 1;
-                        }
+                    if (r != 0 || g != 0 || b != 0 || a > 1) {
+                        eraseImageData.data[i] = 255;
+                        eraseImageData.data[i + 1] = 255;
+                        eraseImageData.data[i + 2] = 255;
+                        eraseImageData.data[i + 3] = 1;
                     }
-
-                    canvas2.putImageData(eraseImageData);
-                    canvas1.drawImage(canvas2.getElement());
                 }
 
-                canvas2.putImageData(
+                tempCanvas1.putImageData(
                     toolState.current.selectionArea.imgData,
                     toolState.current.selectionArea.currentPosition.x,
                     toolState.current.selectionArea.currentPosition.y,
                 );
-                canvas1.drawImage(canvas2.getElement());
+                tempCanvas2.drawImage(tempCanvas1.getElement());
 
-                if (toolState.current.stage != ToolStage.SAVE) {
-                    // draw box outline 
-                    canvas1.drawPolygon(canvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
+                previewCanvas.putImageData(eraseImageData);
+                previewCanvas.drawImage(tempCanvas2.getElement());
+                previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
+
+                if (pointIsInsideBoundery && toolButtonActive) {
+                    toolState.current.selectionArea.currentPosition.x = x - toolState.current.selectionArea.startPosition.x;
+                    toolState.current.selectionArea.currentPosition.y = y - toolState.current.selectionArea.startPosition.y;
+                }
+
+                let outsideOfCanvas = (x < 0 || y < 0 || x > stateCache.current.canvasSize.width || y > stateCache.current.canvasSize.height);
+                let outsideOfSelection = !(pointIsInsideBoundery) && toolButtonActive;
+
+                // save
+                if (outsideOfCanvas || outsideOfSelection) {
+                    saveCanvas.putImageData(eraseImageData);
+                    saveCanvas.drawImage(tempCanvas2.getElement());
+
+                    toolState.current.stage = ToolStage.PREVIEW;
+                    toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
+                    toolState.current.selectionArea.currentPosition = { x: 0, y: 0 };
+                    toolState.current.selectionArea.points = [];
+                    toolState.current.selectionArea.imgData = null;
                 }
             }
-
         },
-        "laso": (x, y, toolButtonActive) => { },
+        "lasso": (x, y, toolButtonActive) => {
+            if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                previewCanvas.drawPixel(x, y);
+                return;
+            }
+            if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                toolState.current.selectionArea.lassoSelection.points.push({ x, y });
+                toolState.current.stage = ToolStage.ADJUSTING;
+            }
+            if (toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+                let lastPoint = toolState.current.selectionArea.lassoSelection.points[toolState.current.selectionArea.lassoSelection.points.length - 1];
+                if (x !== lastPoint.x || y !== lastPoint.y)
+                    toolState.current.selectionArea.lassoSelection.points.push({ x, y });
+
+                let points = toolState.current.selectionArea.lassoSelection.points;
+                previewCanvas.drawPolygon(points, true, "rgba(0,0,0,1)");
+            }
+            if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+                let points = toolState.current.selectionArea.lassoSelection.points;
+                let allPoints = tempCanvas1.getPointsInPolygon(points);
+
+                let { height, width } = stateCache.current.activeLayer.image;
+                let img = new ImageData(width, height);
+
+                allPoints.forEach(point => {
+                    let index = (point.y * width + point.x) * 4;
+                    let r = stateCache.current.activeLayer.image.data[index];
+                    let g = stateCache.current.activeLayer.image.data[index + 1];
+                    let b = stateCache.current.activeLayer.image.data[index + 2];
+                    let a = stateCache.current.activeLayer.image.data[index + 3];
+
+                    img.data[index] = r;
+                    img.data[index + 1] = g;
+                    img.data[index + 2] = b;
+                    img.data[index + 3] = a;
+                });
+
+                toolState.current.selectionArea.imgData = img;
+                toolState.current.stage = ToolStage.MOVING;
+            }
+            if (toolState.current.stage === ToolStage.MOVING) {
+                // set the inital drag point
+                if (toolButtonActive &&
+                    toolState.current.selectionArea.startPosition.x === 0 &&
+                    toolState.current.selectionArea.startPosition.y === 0
+                ) {
+                    toolState.current.selectionArea.startPosition = { x, y };
+                    toolState.current.selectionArea.currentPosition = {
+                        x: x - toolState.current.selectionArea.startPosition.x,
+                        y: y - toolState.current.selectionArea.startPosition.y
+                    };
+                }
+
+                let newPoints: { x: number, y: number }[] = [];
+                toolState.current.selectionArea.lassoSelection.points.forEach(point => {
+                    let currentX = toolState.current.selectionArea.currentPosition.x;
+                    let currentY = toolState.current.selectionArea.currentPosition.y;
+                    let newPoint = { x: Math.floor(point.x + currentX), y: Math.floor(point.y + currentY) };
+
+                    newPoints.push(newPoint);
+                });
+
+                let boundery = tempCanvas1.getBoundary(newPoints);
+                let pointIsInsideBoundery = x >= boundery[0].x
+                    && x <= boundery[1].x
+                    && y >= boundery[0].y
+                    && y <= boundery[3].y;
+
+                let { width, height } = toolState.current.selectionArea.imgData!;
+                const eraseImageData = new ImageData(width, height);
+
+                for (let i = 0; i < eraseImageData.data.length; i += 4) {
+                    let r = toolState.current.selectionArea.imgData!.data[i];
+                    let g = toolState.current.selectionArea.imgData!.data[i + 1];
+                    let b = toolState.current.selectionArea.imgData!.data[i + 2];
+                    let a = toolState.current.selectionArea.imgData!.data[i + 3];
+
+                    if (r != 0 || g != 0 || b != 0 || a > 1) {
+                        eraseImageData.data[i] = 255;
+                        eraseImageData.data[i + 1] = 255;
+                        eraseImageData.data[i + 2] = 255;
+                        eraseImageData.data[i + 3] = 1;
+                    }
+                }
+
+                tempCanvas1.putImageData(
+                    toolState.current.selectionArea.imgData,
+                    toolState.current.selectionArea.currentPosition.x,
+                    toolState.current.selectionArea.currentPosition.y,
+                );
+                tempCanvas2.drawImage(tempCanvas1.getElement());
+
+                previewCanvas.putImageData(eraseImageData);
+                previewCanvas.drawImage(tempCanvas2.getElement());
+                previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
+
+                if (pointIsInsideBoundery && toolButtonActive) {
+                    toolState.current.selectionArea.currentPosition.x = x - toolState.current.selectionArea.startPosition.x;
+                    toolState.current.selectionArea.currentPosition.y = y - toolState.current.selectionArea.startPosition.y;
+                }
+
+                let outsideOfCanvas = (x < 0 || y < 0 || x > stateCache.current.canvasSize.width || y > stateCache.current.canvasSize.height);
+                let outsideOfSelection = !(pointIsInsideBoundery) && toolButtonActive;
+
+                // save
+                if (outsideOfCanvas || outsideOfSelection) {
+                    saveCanvas.putImageData(eraseImageData);
+                    saveCanvas.drawImage(tempCanvas2.getElement());
+
+                    toolState.current.stage = ToolStage.PREVIEW;
+                    toolState.current.selectionArea.startPosition = { x: 0, y: 0 };
+                    toolState.current.selectionArea.currentPosition = { x: 0, y: 0 };
+                    toolState.current.selectionArea.lassoSelection.points = [];
+                    toolState.current.selectionArea.imgData = null;
+                }
+            }
+        },
     };
 
     // animation loop
@@ -695,6 +922,11 @@ function useCanvas() {
             requestAnimationFrame(render);
             paint();
         })();
+    }, []);
+
+    // undo loop
+    useEffect(() => {
+        setInterval(saveCanvasState, 1000);
     }, []);
 
     // update frames and layers preview image
@@ -750,16 +982,15 @@ function useCanvas() {
 
     // canvas setup 
     useEffect(() => {
+        mainCanvas.getCtx().imageSmoothingEnabled = false;
         mainCanvasContainer.current?.appendChild(mainCanvas.getElement());
 
         mainCanvas.getElement().classList.add("p-app__canvas-elm");
         mainCanvas.resize(canvasSize.width, canvasSize.height);
-        canvas1.resize(canvasSize.width, canvasSize.height);
-        canvas2.resize(canvasSize.width, canvasSize.height);
-
-        mainCanvas.getCtx().imageSmoothingEnabled = false;
-        canvas1.getCtx().imageSmoothingEnabled = false;
-        canvas2.getCtx().imageSmoothingEnabled = false;
+        saveCanvas.resize(canvasSize.width, canvasSize.height);
+        previewCanvas.resize(canvasSize.width, canvasSize.height);
+        tempCanvas1.resize(canvasSize.width, canvasSize.height);
+        tempCanvas2.resize(canvasSize.width, canvasSize.height);
 
         setZoom(mainCanvasZoom.current);
     }, []);
@@ -767,15 +998,17 @@ function useCanvas() {
     // resize canvas and layers
     useEffect(() => {
         mainCanvas.resize(canvasSize.width, canvasSize.height);
-        canvas1.resize(canvasSize.width, canvasSize.height);
-        canvas2.resize(canvasSize.width, canvasSize.height);
+        saveCanvas.resize(canvasSize.width, canvasSize.height);
+        previewCanvas.resize(canvasSize.width, canvasSize.height);
+        tempCanvas1.resize(canvasSize.width, canvasSize.height);
+        tempCanvas2.resize(canvasSize.width, canvasSize.height);
 
         const centerImageData = (oldImageData, newWidth, newHeight) => {
             const startX = Math.max(0, Math.floor((newWidth - oldImageData.width) / 2));
             const startY = Math.max(0, Math.floor((newHeight - oldImageData.height) / 2));
-            canvas1.resize(newWidth, newHeight);
-            canvas1.putImageData(oldImageData, startX, startY);
-            return canvas1.getImageData();
+            saveCanvas.resize(newWidth, newHeight);
+            saveCanvas.putImageData(oldImageData, startX, startY);
+            return saveCanvas.getImageData();
         };
 
         frames.forEach(frame => {
@@ -798,20 +1031,92 @@ function useCanvas() {
         setToolSettings({ ...toolSettings, size: (toolSettings.size + delta < 1) ? 1 : (toolSettings.size + delta) });
     }
 
-    function undo() { }
+    function undo() {
+        if (undoStack.current.length > 0) {
+            const currentState = undoStack.current.pop();
+            if (currentState) {
+                redoStack.current.push({ ...currentState });
 
-    function redo() { }
+                const previousState = undoStack.current[undoStack.current.length - 1];
+                if (previousState) {
+                    const { image, layerID } = previousState;
+                    // Find the layer to revert its image data
+                    const layerToRevert = stateCache.current.activeFrame.layers.find(layer => layer.symbol === layerID);
+                    if (layerToRevert) {
+                        layerToRevert.image = new ImageData(
+                            new Uint8ClampedArray(image.data),
+                            image.width,
+                            image.height
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    function redo() {
+        if (redoStack.current.length > 0) {
+            const stateToRedo = redoStack.current.pop();
+            if (stateToRedo) {
+                undoStack.current.push({ ...stateToRedo });
+
+                const { image, layerID } = stateToRedo;
+                // Find the layer to apply the redone image data
+                const layerToRedo = stateCache.current.activeFrame.layers.find(layer => layer.symbol === layerID);
+                if (layerToRedo) {
+                    layerToRedo.image = new ImageData(
+                        new Uint8ClampedArray(image.data),
+                        image.width,
+                        image.height
+                    );
+                }
+            }
+        }
+    }
 
     function saveCanvasState() {
-        canvas2.putImageData(stateCache.current.activeLayer.image);
-        let data = {
-            frameID: stateCache.current.activeFrame.symbol,
-            layerID: stateCache.current.activeLayer.symbol,
-            image: canvas2.getImageData()
-        };
-        undoStack.current.push(data);
-        canvas2.clear();
+        function hashImageData(imageData) {
+            const data = imageData.data;
+            let hash = 5381; // Starting with a prime number
 
+            for (let i = 0; i < data.length; i += 4) {
+                // Combining the RGBA values in a way that tries to ensure uniqueness
+                let part = (data[i] << 24) | (data[i + 1] << 16) | (data[i + 2] << 8) | data[i + 3];
+                hash = ((hash << 5) + hash) + part; // hash * 33 + part
+                hash = hash & hash; // Convert to 32bit integer
+            }
+
+            return hash >>> 0; // Ensure hash is unsigned
+        }
+
+        // Extract the current state
+        const currentImage = stateCache.current.activeLayer.image;
+        const currentHash = hashImageData(currentImage);
+
+        // Check if there's a previous state to compare with
+        if (undoStack.current.length > 0) {
+            const lastState = undoStack.current[undoStack.current.length - 1];
+            const lastHash = lastState.hash;
+
+            // If the hashes match, no need to save the state again
+            if (lastHash === currentHash) return;
+        }
+
+        // If there's a change or no previous state, save the current state
+        const currentState = {
+            layerID: stateCache.current.activeLayer.symbol,
+            image: new ImageData(
+                new Uint8ClampedArray(currentImage.data),
+                currentImage.width,
+                currentImage.height
+            ),
+            hash: currentHash, // Save the hash along with the state
+        };
+
+        undoStack.current.push(currentState);
+        redoStack.current = []; // Optionally clear the redo stack on a new action
+
+        // limit the undo stack size to conserve memory
         if (undoStack.current.length > 100) undoStack.current.shift();
     }
 
@@ -831,11 +1136,16 @@ function useCanvas() {
     }
 
     function paint() {
-        canvas1.getCtx().globalAlpha = 1;
-        canvas2.getCtx().globalAlpha = 1;
-        canvas1.clear();
-        canvas2.clear();
+        saveCanvas.getCtx().globalAlpha = 1;
+        previewCanvas.getCtx().globalAlpha = 1;
+        tempCanvas1.getCtx().globalAlpha = 1;
+        tempCanvas2.getCtx().globalAlpha = 1;
+        tempCanvas1.clear();
+        tempCanvas2.clear();
+        saveCanvas.clear();
+        previewCanvas.clear();
         mainCanvas.clear();
+
         mainCanvas.drawGrid();
 
         // color related operations
@@ -878,39 +1188,38 @@ function useCanvas() {
                     tool === middleTool ? mouseState.current.middleDown : false;
 
         let { r, g, b, a } = stateCache.current.activeColor;
-        canvas1.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+        saveCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+        previewCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
 
-        //* draw a preview of the selected tool into canvas1
-        toolHandlers[tool]?.(x, y, toolButtonActive);
+        // run current tool
+        toolHandlers[tool](x, y, toolButtonActive);
 
-        const canvas1Img = canvas1.getImageData();
-        canvas1.clear();
+        // save pixels from saveCanvas to active layer
+        {
+            let savedImg = saveCanvas.getImageData();
 
-        // save pixels from canvas1 to active layer
-        if (toolState.current.stage === ToolStage.SAVE) {
-            for (let i = 0; i < canvas1Img.data.length; i += 4) {
-                let r = canvas1Img.data[i];
-                let g = canvas1Img.data[i + 1];
-                let b = canvas1Img.data[i + 2];
-                let a = canvas1Img.data[i + 3];
+            for (let i = 0; i < savedImg.data.length; i += 4) {
+                let r = savedImg.data[i];
+                let g = savedImg.data[i + 1];
+                let b = savedImg.data[i + 2];
+                let a = savedImg.data[i + 3];
 
                 // paint colored pixels
-                if (r != 0 || g != 0 || b != 0 || a > 1) {
-                    stateCache.current.activeLayer.image!.data[i] = canvas1Img.data[i];
-                    stateCache.current.activeLayer.image!.data[i + 1] = canvas1Img.data[i + 1];
-                    stateCache.current.activeLayer.image!.data[i + 2] = canvas1Img.data[i + 2];
-                    stateCache.current.activeLayer.image!.data[i + 3] = canvas1Img.data[i + 3];
+                if (r != 0 || g != 0 || b != 0 || a > 5) {
+                    stateCache.current.activeLayer.image!.data[i] = savedImg.data[i];
+                    stateCache.current.activeLayer.image!.data[i + 1] = savedImg.data[i + 1];
+                    stateCache.current.activeLayer.image!.data[i + 2] = savedImg.data[i + 2];
+                    stateCache.current.activeLayer.image!.data[i + 3] = savedImg.data[i + 3];
                 }
 
                 // erase invisible pixels 
-                if (a === 1) {
+                if (a <= 5 && a >= 1) {
                     stateCache.current.activeLayer.image!.data[i] = 0;
                     stateCache.current.activeLayer.image!.data[i + 1] = 0;
                     stateCache.current.activeLayer.image!.data[i + 2] = 0;
                     stateCache.current.activeLayer.image!.data[i + 3] = 0;
                 }
             }
-            toolState.current.stage = ToolStage.PREVIEW;
         }
 
         // render previous frame
@@ -921,12 +1230,12 @@ function useCanvas() {
 
             if (previousFrame) {
                 let reversedLayers = previousFrame.layers.slice().reverse();
-                canvas1.getCtx().globalAlpha = stateCache.current.onionSkin / 255;
+                saveCanvas.getCtx().globalAlpha = stateCache.current.onionSkin / 255;
 
                 reversedLayers.forEach((layer) => {
-                    canvas2.putImageData(layer.image);
-                    canvas1.drawImage(canvas2.getElement());
-                    mainCanvas.drawImage(canvas1.getElement());
+                    previewCanvas.putImageData(layer.image);
+                    saveCanvas.drawImage(previewCanvas.getElement());
+                    mainCanvas.drawImage(saveCanvas.getElement());
                 });
             }
         }
@@ -934,17 +1243,32 @@ function useCanvas() {
         // render active frame
         let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
         reversedLayers.forEach((layer) => {
-            canvas2.putImageData(layer.image);
-            canvas1.getCtx().globalAlpha = layer.opacity / 255;
-            canvas1.drawImage(canvas2.getElement());
+            tempCanvas1.putImageData(layer.image);
+            tempCanvas2.getCtx().globalAlpha = layer.opacity / 255;
 
-            mainCanvas.drawImage(canvas1.getElement(), 0, 0);
-
-            // Paint new pixels if the layer matches the active layer
+            // draw the preview layer ontop of the active layer
             if (layer.symbol === stateCache.current.activeLayer.symbol) {
-                canvas1.putImageData(canvas1Img, 0, 0); // Overwrite the off-screen canvas with new pixels
-                mainCanvas.drawImage(canvas1.getElement(), 0, 0); // Copy the new pixels to the main canvas
+                let previewData = previewCanvas.getImageData();
+                let activeLayerData = tempCanvas1.getImageData();
+
+                for (let i = 0; i < previewData.data.length; i += 4) {
+                    let a = previewData.data[i + 3];
+                    // erase invisible pixels 
+                    if (a === 1) {
+                        activeLayerData.data[i] = 0;
+                        activeLayerData.data[i + 1] = 0;
+                        activeLayerData.data[i + 2] = 0;
+                        activeLayerData.data[i + 3] = 0;
+                    }
+                }
+
+                tempCanvas1.putImageData(activeLayerData);
+                tempCanvas2.putImageData(previewData);
+                tempCanvas1.drawImage(tempCanvas2.getElement());
             }
+
+            tempCanvas2.drawImage(tempCanvas1.getElement());
+            mainCanvas.drawImage(tempCanvas2.getElement());
         });
 
         if (tilemode.current) {

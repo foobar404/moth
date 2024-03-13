@@ -16,7 +16,7 @@ export function Modal(props: IProps) {
         <Portal>
             <main className="c-modal"
                 onClick={() => props.setIsOpen(false)}>
-                <section className="c-modal__body !bg-slate-300"
+                <section className="c-modal__body !bg-base-100"
                     onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
                     <button onClick={() => props.setIsOpen(false)}
                         className="absolute top-2 right-2 btn btn-sm btn-error">

@@ -2,13 +2,13 @@ import { ITool } from '../../types';
 import ReactTooltip from 'react-tooltip';
 import { IoMdMove } from "react-icons/io";
 import { AiFillFire } from "react-icons/ai";
-import { BsBucketFill, BsEraserFill } from "react-icons/bs";
 import { GiMirrorMirror } from "react-icons/gi";
-import { MdInvertColors, MdOutlineCallReceived } from "react-icons/md";
 import { IoBandageSharp } from "react-icons/io5";
 import React, { useEffect, useState } from 'react';
+import { BsBucketFill, BsEraserFill } from "react-icons/bs";
 import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
 import { useShortcuts, useCanvas, useGlobalStore } from '../../utils';
+import { MdInvertColors, MdOutlineCallReceived } from "react-icons/md";
 import { FaEyeDropper, FaBrush, FaTools, FaBox, FaLightbulb, FaShapes } from "react-icons/fa";
 import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } from "react-icons/bi";
 import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
@@ -21,146 +21,146 @@ export function Tools() {
         <nav className="flex items-center mb-2">
             <FaTools data-tip="tools"
                 data-for="tooltip"
-                className={`c-icon ${data.view == "tools" ? "--active" : ""}`}
+                className={`text-lg ${data.view == "tools" ? "text-primary" : "text-secondary"}`}
                 onMouseEnter={() => data.setView("tools")} />
             <AiFillFire data-tip="actions"
                 data-for="tooltip"
-                className={`c-icon ${data.view == "actions" ? "--active-alt" : ""}`}
+                className={`c-icon ${data.view == "actions" ? "text-primary" : "text-secondary"}`}
                 onMouseEnter={() => data.setView("actions")} />
         </nav>
 
         {data.view === "tools" && (
-            <section className="p-app__tools">
+            <section className="space-y-1">
                 <button data-tip={`brush tool ( b​ ) ${data.getButtonTooltip("brush")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("brush")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("brush")}`}
                     onMouseDown={(e) => data.updateTool(e, "brush")}>
-                    <FaBrush />
+                    <FaBrush className="text-xl" />
                 </button>
                 <button data-tip={`eraser tool ( e​ ) ${data.getButtonTooltip("eraser")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("eraser")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("eraser")}`}
                     onMouseDown={(e) => data.updateTool(e, "eraser")}>
-                    <BsEraserFill />
+                    <BsEraserFill className="text-xl" />
                 </button>
                 <button data-tip={`bucket tool ( g​ ) ${data.getButtonTooltip("bucket")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("bucket")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("bucket")}`}
                     onMouseDown={(e) => data.updateTool(e, "bucket")}>
-                    <BsBucketFill />
+                    <BsBucketFill className="text-xl" />
                 </button>
                 <button data-tip={`recolor tool ( r​ ) ${data.getButtonTooltip("recolor")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("recolor")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("recolor")}`}
                     onMouseDown={(e) => data.updateTool(e, "recolor")}>
-                    <MdInvertColors />
+                    <MdInvertColors className="text-xl" />
                 </button>
                 <button data-tip={`shape tool ( s​ ) ${data.getButtonTooltip("shape")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("shape")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("shape")}`}
                     onMouseDown={(e) => data.updateTool(e, "shape")}>
-                    <FaShapes />
+                    <FaShapes className="text-xl" />
                 </button>
                 <button data-tip={`light tool ( t​ ) ${data.getButtonTooltip("light")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("light")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("light")}`}
                     onMouseDown={(e) => data.updateTool(e, "light")}>
-                    <FaLightbulb />
+                    <FaLightbulb className="text-xl" />
                 </button>
                 <button data-tip={`eyedropper tool ( i​ ) ${data.getButtonTooltip("eyedropper")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("eyedropper")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("eyedropper")}`}
                     onMouseDown={(e) => data.updateTool(e, "eyedropper")}>
-                    <FaEyeDropper />
+                    <FaEyeDropper className="text-xl" />
                 </button>
                 <button data-tip={`move tool ( v​ ) ${data.getButtonTooltip("move")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("move")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("move")}`}
                     onMouseDown={(e) => data.updateTool(e, "move")}>
-                    <IoMdMove />
+                    <IoMdMove className="text-xl" />
                 </button>
                 <button data-tip={`box selection tool ( x​ ) ${data.getButtonTooltip("box")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("box")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("box")}`}
                     onMouseDown={(e) => data.updateTool(e, "box")}>
-                    <FaBox />
+                    <FaBox className="text-xl" />
                 </button>
                 <button data-tip={`wand selection tool ( w​ ) ${data.getButtonTooltip("wand")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("wand")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("wand")}`}
                     onMouseDown={(e) => data.updateTool(e, "wand")}>
-                    <IoColorWandSharp />
+                    <IoColorWandSharp className="text-xl" />
                 </button>
-                <button data-tip={`laso selection tool ( o​ ) ${data.getButtonTooltip("laso")}`}
+                <button data-tip={`lasso selection tool ( o​ ) ${data.getButtonTooltip("lasso")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("laso")}`}
-                    onMouseDown={(e) => data.updateTool(e, "laso")}>
-                    <TbArrowLoopRight />
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("lasso")}`}
+                    onMouseDown={(e) => data.updateTool(e, "lasso")}>
+                    <TbArrowLoopRight className="text-xl" />
                 </button>
                 {/* <button data-tip={`bone tool ( n​ ) ${data.getButtonTooltip("bone")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("bone")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("bone")}`}
                     onMouseDown={(e) => data.updateTool(e, "bone")}>
                     <FaBone />
                 </button> */}
                 <button data-tip={`line tool ( l​ ) ${data.getButtonTooltip("line")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("line")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("line")}`}
                     onMouseDown={(e) => data.updateTool(e, "line")}>
-                    <MdOutlineCallReceived />
+                    <MdOutlineCallReceived className="text-xl" />
                 </button>
                 <button data-tip={`mirror tool ( m​ ) ${data.getButtonTooltip("mirror")}`}
                     data-for="tooltip"
-                    className={`mb-2 c-button --fourth --sm ${data.getButtonStyles("mirror")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("mirror")}`}
                     onMouseDown={(e) => data.updateTool(e, "mirror")}>
-                    <GiMirrorMirror />
+                    <GiMirrorMirror className="text-xl" />
                 </button>
             </section>
         )}
 
         {data.view === "actions" && (
-            <section className="p-app__tools">
+            <section className="space-y-2 p-app__tools">
                 <button data-tip="flip layer horizontally ( shift + h )"
                     data-for="tooltip"
                     onClick={() => data.actions["flipHorizontal"]()}
-                    className="mb-2 c-button --sm --second">
-                    <TbFlipHorizontal />
+                    className="box-content py-1 btn btn-secondary btn-sm">
+                    <TbFlipHorizontal className="text-xl" />
                 </button>
                 <button data-tip="flip layer vertically ( shift + v ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["flipVertical"]()}
-                    className="mb-2 c-button --sm --second">
-                    <TbFlipVertical />
+                    className="box-content py-1 btn btn-secondary btn-sm">
+                    <TbFlipVertical className="text-xl" />
                 </button>
                 <button data-tip="center layer horizontally ( shift + ~ )"
                     data-for="tooltip"
                     onClick={() => data.actions["centerHorizontal"]()}
-                    className="mb-2 c-button --sm --second">
-                    <BiHorizontalCenter />
+                    className="box-content py-1 btn btn-secondary btn-sm">
+                    <BiHorizontalCenter className="text-xl" />
                 </button>
                 <button data-tip="center layer vertically ( shift + | ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["centerVertical"]()}
-                    className="mb-2 c-button --sm --second">
-                    <BiVerticalCenter />
+                    className="box-content py-1 btn btn-secondary btn-sm">
+                    <BiVerticalCenter className="text-xl" />
                 </button>
                 <button data-tip="rotate layer 90° right ( shift + r ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["rotateRight"]()}
-                    className="mb-2 c-button --sm --second">
-                    <BiRotateRight />
+                    className="box-content py-1 btn btn-secondary btn-sm">
+                    <BiRotateRight className="text-xl" />
                 </button>
                 <button data-tip="rotate layer 90° left ( shift + l ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["rotateLeft"]()}
-                    className="mb-2 c-button --sm --second">
-                    <BiRotateLeft />
+                    className="box-content py-1 btn btn-secondary btn-sm">
+                    <BiRotateLeft className="text-xl" />
                 </button>
                 <button data-tip="clear current layer ( shift + c​ )"
                     data-for="tooltip"
                     onClick={() => data.actions["clear"]()}
-                    className="mb-2 c-button --sm --second">
-                    <IoNuclear />
+                    className="box-content py-1 btn btn-secondary btn-sm">
+                    <IoNuclear className="text-xl" />
                 </button>
             </section>
         )}
@@ -282,7 +282,7 @@ function useTools() {
         "v": () => updateTool(null, "move", 0),
         "x": () => updateTool(null, "box", 0),
         "w": () => updateTool(null, "wand", 0),
-        "o": () => updateTool(null, "laso", 0),
+        "o": () => updateTool(null, "lasso", 0),
         // "n": () => updateTool(null, "bone", 0),
         "l": () => updateTool(null, "line", 0),
         "m": () => updateTool(null, "mirror", 0),
@@ -322,9 +322,9 @@ function useTools() {
 
     function getButtonStyles(tool: ITool) {
         let classes = "";
-        if (toolSettings.leftTool === tool) classes += " --active-second";
-        else if (toolSettings.rightTool === tool) classes += " --active-third";
-        else if (toolSettings.middleTool === tool) classes += " --active-gray";
+        if (toolSettings.leftTool === tool) classes += " text-secondary border-2 border-secondary";
+        else if (toolSettings.rightTool === tool) classes += " text-accent border-2 border-accent";
+        else if (toolSettings.middleTool === tool) classes += " text-neutral border-2 border-neutral";
         return classes;
     }
 

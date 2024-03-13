@@ -36,12 +36,12 @@ export function Home() {
 
 				<Tabs selectedIndex={data.tabIndex}
 					onSelect={(index) => data.setTabIndex(index)}>
-					<TabList>
-						<Tab className={`p-app__tab ${data.tabIndex === 0 ? "--active" : ""}`}>
-							<IoMdColorPalette className="c-icon" data-tip="Colors" data-for="tooltip" />
+					<TabList className="row-left">
+						<Tab className={`w-12 h-8 row rounded-t-xl cursor-pointer text-primary-content ${data.tabIndex === 0 ? "bg-primary text-primary-content" : "bg-secondary text-secondary-content"}`}>
+							<IoMdColorPalette className="text-xl" data-tip="Colors" data-for="tooltip" />
 						</Tab>
-						<Tab className={`p-app__tab ${data.tabIndex === 1 ? "--active" : ""}`}>
-							<IoLayers className="c-icon" data-tip="Layers" data-for="tooltip" />
+						<Tab className={`w-12 h-8 row rounded-t-xl cursor-pointer ${data.tabIndex === 1 ? "bg-primary text-primary-content" : "bg-secondary text-secondary-content"}`}>
+							<IoLayers className="text-xl" data-tip="Layers" data-for="tooltip" />
 						</Tab>
 					</TabList>
 

@@ -16,6 +16,7 @@ function usePreview(props: IPreview) {
     const frameCount = useRef(0);
     const loopRef = useRef<any>(null);
     const canvas1 = useCanvas();
+    const canvas2 = useCanvas();
     const { canvasSize, frames } = useGlobalStore();
     let canvasContainerRef = useRef<HTMLCanvasElement>(null);
 
@@ -26,6 +27,7 @@ function usePreview(props: IPreview) {
 
     useEffect(() => {
         canvas1.resize(canvasSize.width, canvasSize.height);
+        canvas2.resize(canvasSize.width, canvasSize.height);
     }, [canvasSize]);
 
     useEffect(() => {
@@ -45,7 +47,8 @@ function usePreview(props: IPreview) {
             let frame = frames[frameCount.current];
             let reversedLayers = frame.layers.slice().reverse();
             reversedLayers.forEach(layer => {
-                canvas1.putImageData(layer.image)
+                canvas2.putImageData(layer.image);
+                canvas1.drawImage(canvas2.getElement());
             })
             frameCount.current += 1;
         }, 1000 / props.fps);

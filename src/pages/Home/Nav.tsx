@@ -40,6 +40,23 @@ export function Nav(props: IProps) {
         <Modal {...data.modalExport}>
             <main className="p-12">
                 <section className="space-y-2 col">
+                    <div>
+                        <label>
+                            <p>Scale: {data.exportSettings.scale}</p>
+                            <input type="range"
+                                value={data.exportSettings.scale}
+                                className="range" min={1} max={20} step={1}
+                                onChange={(e) => data.setExportSettings({ ...data.exportSettings, scale: e.currentTarget.valueAsNumber })} />
+                        </label>
+                        <label className="label">
+                            <p className="">Include Moth Data</p>
+                            <input type="checkbox"
+                                className="checkbox"
+                                checked={data.exportSettings.mothData}
+                                onChange={e => data.setExportSettings({ ...data.exportSettings, mothData: e.currentTarget.checked })} />
+                        </label>
+                    </div>
+
                     <button className="btn min-w-[250px] text-left"
                         onClick={() => data.exportProject({ layerOnly: true })}>
                         <i className="c-button__icon"><IoLayers /></i>
@@ -50,23 +67,40 @@ export function Nav(props: IProps) {
                         <i className="c-button__icon"><IoImage /></i>
                         Export Current Frame
                     </button>
-                    <button className="btn min-w-[250px]"
+                    {/* <button className="btn min-w-[250px]"
                         onClick={() => data.createGif()}>
                         <i className="c-button__icon --first"><PiGifFill /></i>
                         Export as GIF
-                    </button>
-                    <section className="p-4 rounded-lg shadow-inner col bg-slate-400">
-                        <button className="btn btn-accent min-w-[250px]"
+                    </button> */}
+                    <section className="p-4 rounded-lg shadow-inner col bg-base-200">
+                        <button className="btn btn-accent min-w-[250px] mb-2"
                             onClick={() => data.exportProject()}>
                             <i className="c-button__icon --first"><MdMovieFilter /></i>
                             Export as Spritesheet
                         </button>
 
-                        <section className="flex flex-wrap">
-                            <label className="mr-4">
-                                <p>scale</p>
-                                <input type="number" className="c-input --sm" value={1} />
+                        <section className="space-x-2 row">
+                            <label>
+                                <p>Padding X</p>
+                                <input type="number"
+                                    className="w-20 input input-sm"
+                                    value={data.exportSettings.paddingX}
+                                    onChange={e => data.setExportSettings({ ...data.exportSettings, paddingX: e.currentTarget.valueAsNumber })} />
                             </label>
+                            <label>
+                                <p>Padding Y</p>
+                                <input type="number"
+                                    className="w-20 input input-sm"
+                                    value={data.exportSettings.paddingY}
+                                    onChange={e => data.setExportSettings({ ...data.exportSettings, paddingY: e.currentTarget.valueAsNumber })} />
+                            </label>
+                            {/* <label>
+                                <p>Data File</p>
+                                <input type="checkbox"
+                                    className="checkbox checkbox-sm"
+                                    checked={data.exportSettings.dataFile}
+                                    onChange={e => data.setExportSettings({ ...data.exportSettings, dataFile: e.currentTarget.checked })} />
+                            </label> */}
                         </section>
                     </section>
                 </section>
@@ -76,10 +110,18 @@ export function Nav(props: IProps) {
         <Modal {...data.modalImport}>
             <main className="p-12">
                 <section className="space-y-2 col">
-                    <button className="px-14 btn btn-accent">
+                    <button className="px-14 btn btn-accent"
+                        onClick={() => {
+                            data.importProject();
+                            data.modalImport.setIsOpen(false);
+                        }}>
                         Import Project
                     </button>
-                    <button className="px-14 btn btn-outline">
+                    <button className="px-14 btn btn-outline"
+                        onClick={() => {
+                            data.importImage();
+                            data.modalImport.setIsOpen(false);
+                        }}>
                         Import Image
                     </button>
 
@@ -88,7 +130,10 @@ export function Nav(props: IProps) {
                     <ul className="w-56 rounded-lg menu bg-base-200">
                         {data.projectList.map((project) => (
                             <li key={project}
-                                onClick={() => data.loadProjectFromLocalStorage(project)}
+                                onClick={() => {
+                                    data.loadProjectFromLocalStorage(project);
+                                    data.modalImport.setIsOpen(false);
+                                }}
                                 className="p-1 text-center rounded-md cursor-pointer hover:bg-slate-400 hover:text-white">
                                 {project}
                             </li>
@@ -98,45 +143,85 @@ export function Nav(props: IProps) {
             </main>
         </Modal>
 
-        <section className="row-left p-app__nav p-app__block w-max">
-            <nav className="flex mr-3">
-                <button onClick={() => data.modalImport.setIsOpen(true)}
-                    className="btn btn-primary rounded-xl mr-2 !hidden md:!inline-flex">
-                    <i className="c-button__icon"> <IoImage /></i> Import
-                </button>
-                <button onClick={() => data.modalExport.setIsOpen(true)}
-                    className="btn btn-secondary rounded-xl !hidden md:!inline-flex">
-                    <i className="c-button__icon"><HiStar /></i> Export
-                </button>
+        <nav className="space-x-2 row-left !flex-nowrap p-app__nav p-app__block w-max">
+            <button onClick={() => data.modalImport.setIsOpen(true)}
+                className="btn btn-sm box-content py-1 btn-primary !hidden md:!inline-flex">
+                <i className="c-button__icon"> <IoImage /></i> Import
+            </button>
+            <button onClick={() => data.modalExport.setIsOpen(true)}
+                className="btn btn-sm box-content py-1 btn-secondary !hidden md:!inline-flex">
+                <i className="c-button__icon"><HiStar /></i> Export
+            </button>
 
-                {/* mobile buttons */}
-                <button onClick={() => data.modalImport.setIsOpen(true)}
-                    className="c-button --secondary --sm mr-2 md:!hidden">
-                    <IoImage />
-                </button>
-                <button onClick={() => data.modalExport.setIsOpen(true)}
-                    className="c-button --primary --sm md:!hidden">
-                    <HiStar />
-                </button>
-            </nav>
+            {/* mobile buttons */}
+            <button onClick={() => data.modalImport.setIsOpen(true)}
+                className="c-button --secondary --sm md:!hidden">
+                <IoImage />
+            </button>
+            <button onClick={() => data.modalExport.setIsOpen(true)}
+                className="c-button --primary --sm md:!hidden">
+                <HiStar />
+            </button>
 
-            <label>
-                <p hidden>project name</p>
-                <input data-tip="project name (press enter to save)"
-                    data-for="tooltip"
-                    type="text"
-                    className="input shadow-lg min-w-[250px]"
-                    placeholder="Enter Name"
-                    value={data.projectName}
-                    onChange={e => data.saveProjectName(e.target.value)} />
-            </label>
+            <select className="select select-sm select-bordered"
+                value={data.theme}
+                onChange={(e) => data.changeTheme(e.currentTarget.value)}>
+
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+
+                <option value="luna-moth">Luna Moth</option>
+                <option value="hawk-moth">Hawk Moth</option>
+                <option value="atlas-moth">Atlas Moth</option>
+                <option value="emperor-moth">Emperor Moth</option>
+
+
+                <option value="acid">Acid</option>
+                <option value="aqua">Aqua</option>
+                <option value="autumn">Autumn</option>
+                <option value="black">Black</option>
+                <option value="bumblebee">Bumblebee</option>
+                <option value="business">Business</option>
+                <option value="coffee">Coffee</option>
+                <option value="corporate">Corporate</option>
+                <option value="cupcake">Cupcake</option>
+                <option value="cmyk">Cmyk</option>
+                <option value="cyberpunk">Cyberpunk</option>
+                <option value="dim">Dim</option>
+                <option value="dracula">Dracula</option>
+                <option value="emerald">Emerald</option>
+                <option value="fantasy">Fantasy</option>
+                <option value="forest">Forest</option>
+                <option value="garden">Garden</option>
+                <option value="halloween">Halloween</option>
+                <option value="lemonade">Lemonade</option>
+                <option value="lofi">Lofi</option>
+                <option value="luxury">Luxury</option>
+                <option value="night">Night</option>
+                <option value="nord">Nord</option>
+                <option value="pastel">Pastel</option>
+                <option value="retro">Retro</option>
+                <option value="sunset">Sunset</option>
+                <option value="synthwave">Synthwave</option>
+                <option value="valentine">Valentine</option>
+                <option value="winter">Winter</option>
+                <option value="wireframe">Wireframe</option>
+            </select>
+
+            <input data-tip="project name"
+                data-for="tooltip"
+                type="text"
+                className="input input-sm min-w-[250px]"
+                placeholder="Enter Name"
+                value={data.projectName}
+                onChange={e => data.saveProjectName(e.target.value)} />
 
             {/* mobile buttons */}
             <button className="c-button --secondary --sm md:!hidden"
                 onClick={() => props.setShowMobilePanel(true)}>
                 <IoColorPalette />
             </button>
-        </section>
+        </nav>
     </>)
 }
 
@@ -153,6 +238,14 @@ function useNav(props: IProps) {
         setCanvasSize, setActiveLayer, setActiveColorPalette
     } = useGlobalStore();
     let [projectList, setProjectList] = useState<string[]>([]);
+    let [theme, setTheme] = useState("light");
+    let [exportSettings, setExportSettings] = useState({
+        scale: 1,
+        paddingX: 0,
+        paddingY: 0,
+        mothData: true,
+        dataFile: false,
+    });
 
     // load local projects
     useEffect(() => {
@@ -179,6 +272,14 @@ function useNav(props: IProps) {
         localStorage.setItem(localProject.name, JSON.stringify(localProject));
     }, [activeLayer]);
 
+    // load theme
+    useEffect(() => {
+        let defaultTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? "dark" : "light";
+        let theme = localStorage.getItem("moth-theme") ?? defaultTheme;
+        changeTheme(theme);
+    }, []);
+
     function saveProjectName(name) {
         let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
         let index = currentProjectList.indexOf(projectName);
@@ -186,6 +287,7 @@ function useNav(props: IProps) {
 
         localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
         localStorage.removeItem(projectName);
+        localStorage.setItem(name, JSON.stringify(getProject()));
 
         setProjectList(currentProjectList);
         setProjectName(name);
@@ -291,15 +393,20 @@ function useNav(props: IProps) {
     function exportProject(settings?: IExportSettings) {
         let height = canvasSize.height;
         let width = (settings?.frameOnly || settings?.layerOnly) ?
-            canvasSize.width :
-            canvasSize.width * frames.length;
+            canvasSize.width : canvasSize.width * frames.length;
+        let newFrames = (settings?.frameOnly || settings?.layerOnly) ?
+            [activeFrame] : frames;
+
+        height += (newFrames.length * exportSettings.paddingY * 2);
+        width += (newFrames.length * exportSettings.paddingX * 2);
+        height *= exportSettings.scale;
+        width *= exportSettings.scale;
+
         canvas1.resize(width, height);
         canvas2.resize(canvasSize.width, canvasSize.height);
         canvas3.resize(canvasSize.width, canvasSize.height);
 
-        let newFrames = (settings?.frameOnly || settings?.layerOnly) ?
-            [activeFrame] : frames;
-
+        // render image
         newFrames.forEach((frame, i) => {
             let layersRevered = frame.layers.slice().reverse();
             let layers = (settings?.layerOnly) ? [activeLayer] : layersRevered;
@@ -309,7 +416,13 @@ function useNav(props: IProps) {
                 canvas2.drawImage(canvas3.getElement());
             });
 
-            canvas1.drawImage(canvas2.getElement(), (width / newFrames.length) * i, 0, canvasSize.width, canvasSize.height);
+            let scaledWidth = canvasSize.width * exportSettings.scale;
+            let scaledHeight = canvasSize.height * exportSettings.scale;
+
+            let posX = (i * (scaledWidth + exportSettings.paddingX)) + exportSettings.paddingX;
+            let posY = exportSettings.paddingY;
+
+            canvas1.drawImage(canvas2.getElement(), posX, posY, scaledWidth, scaledHeight);
             canvas2.clear();
         });
 
@@ -321,8 +434,14 @@ function useNav(props: IProps) {
         let chunks = pngExtract(data);
 
         // add meta data to png
-        let project = getProject();
-        chunks.splice(-1, 0, pngText.encode('moth', Base64.encode(JSON.stringify(project))));
+        if (exportSettings.mothData) {
+            let project = getProject();
+            chunks.splice(-1, 0, pngText.encode('moth', Base64.encode(JSON.stringify(project))));
+        }
+
+        if (exportSettings.dataFile) {
+            exportData();
+        }
 
         // convert data to png
         let newBuffer = pngBuffer.from(pngEncode(chunks), 'base64');
@@ -333,6 +452,24 @@ function useNav(props: IProps) {
         let anchor = document.createElement("a");
         anchor.href = url;
         anchor.download = projectName;
+        anchor.click();
+    }
+
+    function exportData(type = "aseprite") {
+        let data = {};
+
+        if (type === "aseprite") {
+            data = {
+
+            }
+        }
+        if (type === "texture packer") { }
+
+        let blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+        let url = URL.createObjectURL(blob);
+        let anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `${projectName}-data.json`;
         anchor.click();
     }
 
@@ -375,17 +512,29 @@ function useNav(props: IProps) {
         gif.render();
     }
 
+    function changeTheme(themeName) {
+        let root = document.documentElement;
+        root.setAttribute("data-theme", themeName);
+        localStorage.setItem("moth-theme", themeName);
+        setTheme(themeName);
+    }
+
     return {
+        theme,
         modalExport,
         modalImport,
         projectName,
         projectList,
+        exportSettings,
+        setTheme,
         createGif,
+        changeTheme,
         deleteProject,
         exportProject,
         importProject,
         importImage,
         saveProjectName,
+        setExportSettings,
         loadProjectFromLocalStorage,
     }
 }

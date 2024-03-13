@@ -1,3 +1,4 @@
+import { IColor, IColorPalette } from "../../types";
 import ReactTooltip from 'react-tooltip';
 import { useGlobalStore } from '../../utils';
 import { BsTrophyFill } from "react-icons/bs";
@@ -5,7 +6,6 @@ import { BiPlusMedical } from "react-icons/bi";
 import { HiColorSwatch } from "react-icons/hi";
 import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
-import { IColorPalette, IColor } from "../../types";
 import { IoImage, IoLayers } from "react-icons/io5";
 import { Popover, ColorPicker } from "../../components/";
 import { FaSortAlphaDown, FaFilter } from "react-icons/fa";
@@ -21,53 +21,52 @@ export function Colors() {
                 onChange={(color: IColor) => data.setActiveColor({ r: color.r, g: color.g, b: color.b, a: Math.ceil(color.a * 255) })}
                 color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(4)) }} />
 
-            <div className="mb-2"></div>
+            <nav className="my-2 p-app__color-controls">
+                <div className="w-full row">
+                    <select data-tip="color pallete selection"
+                        data-for="tooltip"
+                        className="w-1/2 select select-xs"
+                        onChange={(e) => data.setColorPalette(Number(e.target.value))}
+                        value={data.colorPalettes.findIndex(x => data.activeColorPalette.symbol === x.symbol)}>
 
-            <nav className="p-app__color-controls mb-2">
-                <input type="text"
-                    data-for="tooltip"
-                    data-tip="color pallete name"
-                    className="c-input --xs"
-                    style={{ width: '58%' }}
-                    value={data.activeColorPalette.name}
-                    onChange={e => data.updatePaletteName(e.currentTarget.value)} />
+                        {data.colorPalettes.map((colorPallete, i) => (
+                            <option key={i} value={i}>{colorPallete.name}</option>
+                        ))}
+                    </select>
 
-                <select data-tip="color pallete selection"
-                    data-for="tooltip"
-                    className="c-input --xs --wide"
-                    onChange={(e) => data.setColorPalette(Number(e.target.value))}
-                    style={{ width: "30px" }}>
-
-                    {data.colorPalettes.map((colorPallete, i) => (
-                        <option key={i} value={i}>{colorPallete.name}</option>
-                    ))}
-                </select>
+                    <input type="text"
+                        data-for="tooltip"
+                        data-tip="color pallete name"
+                        className="w-1/2 input input-xs"
+                        value={data.activeColorPalette.name}
+                        onChange={e => data.updatePaletteName(e.currentTarget.value)} />
+                </div>
 
                 <button data-tip="add new pallete"
                     data-for="tooltip"
                     onClick={data.addNewColorPalette}
-                    className="c-button --xs --fourth">
-                    <BiPlusMedical />
+                    className="btn btn-xs">
+                    <BiPlusMedical className="text-lg" />
                 </button>
 
                 <button data-tip="remove current pallete"
                     data-for="tooltip"
                     onClick={data.deleteColorPalette}
-                    className="c-button --xs --fourth">
-                    <MdDelete />
+                    className="btn btn-xs">
+                    <MdDelete className="text-lg" />
                 </button>
 
                 <button data-tip="add current color"
                     data-for="tooltip"
                     onClick={data.addColor}
-                    className="c-button --xs --fourth">
-                    <BiPlusMedical />
+                    className="btn btn-xs">
+                    <BiPlusMedical className="text-lg" />
                 </button>
 
                 <Popover>
                     <button data-tip="sort colors"
                         data-for="tooltip"
-                        className="c-button --xs --fourth">
+                        className="btn btn-xs">
                         <FaSortAlphaDown />
                     </button>
 
@@ -93,7 +92,7 @@ export function Colors() {
                 <Popover>
                     <button data-tip="filter colors"
                         data-for="tooltip"
-                        className="c-button --xs --fourth">
+                        className="btn btn-xs">
                         <FaFilter />
                     </button>
 
@@ -124,21 +123,21 @@ export function Colors() {
                 <button data-tip="remove current color"
                     data-for="tooltip"
                     onClick={data.deleteColor}
-                    className="c-button --xs --fourth">
-                    <MdDelete />
+                    className="btn btn-xs">
+                    <MdDelete className="text-lg" />
                 </button>
             </nav>
 
-            <section className="p-app__color-box mt-2">
+            <section className="row-left">
                 {data.visibleColors.map((color: IColor, i) => (
-                    <div data-tip={`rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`}
+                    <div key={i}
                         data-for="tooltip"
-                        className={`p-app__color c-color-card mb-1 mr-1 ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "--active" : ""}`}
                         onClick={() => data.setActiveColor(color)}
-                        key={i}
+                        data-tip={`rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`}
                         style={{
                             background: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`
-                        }}>
+                        }}
+                        className={`h-8 w-8 rounded mr-1 mb-1 ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "border-2 border-black" : ""}`}>
                     </div>
                 ))}
             </section>
@@ -207,10 +206,10 @@ function useColors() {
 
     function updatePaletteName(name: string) {
         let palette = colorPalettes.find(p => p.symbol === activeColorPalette.symbol);
-        if (!palette) return;
+        palette!.name = name;
 
-        palette.name = name;
         setColorPalettes([...colorPalettes]);
+        setActiveColorPalette(palette!);
     }
 
     function addNewColorPalette() {

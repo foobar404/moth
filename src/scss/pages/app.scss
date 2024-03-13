@@ -1,10 +1,9 @@
 .p-app {
-    background: $color-background;
     display: grid;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    grid-template-rows: 70px 1fr 130px;
+    grid-template-rows: 60px 1fr 130px;
     grid-template-columns: 60px 1fr 285px;
     grid-template-areas:
         "left header right"
@@ -49,6 +48,7 @@
 
     &__canvas-controls {
         align-items: center;
+        background: oklch(var(--b1) / .2);
         display: flex;
         position: absolute;
         top: $spacing-2;
@@ -59,7 +59,6 @@
         z-index: 1;
         box-shadow: $shadow-normal;
         border-radius: $border-radius-rounded;
-        background: $color-gray-dark;
     }
 
     &__brush-controls {
@@ -73,7 +72,7 @@
         z-index: 1;
         box-shadow: $shadow-normal;
         border-radius: $border-radius-rounded;
-        background: $color-gray-dark;
+        background: oklch(var(--b1) / .2);
     }
 
     &__tools {
@@ -308,7 +307,7 @@
         border-radius: $border-radius-rounded;
         margin: $spacing-1;
         padding: $spacing-2;
-        background: $color-gray-dark;
+        background: oklch(var(--b1) / .2);
         box-shadow: $shadow-normal;
     }
 }

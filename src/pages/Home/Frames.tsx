@@ -10,75 +10,74 @@ import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-ic
 export function Frames() {
     const data = useFrames();
 
-    return (<section className="p-app__frames p-app__block">
-        <section>
-            <nav className={"p-app__frames-controls"}>
-                <section className="p-app__frame-controls-section">
+    return (<section className="!justify-between row p-app__block">
+        <section className="flex-1">
+            <nav className={"row !justify-between"}>
+                <section className="space-x-2 p-app__frame-controls-section">
                     <button data-tip="new frame" data-for="tooltip"
                         onClick={data.addFrame}
-                        className="c-button --xs --fourth mr-2">
-                        <MdAddPhotoAlternate />
+                        className="btn btn-xs">
+                        <MdAddPhotoAlternate className="text-lg"/>
                     </button>
                     <button data-tip="duplicate frame"
                         data-for="tooltip"
                         onClick={data.duplicateFrame}
-                        className="c-button --xs --fourth mr-2">
-                        <IoCopy />
+                        className="btn btn-xs">
+                        <IoCopy className="text-lg"/>
                     </button>
 
                     <button data-tip="move frame left"
                         data-for="tooltip"
                         onClick={data.moveFrameLeft}
-                        className="c-button --xs --fourth mr-2">
-                        <BsFillCaretLeftFill />
+                        className="btn btn-xs">
+                        <BsFillCaretLeftFill className="text-lg"/>
                     </button>
                     <button data-tip="move frame right"
                         data-for="tooltip"
                         onClick={data.moveFrameRight}
-                        className="c-button --xs --fourth mr-2">
-                        <BsFillCaretRightFill />
+                        className="btn btn-xs">
+                        <BsFillCaretRightFill className="text-lg"/>
                     </button>
 
                     <button data-tip="delete frame"
                         data-for="tooltip"
                         onClick={data.deleteFrame}
-                        className="c-button --xs --fourth">
-                        <MdDelete />
+                        className="btn btn-xs">
+                        <MdDelete className="text-lg"/>
                     </button>
                 </section>
 
-                <section className="p-app__frame-controls-section flex items-center">
+                <section className="flex items-center p-app__frame-controls-section">
                     <label data-tip="FPS" data-for="tooltip">
                         <input type="number"
                             value={data.preview.fps}
-                            className="c-input --xs mr-2"
+                            className="w-16 mr-2 input input-xs"
                             onChange={e => data.setFps(Number(e.target.value))} />
                     </label>
                     <button data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
                         data-for="tooltip"
                         onClick={data.togglePlay}
-                        className="c-button --xs --fourth">
-                        {data.preview.playing ? <IoStop /> : <IoPlay />}
+                        className="btn btn-xs">
+                        {data.preview.playing ? <IoStop className="text-lg"/> : <IoPlay className="text-lg"/>}
                     </button>
                 </section>
 
-                <section className="p-app__frame-controls-section flex items-center">
+                <section className="row !flex-nowrap p-app__frame-controls-section">
                     <button data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
                         data-for="tooltip"
-                        className="c-button --xs --fourth mr-2"
+                        className="mr-2 btn btn-xs"
                         onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
-                        {data.onionSkin ? <MdLayers /> : <MdLayersClear />}
+                        {data.onionSkin ? <MdLayers className="text-lg"/> : <MdLayersClear className="text-lg"/>}
                     </button>
-                    <label data-tip="onion skin opacity" data-for="tooltip">
-                        <p hidden>onion skin slider</p>
-                        <input type="range"
-                            min="0"
-                            max="255"
-                            value={data.onionSkin}
-                            className="c-input --xs --wide"
-                            onChange={e => data.setOnionSkin(e.target.valueAsNumber)}
-                        ></input>
-                    </label>
+                    <input data-tip="onion skin opacity"
+                        data-for="tooltip"
+                        type="range"
+                        min="0"
+                        max="255"
+                        value={data.onionSkin}
+                        className="range range-xs"
+                        onChange={e => data.setOnionSkin(e.target.valueAsNumber)}
+                    ></input>
                 </section>
             </nav>
 
@@ -90,7 +89,7 @@ export function Frames() {
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => data.handleDrop(e, frame)}
                         onDragEnd={data.handleDragEnd}
-                        className={`p-app__frame ${frame.symbol === data.activeFrame.symbol ? "--active" : ""}`}
+                        className={`p-app__frame ${frame.symbol === data.activeFrame.symbol ? "border-2 border-black" : ""}`}
                         src={data.imageMap[frame.symbol]}
                         onClick={() => {
                             data.setActiveFrame(frame);

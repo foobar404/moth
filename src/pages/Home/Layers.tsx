@@ -17,44 +17,44 @@ export function Layers() {
                 <button data-tip="add new layer"
                     data-for="tooltip"
                     onClick={data.addNewLayer}
-                    className="c-button --xs --fourth">
-                    <HiDocumentAdd />
+                    className="btn btn-xs">
+                    <HiDocumentAdd className="text-lg"/>
                 </button>
                 <button data-tip="delete current layer"
                     data-for="tooltip"
                     onClick={data.deleteLayer}
-                    className="c-button --xs --fourth">
-                    <MdDelete />
+                    className="btn btn-xs">
+                    <MdDelete className="text-lg"/>
                 </button>
                 <button data-tip={`${data.layersAreVisible ? "hide other layers" : "show all layers"}`}
                     data-for="tooltip"
                     onClick={data.toggleLayerVisibility}
-                    className="c-button --xs --fourth">
-                    {data.layersAreVisible ? <IoEye /> : <HiEyeOff />}
+                    className="btn btn-xs">
+                    {data.layersAreVisible ? <IoEye className="text-lg"/> : <HiEyeOff className="text-lg"/>}
                 </button>
                 <button data-tip="move layer up"
                     data-for="tooltip"
                     onClick={data.moveLayerUp}
-                    className="c-button --xs --fourth">
-                    <BsFillCaretUpFill />
+                    className="btn btn-xs">
+                    <BsFillCaretUpFill className="text-lg"/>
                 </button>
                 <button data-tip="move layer down"
                     data-for="tooltip"
                     onClick={data.moveLayerDown}
-                    className="c-button --xs --fourth">
-                    <BsFillCaretDownFill />
+                    className="btn btn-xs">
+                    <BsFillCaretDownFill className="text-lg"/>
                 </button>
                 <button data-tip="merge layer with layer below"
                     data-for="tooltip"
                     onClick={data.mergeLayer}
-                    className="c-button --xs --fourth">
-                    <RiGitMergeFill />
+                    className="btn btn-xs">
+                    <RiGitMergeFill className="text-lg"/>
                 </button>
                 <button data-tip="duplicate layer"
                     data-for="tooltip"
                     onClick={data.duplicateLayer}
-                    className="c-button --xs --fourth">
-                    <IoCopy />
+                    className="btn btn-xs">
+                    <IoCopy className="text-lg"/>
                 </button>
                 <label data-tip="change non-active layers opacity"
                     data-for="tooltip"
@@ -64,13 +64,13 @@ export function Layers() {
                         step="1"
                         max="255"
                         type="range"
-                        className="w-full c-input"
+                        className="w-full range range-xs"
                         value={data.layerOpacity}
                         onChange={e => data.setLayerOpacity(e.currentTarget.valueAsNumber)} />
                 </label>
             </nav>
 
-            <section className="mb-2 p-app__layer-container">
+            <section>
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
                     <div key={i}
                         draggable
@@ -79,7 +79,7 @@ export function Layers() {
                         onDrop={(e) => data.handleDrop(e, layer)}
                         onClick={() => data.setActiveLayer(layer)}
                         onDragStart={(e) => data.handleDragStart(e, layer)}
-                        className={`p-app__layer ${layer.symbol === data.activeLayer.symbol ? "--active" : ""}`}>
+                        className={`row rounded-md cursor-pointer ${layer.symbol === data.activeLayer.symbol ? "!border-2 !border-black" : ""}`}>
 
                         <img src={data.imageMap[layer.symbol]} className="p-app__layer-img" />
                         <input type="text"
