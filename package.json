@@ -16,6 +16,7 @@
     "@types/react-portal": "^4.0.4",
     "@types/tinycolor2": "^1.4.3",
     "buffer": "^6.0.3",
+    "firebase": "^10.8.1",
     "gh-pages": "^4.0.0",
     "gif.js": "^0.2.0",
     "install": "^0.13.0",

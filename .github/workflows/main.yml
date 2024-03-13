@@ -13,7 +13,7 @@ jobs:
     environment: default
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [18.x]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
