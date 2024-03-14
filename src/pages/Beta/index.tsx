@@ -7,7 +7,7 @@ export function Beta() {
     const data = useBeta();
 
     return (<main className="relative w-screen h-screen row">
-        <img src="./assets/splash.webp"
+        <img src="/assets/splash.webp"
             className="fixed inset-0 object-cover w-full h-full" />
 
         <div className="z-10 px-24 py-8 text-center rounded-3xl backdrop-blur-md backdrop-hue-rotate-30">
@@ -36,7 +36,7 @@ export function Beta() {
                 </div>
 
                 <a className="px-4 py-2 mt-4 bg-gradient-to-r from-[#0ACF83] to-[#A8FF78] rounded-xl flex items-center justify-center transform transition duration-500 hover:scale-105 hover:bg-gradient-to-bl shadow-lg"
-                    href="https://www.kickstarter.com/projects/foobar404/moth-pixel-art-editor" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                    href="https://www.kickstarter.com/projects/foobar404/moth-pixel-art-editor?ref=6psfuy" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                     <span className="text-sm font-bold tracking-wide text-white">Support Moth Pixel Art Editor Now on</span>
                     <img className="w-32 mx-1" src="/assets/kickstarter-green.png" alt="Kickstarter Logo" />
                     <span className="text-sm font-bold tracking-wide text-white">!</span>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Beta, Home } from './pages';
 import { ProtectedRoute } from './components';
-import { BrowserRouter, Routes, Route, Navigate, } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 
 export function App() {
@@ -15,5 +15,5 @@ export function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
