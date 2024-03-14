@@ -1,7 +1,7 @@
 import { firebaseDB } from "../../index";
+import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { collection, query, where, getDocs } from 'firebase/firestore';
 
 
 export function ProtectedRoute(props) {
@@ -9,9 +9,13 @@ export function ProtectedRoute(props) {
 
     if (data.loading) {
         return (
-            <main>
-                Loading...
-            </main>
+            <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500">
+                <div className="flex space-x-2">
+                    <div className="w-8 h-8 bg-white rounded-full animate-bounce"></div>
+                    <div className="w-8 h-8 bg-white rounded-full animate-bounce200"></div>
+                    <div className="w-8 h-8 bg-white rounded-full animate-bounce400"></div>
+                </div>
+            </div>
         )
     }
 
@@ -24,15 +28,21 @@ function useProtectedRoute() {
     let [authorized, setAuthorized] = useState(false);
 
     useEffect(() => {
-        checkKeyExists(localStorage.getItem("moth-beta-key"));
+        let key = localStorage.getItem("moth-beta-key");
+        if (!key) {
+            setLoading(false);
+            return;
+        }
+        checkKeyExists(key);
     }, []);
 
     async function checkKeyExists(keyToCheck) {
-        const betaKeysCol = collection(firebaseDB, 'beta-keys');
-        const q = query(betaKeysCol, where('key', '==', keyToCheck));
-        const querySnapshot = await getDocs(q);
+        const docRef = doc(firebaseDB, 'beta-keys', keyToCheck);
+        const docSnap = await getDoc(docRef);
 
-        if (!querySnapshot.empty) setAuthorized(true);
+        if (docSnap.exists())
+            setAuthorized(true);
+
         setLoading(false);
     }
 
