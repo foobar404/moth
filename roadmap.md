@@ -1,7 +1,11 @@
 # Doing
-- site domain 
-- beta splash page
-- beta key system
+- fix url routing
+- assign taks to artists
+    - cover image
+    - video
+    - coins
+    - headers
+    - filler images
 
 # Bugs
 - wand selection tool
@@ -14,11 +18,25 @@
 - gif export not working 
 
 # Pre-Launch
+- add more rewards
+- add console error watch system
+- setup alpha / beta test branch
+- moth subdomain or /moth
+
+# Promotion
+- discord channels
+- google ads
+- reddit
+- itch game jam
+- twitch channels
+- product hunt
 
 # Launch
 - user accounts
 - login page
 - payment page
+- pricing page
+- bugpack home page
 
 # Stretch 
 - add data file for export

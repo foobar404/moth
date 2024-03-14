@@ -1,6 +1,7 @@
 import GIF from "gif.js";
 import { Base64 } from 'js-base64';
 import pngText from "png-chunk-text";
+import { FaBug } from "react-icons/fa";
 import { IProject } from '../../types';
 import { HiStar } from "react-icons/hi";
 import { ImCross } from "react-icons/im";
@@ -163,19 +164,16 @@ export function Nav(props: IProps) {
                 <HiStar />
             </button>
 
-            <select className="select select-sm select-bordered"
+            <select className="select select-bordered"
                 value={data.theme}
                 onChange={(e) => data.changeTheme(e.currentTarget.value)}>
 
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
-
                 <option value="luna-moth">Luna Moth</option>
                 <option value="hawk-moth">Hawk Moth</option>
                 <option value="atlas-moth">Atlas Moth</option>
                 <option value="emperor-moth">Emperor Moth</option>
-
-
                 <option value="acid">Acid</option>
                 <option value="aqua">Aqua</option>
                 <option value="autumn">Autumn</option>
@@ -215,6 +213,14 @@ export function Nav(props: IProps) {
                 placeholder="Enter Name"
                 value={data.projectName}
                 onChange={e => data.saveProjectName(e.target.value)} />
+
+            <a data-tip="report a bug"
+                data-for="tooltip"
+                target="_blank"
+                className="btn btn-sm btn-warning"
+                href={"https://forms.gle/pDXePJUoGSFnUBJF7"}>
+                <FaBug />
+            </a>
 
             {/* mobile buttons */}
             <button className="c-button --secondary --sm md:!hidden"

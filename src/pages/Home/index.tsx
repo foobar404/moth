@@ -4,6 +4,7 @@ import { Canvas } from './Canvas';
 import { Colors } from './Colors';
 import { Frames } from './Frames';
 import { Layers } from './Layers';
+import mixpanel from 'mixpanel-browser';
 import ReactTooltip from 'react-tooltip';
 import { ImCross } from "react-icons/im";
 import { IoLayers } from "react-icons/io5";
@@ -65,6 +66,10 @@ export function Home() {
 function useHome() {
 	let [tabIndex, setTabIndex] = useState(0);
 	let [showMobilePanel, setShowMobilePanel] = useState<boolean>(false);
+
+	useEffect(() => {
+		mixpanel.track('Page: Home');
+	}, []);
 
 	useEffect(() => {
 		document.addEventListener('contextmenu', event => event.preventDefault());
