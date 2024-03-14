@@ -487,7 +487,7 @@ function useNav(props: IProps) {
 
     function createGif() {
         var gif = new GIF({
-            workerScript: '/moth/js/gif.worker.js',
+            workerScript: '/js/gif.worker.js',
             workers: 2,
             quality: 10
         });

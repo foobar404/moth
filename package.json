@@ -1,8 +1,8 @@
 {
-  "name": "pixel-art",
+  "name": "moth-pixel-editor",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://foobar404.dev/moth/",
+  "homepage": "https://bugpack.io",
   "dependencies": {
     "@midudev/tailwind-animations": "^0.0.7",
     "@testing-library/jest-dom": "^5.16.5",

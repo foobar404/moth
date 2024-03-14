@@ -6,7 +6,7 @@ export function Beta() {
     const data = useBeta();
 
     return (<main className="relative w-screen h-screen row">
-        <img src="./moth/assets/splash.webp"
+        <img src="./assets/splash.webp"
             className="fixed inset-0 object-cover w-full h-full" />
 
         <div className="z-10 px-24 py-10 text-center rounded-3xl backdrop-blur-md backdrop-hue-rotate-30">
