@@ -11,13 +11,10 @@ exports.generateKey = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('invalid-argument', 'Invalid key.');
     }
 
-    // Data validation
-    if (!data.monthsValid || !data.pro || !data.user) {
+    if (data.monthsValid === undefined || data.pro === undefined || data.user === undefined) {
         throw new functions.https.HttpsError('invalid-argument', 'Missing required field.');
     }
 
-    // Generate JWT
-    // Note: In a real-world application, ensure your secret is securely stored and not hard-coded
     const secret = '%2Y3ypZURpcV9s';
     const iat = Math.floor(Date.now() / 1000);
     const token = jwt.sign({
@@ -27,7 +24,6 @@ exports.generateKey = functions.https.onCall(async (data, context) => {
         user: data.user
     }, secret);
 
-    // Store JWT in Firestore
     const db = admin.firestore();
     await db.collection('beta-keys').doc(token).set({
         iat: iat,

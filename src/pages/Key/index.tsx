@@ -1,5 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import { firebaseApp } from '../../index';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 
 export function Key() {
@@ -8,18 +10,24 @@ export function Key() {
     return (
         <main className="flex items-center justify-center h-screen bg-gray-100">
             <section className="p-5 bg-white shadow-lg md:p-20 rounded-xl">
+
+                {data.isLoading && <>
+                    <div className="flex items-center justify-center mb-4">
+                        <div className="w-8 h-8 border-b-2 border-gray-900 rounded-full animate-spin"></div>
+                    </div>
+                </>}
+
                 <form onSubmit={data.handleSubmit} className="space-x-2 row">
-                    <input type="text" placeholder="User" value={data.user} onChange={e => data.setUser(e.target.value)} className="input" />
-                    <input type="checkbox" checked={data.pro} onChange={e => data.setPro(e.target.checked)} className="checkbox" />
-                    <input type="number" placeholder="Months Valid" value={data.monthsValid} onChange={e => data.setMonthsValid(e.target.valueAsNumber)} className="w-20 input" />
-                    <button type="submit" className="px-4 py-2 text-white bg-indigo-500 rounded">Create Key</button>
+                    <input type="checkbox" checked={data.pro} onChange={e => data.setPro(e.target.checked)} className="checkbox checkbox-lg" />
+                    <input type="text" placeholder="User" value={data.user} onChange={e => data.setUser(e.target.value)} className="input input-bordered" />
+                    <input type="number" placeholder="Months Valid" value={data.monthsValid} onChange={e => data.setMonthsValid(e.target.valueAsNumber)} className="w-20 input input-bordered" />
+                    <button type="submit" className="btn btn-info">Create Key</button>
                 </form>
 
-                <div className="border-b"></div>
                 <textarea
                     readOnly
                     value={data.newKey}
-                    className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full h-32 px-4 py-2 mt-4 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="Generated Key..."
                 ></textarea>
             </section>
@@ -33,6 +41,7 @@ function useKey() {
     const [user, setUser] = useState("");
     const [pro, setPro] = useState(false);
     const [monthsValid, setMonthsValid] = useState(12);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -40,21 +49,30 @@ function useKey() {
             user,
             pro,
             monthsValid,
-            key: localStorage.getItem("moth-meta-key")
+            key: localStorage.getItem("moth-beta-key")
         });
     };
 
     function createKey(data) {
-        axios.post("https://us-central1-your-project-id.cloudfunctions.net/generateKey", data)
-            .then(res => {
-                setNewKey(res.data.key); // Assuming the response has a `key` property
-            }).catch(error => {
-                console.error('There was an error!', error);
+        const functions = getFunctions(firebaseApp);
+        const generateKey = httpsCallable(functions, 'generateKey');
+        setIsLoading(true);
+
+        generateKey(data)
+            .then((result: any) => {
+                setNewKey(result.data.token as string);
+            })
+            .catch((error) => {
+                alert(`There was an error calling the generateKey function: ${error}`);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     }
 
     return {
         user,
+        isLoading,
         setUser,
         pro,
         setPro,

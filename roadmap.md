@@ -1,12 +1,12 @@
 # Doing
+- restyle color filters 
+- shortcuts dont prevent default 
 - add console error watch system
 - color picker
 
 # TODO
-- shortcuts dont prevent default 
 - gif export not working 
 - switching tabs resets state
-- restyle color filters 
 - make selections standout
 - add more rewards
 - setup alpha / beta test branch
