@@ -241,7 +241,8 @@ function useNav(props: IProps) {
         projectName, frames, activeFrame,
         activeLayer, canvasSize, colorPalettes,
         setProjectName, setFrames, setColorPalettes,
-        setCanvasSize, setActiveLayer, setActiveColorPalette
+        setCanvasSize, setActiveLayer, setActiveColorPalette,
+        setActiveFrame,
     } = useGlobalStore();
     let [projectList, setProjectList] = useState<string[]>([]);
     let [theme, setTheme] = useState("light");
@@ -323,9 +324,10 @@ function useNav(props: IProps) {
         setProjectName(project.name);
         setCanvasSize(project.canvas);
         setFrames(project.frames);
+        setActiveFrame(project.frames[0]);
+        setActiveLayer(project.frames[0].layers[0]);
         setColorPalettes(project.colorPalettes);
         setActiveColorPalette(project.colorPalettes[0])
-        setActiveLayer(project.frames[0].layers[0]);
     }
 
     function loadProjectFromLocalStorage(projectName) {

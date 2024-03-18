@@ -77,7 +77,7 @@ export function useCanvas(props?: IProps) {
         };
     }
 
-    function drawGrid(color1 = "#fff", color2 = "#ddd", size = 1) {
+    function drawGrid(color1 = "#eee", color2 = "#ccc", size = 1) {
         let rows = Math.floor(canvas.current.height / size);
         let cols = Math.floor(canvas.current.width / size);
 

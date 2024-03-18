@@ -17,33 +17,33 @@ export function Frames() {
                     <button data-tip="new frame" data-for="tooltip"
                         onClick={data.addFrame}
                         className="btn btn-xs">
-                        <MdAddPhotoAlternate className="text-lg"/>
+                        <MdAddPhotoAlternate className="text-lg" />
                     </button>
                     <button data-tip="duplicate frame"
                         data-for="tooltip"
                         onClick={data.duplicateFrame}
                         className="btn btn-xs">
-                        <IoCopy className="text-lg"/>
+                        <IoCopy className="text-lg" />
                     </button>
 
                     <button data-tip="move frame left"
                         data-for="tooltip"
                         onClick={data.moveFrameLeft}
                         className="btn btn-xs">
-                        <BsFillCaretLeftFill className="text-lg"/>
+                        <BsFillCaretLeftFill className="text-lg" />
                     </button>
                     <button data-tip="move frame right"
                         data-for="tooltip"
                         onClick={data.moveFrameRight}
                         className="btn btn-xs">
-                        <BsFillCaretRightFill className="text-lg"/>
+                        <BsFillCaretRightFill className="text-lg" />
                     </button>
 
                     <button data-tip="delete frame"
                         data-for="tooltip"
                         onClick={data.deleteFrame}
                         className="btn btn-xs">
-                        <MdDelete className="text-lg"/>
+                        <MdDelete className="text-lg" />
                     </button>
                 </section>
 
@@ -58,7 +58,7 @@ export function Frames() {
                         data-for="tooltip"
                         onClick={data.togglePlay}
                         className="btn btn-xs">
-                        {data.preview.playing ? <IoStop className="text-lg"/> : <IoPlay className="text-lg"/>}
+                        {data.preview.playing ? <IoStop className="text-lg" /> : <IoPlay className="text-lg" />}
                     </button>
                 </section>
 
@@ -67,7 +67,7 @@ export function Frames() {
                         data-for="tooltip"
                         className="mr-2 btn btn-xs"
                         onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
-                        {data.onionSkin ? <MdLayers className="text-lg"/> : <MdLayersClear className="text-lg"/>}
+                        {data.onionSkin ? <MdLayers className="text-lg" /> : <MdLayersClear className="text-lg" />}
                     </button>
                     <input data-tip="onion skin opacity"
                         data-for="tooltip"
@@ -181,6 +181,7 @@ function useFrames() {
                 layers: [{ image: new ImageData(canvasSize.width, canvasSize.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
                 symbol: Symbol(),
             });
+            setActiveLayer(newFrames[0].layers[0]);
         }
         setFrames(newFrames);
         setActiveFrame(newFrames[0]);

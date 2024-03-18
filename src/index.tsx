@@ -1,6 +1,6 @@
 import React from 'react';
 import "./scss/index.scss";
-import { App } from "./App";
+import { Routing } from "./Routing";
 import mixpanel from 'mixpanel-browser';
 import ReactDOM from 'react-dom/client';
 import { initializeApp } from "firebase/app";
@@ -25,7 +25,7 @@ export const firebaseDB = getFirestore(firebaseApp);
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
-root.render(<App />);
+root.render(<Routing />);
 
 
 

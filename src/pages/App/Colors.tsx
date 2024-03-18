@@ -128,7 +128,7 @@ export function Colors() {
                 </button>
             </nav>
 
-            <section className="row-left">
+            <section className="flex-wrap row-left">
                 {data.visibleColors.map((color: IColor, i) => (
                     <div key={i}
                         data-for="tooltip"
@@ -200,8 +200,10 @@ function useColors() {
     }
 
     function addColor() {
-        activeColorPalette.colors.push(activeColor);
-        setActiveColorPalette({ ...activeColorPalette });
+        if (!activeColorPalette.colors.find(c => JSON.stringify(c) === JSON.stringify(activeColor))) {
+            let newColors = [...activeColorPalette.colors, activeColor];
+            setActiveColorPalette({ ...activeColorPalette, colors: newColors });
+        }
     }
 
     function updatePaletteName(name: string) {

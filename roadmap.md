@@ -1,25 +1,14 @@
 # Doing
-- fix url routing
-- assign taks to artists
-    - cover image
-    - video
-    - coins
-    - headers
-    - filler images
-
-# Bugs
-- wand selection tool
-- same color in color palette
-- bucket fill is filling ghost pixels
-- importing new project keeps current activeLayer
-- shortcuts dont prevent default 
-- light tool errors when outside of bounds
-- cant delete last frame
-- gif export not working 
-
-# Pre-Launch
-- add more rewards
 - add console error watch system
+- color picker
+
+# TODO
+- shortcuts dont prevent default 
+- gif export not working 
+- switching tabs resets state
+- restyle color filters 
+- make selections standout
+- add more rewards
 - setup alpha / beta test branch
 - moth subdomain or /moth
 
@@ -31,7 +20,7 @@
 - twitch channels
 - product hunt
 
-# Launch
+# Kickstarter Launch
 - user accounts
 - login page
 - payment page
@@ -39,6 +28,7 @@
 - bugpack home page
 
 # Stretch 
+- multiple sprite tabs
 - add data file for export
 - node based editor
 - online gallery 
@@ -48,6 +38,7 @@
     - custom brushes 
     - fonts
 - theme
+    - retro game consoles
     - grid colors
     - custom layout, custom shortcut
     - minimize UI

@@ -6,45 +6,41 @@ import React, { useEffect, useState } from 'react';
 export function Beta() {
     const data = useBeta();
 
-    return (<main className="relative w-screen h-screen row">
-        <img src="/assets/splash.webp"
-            className="fixed inset-0 object-cover w-full h-full" />
+    return (
+        <main className="relative flex items-center justify-center w-screen h-screen p-4 bg-gradient-to-r from-primary to-accent">
+            <div className="z-10 max-w-md p-8 mx-auto text-center shadow-lg bg-blue-50 rounded-3xl backdrop-blur-md backdrop-hue-rotate-30">
+                <h1 className="mb-4 text-4xl font-bold text-blue-900">Moth: Pixel Art Editor</h1>
+                <p className="mb-8 text-lg text-blue-900">Join our beta and unleash your creativity with pixel art.</p>
 
-        <div className="z-10 px-24 py-8 text-center rounded-3xl backdrop-blur-md backdrop-hue-rotate-30">
-            <h1 className="mb-4 text-4xl font-bold ">Moth: Pixel Art App</h1>
-            <p className="mb-8 text-lg">Join our beta and unleash your creativity with pixel art.</p>
-
-            <div className="space-y-4">
-                <textarea
-                    placeholder="Enter your beta key..."
-                    className="textarea w-[400px]"
-                    onChange={e => data.setKey(e.currentTarget.value)} />
-                <div>
+                <div className="space-y-4">
+                    <textarea
+                        placeholder="Enter your beta key..."
+                        className="w-full p-4 text-blue-900 transition-colors border-2 border-blue-200 rounded-lg focus:outline-none focus:border-blue-500"
+                        onChange={e => data.setKey(e.currentTarget.value)} />
                     <button
                         onClick={data.submitKey}
-                        className="btn btn-primary w-[200px]">
+                        className="w-full py-2 font-bold text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600">
                         Submit Beta Key
                     </button>
-                </div>
-                <p className="divider">or</p>
-                <div>
+                    <p className="text-blue-900 divider">or</p>
                     <a href="https://forms.gle/23ywXm7Qcrr8EQJo9"
                         target="_blank"
-                        className="btn btn-secondary w-[200px]">
+                        className="inline-block w-full py-2 font-bold text-center text-white transition-colors bg-green-500 rounded-lg hover:bg-green-600">
                         Request a Beta Key
                     </a>
-                </div>
 
-                <a className="px-4 py-2 mt-4 bg-gradient-to-r from-[#0ACF83] to-[#A8FF78] rounded-xl flex items-center justify-center transform transition duration-500 hover:scale-105 hover:bg-gradient-to-bl shadow-lg"
-                    href="https://www.kickstarter.com/projects/foobar404/moth-pixel-art-editor?ref=6psfuy" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                    <span className="text-sm font-bold tracking-wide text-white">Support Moth Pixel Art Editor Now on</span>
-                    <img className="w-32 mx-1" src="/assets/kickstarter-green.png" alt="Kickstarter Logo" />
-                    <span className="text-sm font-bold tracking-wide text-white">!</span>
-                </a>
+                    <a className="inline-flex items-center justify-center w-full py-3 mt-4 text-sm font-bold tracking-wide text-blue-900 duration-200 hover:scale-105"
+                        href="https://www.kickstarter.com/projects/foobar404/moth-pixel-art-editor?ref=6psfuy" target="_blank" rel="noopener noreferrer">
+                        Support Moth Pixel Art Editor Now on
+                        <img className="w-24 mx-1" src="/assets/kickstarter-green.png" alt="Kickstarter Logo" />
+                        !
+                    </a>
+                </div>
             </div>
-        </div>
-    </main>)
+        </main>
+    );
 }
+
 
 function useBeta() {
     let [key, setKey] = useState("");

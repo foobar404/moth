@@ -1,7 +1,10 @@
 import { Beta } from "./Beta";
-import { Home } from "./Home";
+import { App } from "./App";
+import { Key } from "./Key";
+
 
 export {
     Beta,
-    Home
+    App,
+    Key,
 }

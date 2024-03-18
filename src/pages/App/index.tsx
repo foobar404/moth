@@ -13,8 +13,8 @@ import React, { useEffect, useState } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 
-export function Home() {
-	const data = useHome();
+export function App() {
+	const data = useApp();
 
 	return (
 		<main className="p-app">
@@ -63,7 +63,7 @@ export function Home() {
 	)
 }
 
-function useHome() {
+function useApp() {
 	let [tabIndex, setTabIndex] = useState(0);
 	let [showMobilePanel, setShowMobilePanel] = useState<boolean>(false);
 

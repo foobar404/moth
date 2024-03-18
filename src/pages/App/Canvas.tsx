@@ -3,11 +3,11 @@ import { FaMap } from "react-icons/fa6";
 import { ImMinus } from "react-icons/im";
 import ReactTooltip from 'react-tooltip';
 import { BiPlusMedical } from "react-icons/bi";
-import { BsCircleHalf } from "react-icons/bs";
+import { BsCircleFill, BsCircleHalf } from "react-icons/bs";
 import React, { useEffect, useRef } from 'react';
-import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV } from "react-icons/fa";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
 import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
+import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV } from "react-icons/fa";
 
 
 enum ToolStage {
@@ -29,11 +29,13 @@ export function Canvas() {
                 {data.toolSettings.leftTool === "eraser" && (<>
                     <label data-tip="erase all"
                         data-for="tooltip"
-                        className="flex mr-2">
-                        <BsCircleHalf className="mr-2 text-lg" />
-                        <input type="checkbox"
-                            className="checkbox"
-                            onChange={e => data.setToolSettings({ ...data.toolSettings, eraseAll: e.currentTarget.checked })} />
+                        className="mr-2 swap swap-rotate"
+                        onChange={e => data.setToolSettings({ ...data.toolSettings, eraseAll: !data.toolSettings.eraseAll })}>
+
+                        <input type="checkbox" checked={data.toolSettings.eraseAll} />
+
+                        <BsCircleHalf className="text-xl swap-off" />
+                        <BsCircleFill className="text-xl swap-on" />
                     </label>
                 </>)}
 
@@ -280,22 +282,20 @@ function useCanvas() {
 
             if (toolButtonActive) {
                 if (stateCache.current.toolSettings.eraseAll) {
-                    tempCanvas1.putImageData(activeLayer.image);
+                    tempCanvas1.putImageData(stateCache.current.activeLayer.image);
                     let points = tempCanvas1.floodFill(x, y);
 
-                    points.forEach(point => {
-                        saveCanvas.drawPixel(point.x, point.y, 1, "rgba(255,255,255,.004)");
-                    });
+                    points.forEach(point => saveCanvas.erasePixel(point.x, point.y, size));
                 } else {
-                    saveCanvas.erasePixel(newX, newY, stateCache.current.toolSettings.size);
+                    saveCanvas.erasePixel(newX, newY, size);
                 }
             } else {
-                previewCanvas.drawPixel(newX, newY, size, "rgba(255,0,0,.004)");
+                previewCanvas.erasePixel(newX, newY, size);
             }
         },
         "bucket": (x, y, toolButtonActive) => {
             if (toolButtonActive) {
-                tempCanvas1.putImageData(activeLayer.image);
+                tempCanvas1.putImageData(stateCache.current.activeLayer.image);
                 let points = tempCanvas1.floodFill(x, y);
 
                 points.forEach(point => {
@@ -425,7 +425,7 @@ function useCanvas() {
                 } else {
                     let { width, height } = stateCache.current.canvasSize;
                     let { r, g, b, a } = currentColor;
-                    previewCanvas.drawRect(0, 0, width - 1, height - 1, `rgba(${r},${g},${b},${a})`);
+                    previewCanvas.drawRect(0, 0, width - 1, height - 1, `rgba(${r},${g},${b},${a / 255})`);
                 }
             }
             if (toolState.current.stage = ToolStage.ADJUSTING) {
@@ -486,10 +486,12 @@ function useCanvas() {
                 : stateCache.current.toolSettings.lightIntensity * -1;
 
             // Calculate start and end points, ensuring they are within canvas bounds
-            const startX = Math.max(0, x - Math.floor(brushSize / 2));
-            const startY = Math.max(0, y - Math.floor(brushSize / 2));
+            const startX = Math.max(-brushSize, x - Math.floor(brushSize / 2));
+            const startY = Math.max(-brushSize, y - Math.floor(brushSize / 2));
             const endX = Math.min(tempCanvas1.getWidth(), startX + brushSize);
             const endY = Math.min(tempCanvas1.getHeight(), startY + brushSize);
+
+            if (startX >= tempCanvas1.getWidth() || startY >= tempCanvas1.getHeight()) return;
 
             // Get the image data for the brush area
             let imgData = tempCanvas1.getImageData(startX, startY, endX - startX, endY - startY);
@@ -542,7 +544,7 @@ function useCanvas() {
         },
         "recolor": (x, y, toolButtonActive) => {
             if (toolButtonActive) {
-                const imgData = activeLayer.image;
+                const imgData = stateCache.current.activeLayer.image;
                 const data = imgData.data;
 
                 // Step 2: Get the color of the pixel at the current point
@@ -701,7 +703,7 @@ function useCanvas() {
                 return;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                tempCanvas1.putImageData(activeLayer.image);
+                tempCanvas1.putImageData(stateCache.current.activeLayer.image);
                 let points = tempCanvas1.floodFill(x, y);
                 let color = tempCanvas1.getColor(x, y);
 
@@ -1136,10 +1138,6 @@ function useCanvas() {
     }
 
     function paint() {
-        saveCanvas.getCtx().globalAlpha = 1;
-        previewCanvas.getCtx().globalAlpha = 1;
-        tempCanvas1.getCtx().globalAlpha = 1;
-        tempCanvas2.getCtx().globalAlpha = 1;
         tempCanvas1.clear();
         tempCanvas2.clear();
         saveCanvas.clear();
@@ -1148,15 +1146,38 @@ function useCanvas() {
 
         mainCanvas.drawGrid();
 
+        // position relative to the canvas element
+        let rect = mainCanvas.getElement().getBoundingClientRect();
+        let x = Math.floor((mouseState.current.x - rect.x) / mainCanvasZoom.current);
+        let y = Math.floor((mouseState.current.y - rect.y) / mainCanvasZoom.current);
+
+        // tool info
+        const { leftTool, rightTool, middleTool } = stateCache.current.toolSettings;
+        const tool =
+            mouseState.current.leftDown ? leftTool :
+                mouseState.current.rightDown ? rightTool :
+                    mouseState.current.middleDown ? middleTool : leftTool;
+        const toolButtonActive =
+            tool === leftTool ? mouseState.current.leftDown :
+                tool === rightTool ? mouseState.current.rightDown :
+                    tool === middleTool ? mouseState.current.middleDown : false;
+
+        // set tool color
+        let { r, g, b, a } = stateCache.current.activeColor;
+        saveCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+        previewCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+
+        // run current tool
+        toolHandlers[tool](x, y, toolButtonActive);
+
         // color related operations
-        const isMouseDown = mouseState.current.leftDown || mouseState.current.rightDown || mouseState.current.middleDown;
         const existingColor = stateCache.current.activeColorPalette.colors
-            .find(color => color === stateCache.current.activeColor);
-        if (!existingColor && isMouseDown) {
+            .find(c => JSON.stringify(c) === JSON.stringify(stateCache.current.activeColor));
+        if (!existingColor && toolButtonActive) {
             const newColors = [...stateCache.current.activeColorPalette.colors, stateCache.current.activeColor];
             setActiveColorPalette({ ...stateCache.current.activeColorPalette, colors: newColors });
         }
-        if (isMouseDown) {
+        if (toolButtonActive) {
             let { r, g, b, a } = stateCache.current.activeColor;
             let colorString = `${r},${g},${b},${a}`;
 
@@ -1171,28 +1192,6 @@ function useCanvas() {
                 },
             });
         }
-
-        // position relative to the canvas element
-        let rect = mainCanvas.getElement().getBoundingClientRect();
-        let x = Math.floor((mouseState.current.x - rect.x) / mainCanvasZoom.current);
-        let y = Math.floor((mouseState.current.y - rect.y) / mainCanvasZoom.current);
-
-        const { leftTool, rightTool, middleTool } = stateCache.current.toolSettings;
-        const tool =
-            mouseState.current.leftDown ? leftTool :
-                mouseState.current.rightDown ? rightTool :
-                    mouseState.current.middleDown ? middleTool : leftTool;
-        const toolButtonActive =
-            tool === leftTool ? mouseState.current.leftDown :
-                tool === rightTool ? mouseState.current.rightDown :
-                    tool === middleTool ? mouseState.current.middleDown : false;
-
-        let { r, g, b, a } = stateCache.current.activeColor;
-        saveCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-        previewCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-
-        // run current tool
-        toolHandlers[tool](x, y, toolButtonActive);
 
         // save pixels from saveCanvas to active layer
         {
@@ -1230,13 +1229,15 @@ function useCanvas() {
 
             if (previousFrame) {
                 let reversedLayers = previousFrame.layers.slice().reverse();
-                saveCanvas.getCtx().globalAlpha = stateCache.current.onionSkin / 255;
+                tempCanvas2.getCtx().globalAlpha = stateCache.current.onionSkin / 255;
 
                 reversedLayers.forEach((layer) => {
-                    previewCanvas.putImageData(layer.image);
-                    saveCanvas.drawImage(previewCanvas.getElement());
-                    mainCanvas.drawImage(saveCanvas.getElement());
+                    tempCanvas1.putImageData(layer.image);
+                    tempCanvas2.drawImage(tempCanvas1.getElement());
+                    mainCanvas.drawImage(tempCanvas2.getElement());
                 });
+
+                tempCanvas2.getCtx().globalAlpha = 1;
             }
         }
 
@@ -1254,7 +1255,7 @@ function useCanvas() {
                 for (let i = 0; i < previewData.data.length; i += 4) {
                     let a = previewData.data[i + 3];
                     // erase invisible pixels 
-                    if (a === 1) {
+                    if (a <= 5 && a >= 1) {
                         activeLayerData.data[i] = 0;
                         activeLayerData.data[i + 1] = 0;
                         activeLayerData.data[i + 2] = 0;
@@ -1269,6 +1270,8 @@ function useCanvas() {
 
             tempCanvas2.drawImage(tempCanvas1.getElement());
             mainCanvas.drawImage(tempCanvas2.getElement());
+
+            tempCanvas2.getCtx().globalAlpha = 1;
         });
 
         if (tilemode.current) {
