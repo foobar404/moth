@@ -3,7 +3,7 @@
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    grid-template-rows: 60px 1fr 130px;
+    grid-template-rows: 60px 1fr max-content;
     grid-template-columns: 60px 1fr 285px;
     grid-template-areas:
         "left header right"
@@ -231,16 +231,11 @@
     }
 
     &__preview {
-        border-radius: $border-radius-rounded;
-        box-shadow: $shadow-normal;
         backface-visibility: hidden;
         image-rendering: pixelated;
         image-rendering: crisp-edges;
         transform: translate3d(0, 0, 0);
-        height: 100px;
-        max-width: 100px;
         will-change: contents;
-        margin-left: $spacing-2;
     }
 
     &__frames {

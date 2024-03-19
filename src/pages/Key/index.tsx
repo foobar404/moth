@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import { firebaseApp } from '../../index';
 import { getFunctions, httpsCallable } from 'firebase/functions';

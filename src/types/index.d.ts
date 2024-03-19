@@ -58,7 +58,7 @@ export interface IColorPalette {
 export interface IColorStats { [color: string]: { count: number, lastUsed: string } }
 
 
-export type ITool = "brush" | "eraser" | "shape" | "light" | "eyedropper" | "bucket" | "recolor" | "move" | "wand" | "box" | "lasso" | "bone" | "line" | "mirror";
+export type ITool = "brush" | "eraser" | "shape" | "light" | "eyedropper" | "bucket" | "move" | "wand" | "box" | "lasso" | "bone" | "line" | "mirror";
 
 
 export interface IToolSettings {
@@ -74,6 +74,7 @@ export interface IToolSettings {
 	lightMode: "dark" | "light";
 	lightIntensity: number;
 	eraseAll: boolean;
+	fillAll: boolean;
 }
 
 

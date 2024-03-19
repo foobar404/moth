@@ -247,7 +247,7 @@ export function ColorPicker(props: IProps) {
 
             {/* drawer */}
             <section className="c-color-picker__drawer" style={{
-                height: data.isDrawerOpen ? '150px' : '0',
+                height: data.isDrawerOpen ? '300px' : '0',
             }}>
                 {JSON.stringify(data.currentColor) !== JSON.stringify(data.drawerColor) && (
                     <p onClick={() => data.setDrawerColor(data.currentColor)}
@@ -260,7 +260,7 @@ export function ColorPicker(props: IProps) {
                 {[tinycolor(data.drawerColor).lighten(30), tinycolor(data.drawerColor).lighten(20), tinycolor(data.drawerColor).lighten(10), tinycolor(data.drawerColor).darken(10), tinycolor(data.drawerColor).darken(20), tinycolor(data.drawerColor).darken(30)]
                     .map((color, i) => (
                         <div key={i}
-                            className="c-color-card mr-2"
+                            className="mr-2 c-color-card"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -270,7 +270,7 @@ export function ColorPicker(props: IProps) {
                 {[tinycolor(data.drawerColor).complement()]
                     .map((color, i) => (
                         <div key={i}
-                            className="c-color-card mr-2"
+                            className="mr-2 c-color-card"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -280,7 +280,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).splitcomplement()
                     .map((color, i) => (
                         <div key={i}
-                            className="c-color-card mr-2"
+                            className="mr-2 c-color-card"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -290,7 +290,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).triad()
                     .map((color, i) => (
                         <div key={i}
-                            className="c-color-card mr-2"
+                            className="mr-2 c-color-card"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -300,7 +300,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).tetrad()
                     .map((color, i) => (
                         <div key={i}
-                            className="c-color-card mr-2"
+                            className="mr-2 c-color-card"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -310,7 +310,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).analogous()
                     .map((color, i) => (
                         <div key={i}
-                            className="c-color-card mr-2"
+                            className="mr-2 c-color-card"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -320,7 +320,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).monochromatic()
                     .map((color, i) => (
                         <div key={i}
-                            className="c-color-card mr-2"
+                            className="mr-2 c-color-card"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))

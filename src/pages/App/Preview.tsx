@@ -7,7 +7,10 @@ export function Preview(props: IPreview) {
     const data = usePreview(props);
 
     return (
-        <section ref={data.canvasContainerRef}></section>
+        <section
+            className="w-full h-full border-4 rounded-md shadow-2xl border-accent"
+            ref={data.canvasContainerRef}>
+        </section>
     )
 }
 
@@ -22,7 +25,7 @@ function usePreview(props: IPreview) {
 
     useEffect(() => {
         canvasContainerRef.current?.appendChild(canvas1.getElement());
-        canvas1.getElement().classList.add("p-app__preview");
+        canvas1.getElement().classList.add("w-full", "h-full", "p-app__preview");
     }, []);
 
     useEffect(() => {

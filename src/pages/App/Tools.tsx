@@ -49,12 +49,6 @@ export function Tools() {
                     onMouseDown={(e) => data.updateTool(e, "bucket")}>
                     <BsBucketFill className="text-xl" />
                 </button>
-                <button data-tip={`recolor tool ( r​ ) ${data.getButtonTooltip("recolor")}`}
-                    data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("recolor")}`}
-                    onMouseDown={(e) => data.updateTool(e, "recolor")}>
-                    <MdInvertColors className="text-xl" />
-                </button>
                 <button data-tip={`shape tool ( s​ ) ${data.getButtonTooltip("shape")}`}
                     data-for="tooltip"
                     className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("shape")}`}
@@ -175,8 +169,6 @@ function useTools() {
     let [view, setView] = useState<'tools' | 'actions'>("tools");
     let actions = {
         "clear": () => {
-            if (!window.confirm("Are you sure you want to clear the current layer?")) return;
-
             setActiveLayer({
                 ...activeLayer,
                 image: new ImageData(activeLayer.image.width, activeLayer.image.height)
@@ -276,7 +268,6 @@ function useTools() {
         "e": () => updateTool(null, "eraser", 0),
         "s": () => updateTool(null, "shape", 0),
         "g": () => updateTool(null, "bucket", 0),
-        "r": () => updateTool(null, "recolor", 0),
         "t": () => updateTool(null, "light", 0),
         "i": () => updateTool(null, "eyedropper", 0),
         "v": () => updateTool(null, "move", 0),
@@ -322,9 +313,9 @@ function useTools() {
 
     function getButtonStyles(tool: ITool) {
         let classes = "";
-        if (toolSettings.leftTool === tool) classes += " text-secondary border-2 border-secondary";
-        else if (toolSettings.rightTool === tool) classes += " text-accent border-2 border-accent";
-        else if (toolSettings.middleTool === tool) classes += " text-neutral border-2 border-neutral";
+        if (toolSettings.leftTool === tool) classes += " btn-secondary";
+        else if (toolSettings.rightTool === tool) classes += " btn-accent";
+        else if (toolSettings.middleTool === tool) classes += " btn-neutral";
         return classes;
     }
 
@@ -337,14 +328,18 @@ function useTools() {
     }
 
     function updateTool(e: any, tool: ITool, mouseButton?: number) {
-        let rightOrLeft = e ? e.button : mouseButton;
+        const btn = e ? e.button : mouseButton;
+        const { leftTool, middleTool, rightTool } = toolSettings;
 
-        if (rightOrLeft === 0)
-            setToolSettings({ ...toolSettings, leftTool: tool });
-        else if (rightOrLeft == 1)
-            setToolSettings({ ...toolSettings, middleTool: tool });
-        else if (rightOrLeft == 2)
-            setToolSettings({ ...toolSettings, rightTool: tool });
+        // Directly check if the tool is already assigned to any button
+        if (tool === leftTool || tool === middleTool || tool === rightTool) {
+            return; // Stop execution if the tool is already assigned
+        }
+
+        // Assign the tool based on the button clicked
+        if (btn === 0) setToolSettings({ ...toolSettings, leftTool: tool });
+        else if (btn === 1) setToolSettings({ ...toolSettings, middleTool: tool });
+        else if (btn === 2) setToolSettings({ ...toolSettings, rightTool: tool });
     }
 
     return {

@@ -12,49 +12,49 @@ export function Layers() {
     const data = useLayers();
 
     return (
-        <section>
-            <nav className="mb-2 p-app__layer-controls">
+        <section className="mt-2">
+            <nav className="mb-2 p-app__layer-controls !bg-accent">
                 <button data-tip="add new layer"
                     data-for="tooltip"
                     onClick={data.addNewLayer}
                     className="btn btn-xs">
-                    <HiDocumentAdd className="text-lg"/>
+                    <HiDocumentAdd className="text-lg" />
                 </button>
                 <button data-tip="delete current layer"
                     data-for="tooltip"
                     onClick={data.deleteLayer}
                     className="btn btn-xs">
-                    <MdDelete className="text-lg"/>
+                    <MdDelete className="text-lg" />
                 </button>
                 <button data-tip={`${data.layersAreVisible ? "hide other layers" : "show all layers"}`}
                     data-for="tooltip"
-                    onClick={data.toggleLayerVisibility}
+                    onClick={data.toggleAllLayerVisibility}
                     className="btn btn-xs">
-                    {data.layersAreVisible ? <IoEye className="text-lg"/> : <HiEyeOff className="text-lg"/>}
+                    {data.layersAreVisible ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
                 </button>
                 <button data-tip="move layer up"
                     data-for="tooltip"
                     onClick={data.moveLayerUp}
                     className="btn btn-xs">
-                    <BsFillCaretUpFill className="text-lg"/>
+                    <BsFillCaretUpFill className="text-lg" />
                 </button>
                 <button data-tip="move layer down"
                     data-for="tooltip"
                     onClick={data.moveLayerDown}
                     className="btn btn-xs">
-                    <BsFillCaretDownFill className="text-lg"/>
+                    <BsFillCaretDownFill className="text-lg" />
                 </button>
                 <button data-tip="merge layer with layer below"
                     data-for="tooltip"
                     onClick={data.mergeLayer}
                     className="btn btn-xs">
-                    <RiGitMergeFill className="text-lg"/>
+                    <RiGitMergeFill className="text-lg" />
                 </button>
                 <button data-tip="duplicate layer"
                     data-for="tooltip"
                     onClick={data.duplicateLayer}
                     className="btn btn-xs">
-                    <IoCopy className="text-lg"/>
+                    <IoCopy className="text-lg" />
                 </button>
                 <label data-tip="change non-active layers opacity"
                     data-for="tooltip"
@@ -65,8 +65,8 @@ export function Layers() {
                         max="255"
                         type="range"
                         className="w-full range range-xs"
-                        value={data.layerOpacity}
-                        onChange={e => data.setLayerOpacity(e.currentTarget.valueAsNumber)} />
+                        value={data.allLayersOpacity}
+                        onChange={e => data.setAllLayersOpacity(e.currentTarget.valueAsNumber)} />
                 </label>
             </nav>
 
@@ -93,6 +93,10 @@ export function Layers() {
                                 })
                             }}
                         />
+                        {/* <button onClick={() => data.toggleLayerVisibility(layer)}
+                            className="ml-1 btn btn-sm btn-accent">
+                            {layer.opacity === 255 ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
+                        </button> */}
                     </div>
                 ))}
             </section>
@@ -103,12 +107,12 @@ export function Layers() {
 
 function useLayers() {
     let [imageMap, setImageMap] = useState<any>({});
-    let [layerOpacity, setLayerOpacity] = useState(255);
+    let [allLayersOpacity, setAllLayersOpacity] = useState(255);
     let [draggedLayer, setDraggedLayer] = useState<ILayer | null>(null);
 
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
-    const layersAreVisible = layerOpacity === 255;
+    const layersAreVisible = allLayersOpacity === 255;
     const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
     const previousActiveLayer = useRef<Symbol>(activeLayer.symbol);
 
@@ -124,13 +128,13 @@ function useLayers() {
     useEffect(() => {
         if (previousActiveLayer.current !== activeLayer.symbol) {
             previousActiveLayer.current = activeLayer.symbol;
-            onionSkinHandler(layerOpacity);
+            onionSkinHandler(allLayersOpacity);
         }
     }, [activeLayer]);
 
     useEffect(() => {
-        onionSkinHandler(layerOpacity);
-    }, [layerOpacity]);
+        onionSkinHandler(allLayersOpacity);
+    }, [allLayersOpacity]);
 
     const handleDragStart = (e: React.DragEvent, layer: ILayer) => {
         setDraggedLayer(layer);
@@ -178,9 +182,21 @@ function useLayers() {
         setActiveFrame({ ...activeFrame });
     }
 
-    function toggleLayerVisibility() {
-        if (layerOpacity === 255) setLayerOpacity(0);
-        else setLayerOpacity(255);
+    function toggleAllLayerVisibility() {
+        if (allLayersOpacity === 255) setAllLayersOpacity(0);
+        else setAllLayersOpacity(255);
+    }
+
+    function toggleLayerVisibility(layer) {
+        let newLayers = activeFrame.layers
+            .map(l => {
+                if (l.symbol === layer.symbol) {
+                    l.opacity = l.opacity === 255 ? 0 : 255;
+                }
+                return layer;
+            });
+        activeFrame.layers = newLayers;
+        setActiveFrame({ ...activeFrame });
     }
 
     function moveLayerUp() {
@@ -206,8 +222,6 @@ function useLayers() {
     }
 
     function deleteLayer() {
-        if (!window.confirm("Are you sure you want to delete this layer?")) return;
-
         let newLayers = activeFrame.layers.filter(layer => layer.symbol !== activeLayer.symbol);
         if (newLayers.length === 0) {
             newLayers.push({
@@ -277,7 +291,7 @@ function useLayers() {
         imageMap,
         activeFrame,
         activeLayer,
-        layerOpacity,
+        allLayersOpacity,
         layersAreVisible,
         handleDrop,
         mergeLayer,
@@ -289,9 +303,10 @@ function useLayers() {
         handleDragEnd,
         setActiveLayer,
         duplicateLayer,
-        setLayerOpacity,
+        setAllLayersOpacity,
         handleDragStart,
         onionSkinHandler,
         toggleLayerVisibility,
+        toggleAllLayerVisibility,
     }
 }

@@ -25,7 +25,7 @@ export function Canvas() {
 
     return (
         <section className="p-app__canvas p-app__block">
-            <nav className="p-app__brush-controls">
+            <nav className="p-app__brush-controls !bg-accent text-accent-content">
                 {data.toolSettings.leftTool === "eraser" && (<>
                     <label data-tip="erase all"
                         data-for="tooltip"
@@ -36,6 +36,21 @@ export function Canvas() {
 
                         <BsCircleHalf className="text-xl swap-off" />
                         <BsCircleFill className="text-xl swap-on" />
+                    </label>
+                </>)}
+
+                {data.toolSettings.leftTool === "bucket" && (<>
+                    <label data-tip="fill all"
+                        data-for="tooltip"
+                        className="p-1 space-x-1 bg-base rounded-xl row">
+                        <BsCircleHalf className={``} />
+                        <input
+                            type="checkbox"
+                            value="synthwave"
+                            className="toggle toggle-sm"
+                            checked={data.toolSettings.fillAll}
+                            onChange={(e) => data.setToolSettings({ ...data.toolSettings, fillAll: e.currentTarget.checked })} />
+                        <BsCircleFill />
                     </label>
                 </>)}
 
@@ -140,7 +155,13 @@ export function Canvas() {
                     </div>
                 </>)}
 
-                <div className="space-x-2">
+                <div className="space-x-1 row">
+                    <input data-tip="set brush size"
+                        data-for="tooltip"
+                        type="range" min="1" max="10" step="1"
+                        className="range range-xs w-[40px]"
+                        value={data.toolSettings.size}
+                        onChange={(e) => data.setToolSettings({ ...data.toolSettings, size: e.currentTarget.valueAsNumber })} />
                     <button data-tip="decrease brush size ( [ )"
                         data-for="tooltip"
                         className="btn btn-xs"
@@ -160,7 +181,7 @@ export function Canvas() {
                 </div>
             </nav>
 
-            <nav className="space-x-2 p-app__canvas-controls">
+            <nav className="space-x-2 p-app__canvas-controls !bg-accent text-accent-content">
                 <input type="range" min="1" max="50" step="1"
                     data-tip="grid zoom"
                     data-for="tooltip"
@@ -295,12 +316,33 @@ function useCanvas() {
         },
         "bucket": (x, y, toolButtonActive) => {
             if (toolButtonActive) {
-                tempCanvas1.putImageData(stateCache.current.activeLayer.image);
-                let points = tempCanvas1.floodFill(x, y);
+                if (stateCache.current.toolSettings.fillAll) {
+                    const imgData = stateCache.current.activeLayer.image;
+                    const data = imgData.data;
+                    const index = (x + y * imgData.width) * 4;
+                    const targetColor = { r: data[index], g: data[index + 1], b: data[index + 2], a: data[index + 3] };
+                    const activeColor = stateCache.current.activeColor;
 
-                points.forEach(point => {
-                    saveCanvas.drawPixel(point.x, point.y);
-                });
+                    for (let i = 0; i < data.length; i += 4) {
+                        // Using a simple color match; for more complex scenarios, consider a tolerance
+                        if (data[i] === targetColor.r && data[i + 1] === targetColor.g && data[i + 2] === targetColor.b && data[i + 3] === targetColor.a) {
+                            // Replace with active color
+                            data[i] = activeColor.r;
+                            data[i + 1] = activeColor.g;
+                            data[i + 2] = activeColor.b;
+                            data[i + 3] = activeColor.a;
+                        }
+                    }
+
+                    saveCanvas.putImageData(imgData, 0, 0);
+                } else {
+                    tempCanvas1.putImageData(stateCache.current.activeLayer.image);
+                    let points = tempCanvas1.floodFill(x, y);
+
+                    points.forEach(point => {
+                        saveCanvas.drawPixel(point.x, point.y);
+                    });
+                }
             } else {
                 previewCanvas.drawPixel(x, y, 1);
             }
@@ -540,36 +582,6 @@ function useCanvas() {
             } else {
                 toolState.current.modifiedPoints.clear();
                 previewCanvas.putImageData(imgData, startX, startY);
-            }
-        },
-        "recolor": (x, y, toolButtonActive) => {
-            if (toolButtonActive) {
-                const imgData = stateCache.current.activeLayer.image;
-                const data = imgData.data;
-
-                // Step 2: Get the color of the pixel at the current point
-                const index = (x + y * imgData.width) * 4;
-                const targetColor = { r: data[index], g: data[index + 1], b: data[index + 2], a: data[index + 3] };
-
-                // Assume activeColor is an object { r: number, g: number, b: number, a: number }
-                const activeColor = stateCache.current.activeColor; // You need to implement this based on how active color is set
-
-                // Step 3 & 4: Loop through all pixels to find and replace the target color
-                for (let i = 0; i < data.length; i += 4) {
-                    // Using a simple color match; for more complex scenarios, consider a tolerance
-                    if (data[i] === targetColor.r && data[i + 1] === targetColor.g && data[i + 2] === targetColor.b && data[i + 3] === targetColor.a) {
-                        // Replace with active color
-                        data[i] = activeColor.r;
-                        data[i + 1] = activeColor.g;
-                        data[i + 2] = activeColor.b;
-                        data[i + 3] = activeColor.a;
-                    }
-                }
-
-                // Step 5: Apply the modified image data back to the canvas
-                saveCanvas.putImageData(imgData, 0, 0);
-            } else {
-                previewCanvas.drawPixel(x, y);
             }
         },
         "box": (x, y, toolButtonActive) => {
@@ -1275,8 +1287,8 @@ function useCanvas() {
         });
 
         if (tilemode.current) {
-            let width = stateCache.current.canvasSize.width * mainCanvasZoom.current;
-            let height = stateCache.current.canvasSize.height * mainCanvasZoom.current;
+            let width = Math.ceil(stateCache.current.canvasSize.width * mainCanvasZoom.current);
+            let height = Math.ceil(stateCache.current.canvasSize.height * mainCanvasZoom.current);
             mainCanvasContainer.current!.style.background = `url(${mainCanvas.getElement().toDataURL()}) repeat center`;
             mainCanvasContainer.current!.style.backgroundSize = `${width}px ${height}px`;
         } else {

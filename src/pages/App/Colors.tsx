@@ -16,16 +16,16 @@ export function Colors() {
     const data = useColors();
 
     return (
-        <section>
+        <section className="mt-2">
             <ColorPicker
                 onChange={(color: IColor) => data.setActiveColor({ r: color.r, g: color.g, b: color.b, a: Math.ceil(color.a * 255) })}
                 color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(4)) }} />
 
-            <nav className="my-2 p-app__color-controls">
+            <nav className="my-2 p-app__color-controls !bg-accent">
                 <div className="w-full row">
                     <select data-tip="color pallete selection"
                         data-for="tooltip"
-                        className="w-1/2 select select-xs"
+                        className="w-1/2 mr-2 select select-xs"
                         onChange={(e) => data.setColorPalette(Number(e.target.value))}
                         value={data.colorPalettes.findIndex(x => data.activeColorPalette.symbol === x.symbol)}>
 
@@ -141,23 +141,6 @@ export function Colors() {
                     </div>
                 ))}
             </section>
-
-            {/* <section className="p-app__color-swatch">
-                {data.mostRecentColors.map((_, i) => {
-                    let index = data.mostRecentColors.length - 1 - i;
-                    let recentColor = data.mostRecentColors[index];
-
-                    return (
-                        <div key={index}
-                            className="p-app__color-swatch-layer"
-                            onClick={() => setActiveColor(recentColor)}
-                            style={{
-                                background: `rgb(${recentColor.r}, ${recentColor.g}, ${recentColor.b})`
-                            }}>
-                        </div>
-                    )
-                })}
-            </section> */}
         </section>
     )
 }

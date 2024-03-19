@@ -10,10 +10,10 @@ import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-ic
 export function Frames() {
     const data = useFrames();
 
-    return (<section className="!justify-between row p-app__block">
-        <section className="flex-1">
+    return (<section className="!justify-between row-top p-app__block">
+        <section className="flex-1 w-full">
             <nav className={"row !justify-between"}>
-                <section className="space-x-2 p-app__frame-controls-section">
+                <section className="space-x-2 p-app__frame-controls-section bg-accent">
                     <button data-tip="new frame" data-for="tooltip"
                         onClick={data.addFrame}
                         className="btn btn-xs">
@@ -47,7 +47,7 @@ export function Frames() {
                     </button>
                 </section>
 
-                <section className="flex items-center p-app__frame-controls-section">
+                <section className="flex items-center p-app__frame-controls-section bg-accent">
                     <label data-tip="FPS" data-for="tooltip">
                         <input type="number"
                             value={data.preview.fps}
@@ -62,7 +62,7 @@ export function Frames() {
                     </button>
                 </section>
 
-                <section className="row !flex-nowrap p-app__frame-controls-section">
+                <section className="row !flex-nowrap p-app__frame-controls-section bg-accent">
                     <button data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
                         data-for="tooltip"
                         className="mr-2 btn btn-xs"
@@ -81,7 +81,7 @@ export function Frames() {
                 </section>
             </nav>
 
-            <section className="p-app__frames-container">
+            <section className="overflow-auto max-w-half row-left">
                 {data.frames.map((frame, i) => (
                     <img key={i}
                         draggable
@@ -99,7 +99,10 @@ export function Frames() {
             </section>
         </section>
 
-        <Preview {...data.preview} />
+        <div onClick={() => data.setEnlargePreview(!data.enlargePreview)}
+            className={`ml-2 cursor-pointer hover:scale-105 ${!data.enlargePreview ? "h-[100px] w-[100px]" : "h-[300px] w-[300px]"}`}>
+            <Preview {...data.preview} />
+        </div>
     </section>)
 }
 
@@ -112,6 +115,7 @@ function useFrames() {
     } = useGlobalStore();
 
     let [imageMap, setImageMap] = useState<any>({});
+    let [enlargePreview, setEnlargePreview] = useState(false);
     let [draggedFrame, setDraggedFrame] = useState<IFrame | null>(null);
     let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false });
 
@@ -173,8 +177,6 @@ function useFrames() {
     }
 
     function deleteFrame() {
-        if (!window.confirm("Are you sure you want to delete this frame?")) return;
-
         let newFrames = frames.filter(frame => frame.symbol !== activeFrame.symbol);
         if (newFrames.length === 0) {
             newFrames.push({
@@ -251,6 +253,8 @@ function useFrames() {
         duplicateFrame,
         setActiveFrame,
         setActiveLayer,
+        enlargePreview,
+        setEnlargePreview,
     }
 }
 

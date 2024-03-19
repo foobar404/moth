@@ -1,16 +1,21 @@
 # Doing
+- Making to many frames pushes the color palette off the screen
+- A button on each layer to hide / unhide
+
+# TODO
+- undo / redo
+- color picker
+    - Having the complementary color tab drop down till it fills in the empty area under the color picker
+    - Having the color picker fit in with the color scheme better, and maybe outlines?
+
+- The zoom scroll zooms to the center, not the cursor
+- show save status
 - restyle color filters 
 - shortcuts dont prevent default 
 - add console error watch system
-- color picker
-
-# TODO
 - gif export not working 
 - switching tabs resets state
 - make selections standout
-- add more rewards
-- setup alpha / beta test branch
-- moth subdomain or /moth
 
 # Promotion
 - discord channels
@@ -21,6 +26,8 @@
 - product hunt
 
 # Kickstarter Launch
+- setup alpha / beta test branch
+- moth subdomain or /moth
 - user accounts
 - login page
 - payment page
@@ -28,6 +35,8 @@
 - bugpack home page
 
 # Stretch 
+- Multiple sprite tabs
+- Layer groups / frame groups
 - multiple sprite tabs
 - add data file for export
 - node based editor
@@ -37,6 +46,7 @@
     - perfect mode for brush
     - custom brushes 
     - fonts
+    - A spray brush
 - theme
     - retro game consoles
     - grid colors
@@ -66,6 +76,8 @@
     - hold shift to imitate mouse pressed (for trackpad users)
     - custom shortcuts 
 - colors
+    - Color pallets that are premade
+    - Option to create a color pallet from sprite
     - previous 2 color switch
     - color pallette recommendations 
     - recommend colors based on current pallete and AI 
@@ -83,6 +95,10 @@
     - outline effect        
     - The "sun" effect is a ball, that is placed somewhere on the canvas, and affects the colors of the sprites with a specific falloff
         - light source tool, creates highlights and shadows for you 
+
+
+
+
 
 
 
