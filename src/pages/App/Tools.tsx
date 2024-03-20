@@ -238,9 +238,9 @@ function useTools() {
             const imageData = activeLayer.image;
             const bounds = findVisibleBounds(imageData);
             const visibleWidth = bounds.maxX - bounds.minX + 1;
-            const dx = (canvas2.getWidth() - visibleWidth) / 2 - bounds.minX;
+            const dx = (canvas1.getWidth() - visibleWidth) / 2 - bounds.minX;
 
-            canvas1.getCtx().putImageData(imageData, dx, 0);
+            canvas1.putImageData(imageData, dx, 0);
 
             setActiveLayer({
                 ...activeLayer,
@@ -255,7 +255,7 @@ function useTools() {
             const visibleHeight = bounds.maxY - bounds.minY + 1;
             const dy = (canvas1.getHeight() - visibleHeight) / 2 - bounds.minY;
 
-            canvas1.getCtx().putImageData(imageData, 0, dy);
+            canvas1.putImageData(imageData, 0, dy);
 
             setActiveLayer({
                 ...activeLayer,

@@ -10,8 +10,8 @@ import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-ic
 export function Frames() {
     const data = useFrames();
 
-    return (<section className="!justify-between row-top p-app__block">
-        <section className="flex-1 w-full">
+    return (<section className="!justify-between row-top p-app__block overflow-hidden">
+        <section className="flex-1">
             <nav className={"row !justify-between"}>
                 <section className="space-x-2 p-app__frame-controls-section bg-accent">
                     <button data-tip="new frame" data-for="tooltip"
@@ -81,7 +81,7 @@ export function Frames() {
                 </section>
             </nav>
 
-            <section className="overflow-auto max-w-half row-left">
+            <section className={`overflow-auto max-h-[300px] p-1 row-left ${data.enlargePreview ? "flex-wrap" : ""}`}>
                 {data.frames.map((frame, i) => (
                     <img key={i}
                         draggable
@@ -89,7 +89,7 @@ export function Frames() {
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => data.handleDrop(e, frame)}
                         onDragEnd={data.handleDragEnd}
-                        className={`p-app__frame ${frame.symbol === data.activeFrame.symbol ? "border-2 border-black" : ""}`}
+                        className={`p-app__frame m-1 hover:scale-105 h-[60px] shadow-md rounded-md cursor-pointer ${frame.symbol === data.activeFrame.symbol ? "border-2 border-black" : ""}`}
                         src={data.imageMap[frame.symbol]}
                         onClick={() => {
                             data.setActiveFrame(frame);
@@ -100,7 +100,7 @@ export function Frames() {
         </section>
 
         <div onClick={() => data.setEnlargePreview(!data.enlargePreview)}
-            className={`ml-2 cursor-pointer hover:scale-105 ${!data.enlargePreview ? "h-[100px] w-[100px]" : "h-[300px] w-[300px]"}`}>
+            className={`ml-2 cursor-pointer hover:scale-105 ${!data.enlargePreview ? "min-h-[100px] min-w-[100px]" : "min-h-[300px] min-w-[300px]"}`}>
             <Preview {...data.preview} />
         </div>
     </section>)
@@ -183,10 +183,10 @@ function useFrames() {
                 layers: [{ image: new ImageData(canvasSize.width, canvasSize.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
                 symbol: Symbol(),
             });
-            setActiveLayer(newFrames[0].layers[0]);
         }
         setFrames(newFrames);
         setActiveFrame(newFrames[0]);
+        setActiveLayer(newFrames[0].layers[0]);
     }
 
     function duplicateFrame() {

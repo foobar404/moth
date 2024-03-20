@@ -4,7 +4,7 @@
     width: 100vw;
     overflow: hidden;
     grid-template-rows: 60px 1fr max-content;
-    grid-template-columns: 60px 1fr 285px;
+    grid-template-columns: 60px calc(100% - (285px + 60px)) 285px;
     grid-template-areas:
         "left header right"
         "left content right"
@@ -110,7 +110,7 @@
         }
     }
 
-    &__tab{
+    &__tab {
         background-color: $color-black;
         border-top-left-radius: $border-radius-rounded;
         border-top-right-radius: $border-radius-rounded;
@@ -119,7 +119,7 @@
         padding: $spacing-2 $spacing-3;
         text-align: center;
 
-        &.--active{
+        &.--active {
             background: $color-fourth;
         }
     }
@@ -199,6 +199,8 @@
         image-rendering: pixelated;
         max-width: 50%;
         object-fit: contain;
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><rect x="0" y="0" width="4" height="4" fill="%23ccc5" /><rect x="4" y="4" width="4" height="4" fill="%23ccc5" /></svg>');
+        background-size: 4px 4px;
     }
 
     &__preview {
@@ -234,25 +236,11 @@
     }
 
     &__frame {
-        border-radius: $border-radius-rounded;
-        box-shadow: $shadow-normal;
-        cursor: pointer;
-        height: 60px;
         image-rendering: pixelated;
-        margin: $spacing-1;
-        max-width: 150px;
         object-fit: contain;
-        padding: $spacing-1;
-        display: inline-block;
 
-        &:hover {
-            opacity: 0.8;
-            transform: scale(1.1);
-        }
-
-        &.--active {
-            border: 2px solid $color-second;
-        }
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><rect x="0" y="0" width="4" height="4" fill="%23ccc5" /><rect x="4" y="4" width="4" height="4" fill="%23ccc5" /></svg>');
+        background-size: 4px 4px;
     }
 
     &__frames-controls {

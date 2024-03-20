@@ -1,6 +1,5 @@
 # Doing
 - undo / redo
-- Making to many frames pushes the color palette off the screen
 
 # TODO
 - The zoom scroll zooms to the center, not the cursor

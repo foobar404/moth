@@ -207,7 +207,12 @@ export function Nav(props: IProps) {
             </a>
 
             <section className="fixed z-50 p-2 bottom-right">
-                <div className="px-6 py-4 badge badge-info">{data.saving ? "saving..." : "saved"}</div>
+                <div className="px-6 py-4 badge badge-info">
+                    {data.message && data.message}
+                    {!data.message && (<>
+                        {data.saving ? "Saving..." : "Saved"}
+                    </>)}
+                </div>
             </section>
 
             {/* mobile buttons */}
@@ -242,6 +247,7 @@ function useNav(props: IProps) {
         dataFile: false,
     });
     let [saving, setSaving] = useState(false);
+    let [message, setMessage] = useState("");
 
     // load local projects
     useEffect(() => {
@@ -255,22 +261,28 @@ function useNav(props: IProps) {
 
     // save project locally
     useIntervalEffect(() => {
-        let localProject = getProject();
+        try {
+            let localProject = getProject();
 
-        let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
-        if (!currentProjectList.includes(localProject.name)) {
-            currentProjectList.push(localProject.name);
-            localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+            let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
+            if (!currentProjectList.includes(localProject.name)) {
+                currentProjectList.push(localProject.name);
+                localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+            }
+
+            if (currentProjectList.length > 5) {
+                let front = currentProjectList.shift();
+                localStorage.removeItem(front);
+                localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+            }
+
+            localStorage.setItem(localProject.name, JSON.stringify(localProject));
+            setSaving(false);
+            setMessage("");
         }
-
-        if (currentProjectList.length > 10) {
-            let front = currentProjectList.shift();
-            localStorage.removeItem(front);
-            localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+        catch (e) {
+            setMessage("Storage Full");
         }
-
-        localStorage.setItem(localProject.name, JSON.stringify(localProject));
-        setSaving(false);
     }, 2000, [canvasChangeCount]);
 
     // load theme
@@ -524,6 +536,7 @@ function useNav(props: IProps) {
     return {
         theme,
         saving,
+        message,
         modalExport,
         modalImport,
         projectName,

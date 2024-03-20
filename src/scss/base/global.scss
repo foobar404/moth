@@ -13,22 +13,16 @@ html {
 }
 
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0);
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: black;
+    background-color: oklch(var(--s));
+    border-radius: 4px;
+    border: 2px solid oklch(var(--a));
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: $color-second;
-}
-
-::-webkit-scrollbar-corner {
-    background: rgba(0, 0, 0, 0);
+    cursor: pointer;
 }
