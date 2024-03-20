@@ -7,7 +7,7 @@
     bottom: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(45deg, $color-first, $color-second);
+    background: linear-gradient(45deg, oklch(var(--p)), oklch(var(--s)));
     background-size: 400% 400%;
     animation: gradient 5s ease infinite;
     display: flex;

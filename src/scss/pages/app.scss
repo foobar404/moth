@@ -46,35 +46,6 @@
         image-rendering: pixelated;
     }
 
-    &__canvas-controls {
-        align-items: center;
-        background: oklch(var(--b1) / .2);
-        display: flex;
-        position: absolute;
-        top: $spacing-2;
-        right: $spacing-2;
-        width: fit-content;
-        justify-content: end;
-        padding: $spacing-2;
-        z-index: 1;
-        box-shadow: $shadow-normal;
-        border-radius: $border-radius-rounded;
-    }
-
-    &__brush-controls {
-        align-items: center;
-        display: flex;
-        position: absolute;
-        top: $spacing-2;
-        left: $spacing-2;
-        width: fit-content;
-        padding: $spacing-2;
-        z-index: 1;
-        box-shadow: $shadow-normal;
-        border-radius: $border-radius-rounded;
-        background: oklch(var(--b1) / .2);
-    }
-
     &__tools {
         display: flex;
         align-items: center;

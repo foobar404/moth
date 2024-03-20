@@ -10,6 +10,8 @@ import { IoImage, IoLayers } from "react-icons/io5";
 import { Popover, ColorPicker } from "../../components/";
 import { FaSortAlphaDown, FaFilter } from "react-icons/fa";
 import { MdDelete, MdAccessTimeFilled } from "react-icons/md";
+import { ChromePicker } from "react-color";
+import tinycolor from "tinycolor2";
 
 
 export function Colors() {
@@ -17,15 +19,22 @@ export function Colors() {
 
     return (
         <section className="mt-2">
-            <ColorPicker
-                onChange={(color: IColor) => data.setActiveColor({ r: color.r, g: color.g, b: color.b, a: Math.ceil(color.a * 255) })}
-                color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(4)) }} />
+            <ChromePicker
+                className="!w-full !bg-base-100 !rounded-xl !shadow-xl border-4 border-accent overflow-hidden !box-border"
+                color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(2)) }}
+                onChange={(color: any) => data.setActiveColor({ r: color.rgb.r, g: color.rgb.g, b: color.rgb.b, a: Math.ceil(color.rgb.a * 255) })} />
 
             <nav className="my-2 p-app__color-controls !bg-accent">
-                <div className="w-full row">
+                <div className="w-full space-x-1 row">
+                    <button data-tip="add new pallete"
+                        data-for="tooltip"
+                        onClick={data.addNewColorPalette}
+                        className="btn btn-xs">
+                        <BiPlusMedical className="text-lg" />
+                    </button>
                     <select data-tip="color pallete selection"
                         data-for="tooltip"
-                        className="w-1/2 mr-2 select select-xs"
+                        className="w-1/2 select select-xs"
                         onChange={(e) => data.setColorPalette(Number(e.target.value))}
                         value={data.colorPalettes.findIndex(x => data.activeColorPalette.symbol === x.symbol)}>
 
@@ -40,21 +49,13 @@ export function Colors() {
                         className="w-1/2 input input-xs"
                         value={data.activeColorPalette.name}
                         onChange={e => data.updatePaletteName(e.currentTarget.value)} />
+                    <button data-tip="remove current pallete"
+                        data-for="tooltip"
+                        onClick={data.deleteColorPalette}
+                        className="btn btn-xs">
+                        <MdDelete className="text-lg" />
+                    </button>
                 </div>
-
-                <button data-tip="add new pallete"
-                    data-for="tooltip"
-                    onClick={data.addNewColorPalette}
-                    className="btn btn-xs">
-                    <BiPlusMedical className="text-lg" />
-                </button>
-
-                <button data-tip="remove current pallete"
-                    data-for="tooltip"
-                    onClick={data.deleteColorPalette}
-                    className="btn btn-xs">
-                    <MdDelete className="text-lg" />
-                </button>
 
                 <button data-tip="add current color"
                     data-for="tooltip"
@@ -133,11 +134,9 @@ export function Colors() {
                     <div key={i}
                         data-for="tooltip"
                         onClick={() => data.setActiveColor(color)}
-                        data-tip={`rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`}
-                        style={{
-                            background: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`
-                        }}
-                        className={`h-8 w-8 rounded mr-1 mb-1 ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "border-2 border-black" : ""}`}>
+                        data-tip={`rgba(${color.r}, ${color.g}, ${color.b}, ${Number((color.a / 255).toFixed(2))})`}
+                        style={{ background: `rgba(${color.r}, ${color.g}, ${color.b}, ${(color.a / 255).toFixed(2)})` }}
+                        className={`h-8 w-8 rounded shadow-xl mr-1 mb-1 ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "border-2 border-black" : ""}`}>
                     </div>
                 ))}
             </section>

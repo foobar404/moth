@@ -18,15 +18,15 @@ export function Tools() {
     const data = useTools();
 
     return (<>
-        <nav className="flex items-center mb-2">
+        <nav className="flex items-center p-1 mb-1 border-2 rounded-md border-primary">
             <FaTools data-tip="tools"
                 data-for="tooltip"
-                className={`text-lg ${data.view == "tools" ? "text-primary" : "text-secondary"}`}
-                onMouseEnter={() => data.setView("tools")} />
+                className={`text-lg ${data.view == "tools" ? "text-primary" : "text-secondary-content"}`}
+                onClick={() => data.setView("tools")} />
             <AiFillFire data-tip="actions"
                 data-for="tooltip"
-                className={`c-icon ${data.view == "actions" ? "text-primary" : "text-secondary"}`}
-                onMouseEnter={() => data.setView("actions")} />
+                className={`c-icon ${data.view == "actions" ? "text-primary" : "text-secondary-content"}`}
+                onClick={() => data.setView("actions")} />
         </nav>
 
         {data.view === "tools" && (

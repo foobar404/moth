@@ -14,7 +14,9 @@ interface IGlobalStore {
     activeColor: { r: number; g: number; b: number; a: number };
     colorStats: IColorStats;
     toolSettings: IToolSettings;
+    canvasChangeCount: number;
 
+    setCanvasChangeCount: (canvasChangeCount: number) => void;
     setProjectName: (projectName: string) => void;
     setCanvasSize: (canvasSize: { height: number; width: number }) => void;
     setOnionSkin: (onionSkin: number) => void;
@@ -64,13 +66,14 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
             eraseAll: false,
             fillAll: false,
         },
+        canvasChangeCount: 0,
         // Action methods...
+        setCanvasChangeCount: (canvasChangeCount: number) => set({ canvasChangeCount }),
         setProjectName: (projectName: string) => set({ projectName }),
         setCanvasSize: (canvasSize: { height: number; width: number }) => set({ canvasSize }),
         setOnionSkin: (onionSkin: number) => set({ onionSkin }),
         setFrames: (frames: IFrame[]) => set({ frames }),
         setColorPalettes: (colorPalettes: IColorPalette[]) => set({ colorPalettes }),
-        setActiveColorPalette: (activeColorPalette: IColorPalette) => set({ activeColorPalette }),
         setActiveColor: (activeColor: { r: number, g: number, b: number, a: number }) => set({ activeColor }),
         setColorStats: (colorStats: IColorStats) => set({ colorStats }),
         setToolSettings: (toolSettings: IToolSettings) => set({ toolSettings }),
@@ -101,6 +104,19 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
             }
             set({ activeLayer });
         },
+        setActiveColorPalette: (activeColorPalette: IColorPalette) => {
+            let index = get().colorPalettes.findIndex(palette => palette.symbol === activeColorPalette.symbol);
+            if (index === -1) { // if palette is new add
+                let newPalettes = [...get().colorPalettes, activeColorPalette];
+                set({ colorPalettes: newPalettes });
+            }
+            else { // if palette exists update
+                let newPalettes = [...get().colorPalettes];
+                newPalettes[index] = activeColorPalette;
+                set({ colorPalettes: newPalettes });
+            }
+            set({ activeColorPalette });
+        }
     };
 
     return initialState;

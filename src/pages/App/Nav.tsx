@@ -12,8 +12,8 @@ import pngExtract from "png-chunks-extract";
 import { Buffer as pngBuffer } from "buffer";
 import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
-import { useCanvas, useModal, useGlobalStore } from '../../utils';
 import { IoImage, IoLayers, IoColorPalette } from "react-icons/io5";
+import { useCanvas, useModal, useGlobalStore, useIntervalEffect } from '../../utils';
 
 
 interface IProps {
@@ -206,6 +206,10 @@ export function Nav(props: IProps) {
                 <FaBug />
             </a>
 
+            <section className="fixed z-50 p-2 bottom-right">
+                <div className="px-6 py-4 badge badge-info">{data.saving ? "saving..." : "saved"}</div>
+            </section>
+
             {/* mobile buttons */}
             <button className="c-button --secondary --sm md:!hidden"
                 onClick={() => props.setShowMobilePanel(true)}>
@@ -226,7 +230,7 @@ function useNav(props: IProps) {
         activeLayer, canvasSize, colorPalettes,
         setProjectName, setFrames, setColorPalettes,
         setCanvasSize, setActiveLayer, setActiveColorPalette,
-        setActiveFrame,
+        setActiveFrame, canvasChangeCount
     } = useGlobalStore();
     let [projectList, setProjectList] = useState<string[]>([]);
     let [theme, setTheme] = useState("light");
@@ -237,6 +241,7 @@ function useNav(props: IProps) {
         mothData: true,
         dataFile: false,
     });
+    let [saving, setSaving] = useState(false);
 
     // load local projects
     useEffect(() => {
@@ -244,8 +249,12 @@ function useNav(props: IProps) {
         setProjectList(cachedList);
     }, []);
 
-    // save project locally
     useEffect(() => {
+        setSaving(true);
+    }, [canvasChangeCount]);
+
+    // save project locally
+    useIntervalEffect(() => {
         let localProject = getProject();
 
         let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
@@ -261,7 +270,8 @@ function useNav(props: IProps) {
         }
 
         localStorage.setItem(localProject.name, JSON.stringify(localProject));
-    }, [activeLayer]);
+        setSaving(false);
+    }, 2000, [canvasChangeCount]);
 
     // load theme
     useEffect(() => {
@@ -513,6 +523,7 @@ function useNav(props: IProps) {
 
     return {
         theme,
+        saving,
         modalExport,
         modalImport,
         projectName,

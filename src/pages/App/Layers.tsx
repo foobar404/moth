@@ -26,12 +26,6 @@ export function Layers() {
                     className="btn btn-xs">
                     <MdDelete className="text-lg" />
                 </button>
-                <button data-tip={`${data.layersAreVisible ? "hide other layers" : "show all layers"}`}
-                    data-for="tooltip"
-                    onClick={data.toggleAllLayerVisibility}
-                    className="btn btn-xs">
-                    {data.layersAreVisible ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
-                </button>
                 <button data-tip="move layer up"
                     data-for="tooltip"
                     onClick={data.moveLayerUp}
@@ -56,47 +50,57 @@ export function Layers() {
                     className="btn btn-xs">
                     <IoCopy className="text-lg" />
                 </button>
-                <label data-tip="change non-active layers opacity"
-                    data-for="tooltip"
-                    className="w-full">
-                    <p hidden>layers opacity lever</p>
-                    <input min="1"
-                        step="1"
-                        max="255"
-                        type="range"
-                        className="w-full range range-xs"
-                        value={data.allLayersOpacity}
-                        onChange={e => data.setAllLayersOpacity(e.currentTarget.valueAsNumber)} />
-                </label>
+                <div className="content-center w-full row">
+                    <label data-tip="change non-active layers opacity"
+                        data-for="tooltip"
+                        className="w-full mt-1 mr-2 ">
+                        <p hidden>layers opacity lever</p>
+                        <input min="1"
+                            step="1"
+                            max="255"
+                            type="range"
+                            className="w-full range range-xs"
+                            value={data.allLayersOpacity}
+                            onChange={e => data.setAllLayersOpacity(e.currentTarget.valueAsNumber)} />
+                    </label>
+                    <button data-tip={`${data.layersAreVisible ? "hide other layers" : "show all layers"}`}
+                        data-for="tooltip"
+                        onClick={data.toggleAllLayerVisibility}
+                        className="btn btn-xs">
+                        {data.layersAreVisible ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
+                    </button>
+                </div>
             </nav>
 
             <section>
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
-                    <div key={i}
-                        draggable
-                        onDragEnd={data.handleDragEnd}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => data.handleDrop(e, layer)}
-                        onClick={() => data.setActiveLayer(layer)}
-                        onDragStart={(e) => data.handleDragStart(e, layer)}
-                        className={`row rounded-md cursor-pointer ${layer.symbol === data.activeLayer.symbol ? "!border-2 !border-black" : ""}`}>
+                    <div className="row">
+                        <div key={i}
+                            draggable
+                            onDragEnd={data.handleDragEnd}
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={(e) => data.handleDrop(e, layer)}
+                            onClick={() => data.setActiveLayer(layer)}
+                            onDragStart={(e) => data.handleDragStart(e, layer)}
+                            className={`row rounded-md cursor-pointer hover:scale-105 hover:border-2 border-black/25 cursor-grab ${layer.symbol === data.activeLayer.symbol ? "!border-2 !border-black" : ""}`}>
 
-                        <img src={data.imageMap[layer.symbol]} className="p-app__layer-img" />
-                        <input type="text"
-                            className="c-input --xs !w-9/12"
-                            value={layer.name}
-                            onChange={e => {
-                                let value = e.target.value;
-                                data.setActiveLayer({
-                                    ...data.activeLayer,
-                                    name: value
-                                })
-                            }}
-                        />
-                        {/* <button onClick={() => data.toggleLayerVisibility(layer)}
-                            className="ml-1 btn btn-sm btn-accent">
+                            <img src={data.imageMap[layer.symbol]} className="p-app__layer-img" />
+                            <input type="text"
+                                className="c-input --xs !w-9/12"
+                                value={layer.name}
+                                onChange={e => {
+                                    let value = e.target.value;
+                                    data.setActiveLayer({
+                                        ...data.activeLayer,
+                                        name: value
+                                    })
+                                }}
+                            />
+                        </div>
+                        <button onClick={() => data.toggleLayerVisibility(layer)}
+                            className="ml-1 btn btn-xs btn-accent">
                             {layer.opacity === 255 ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
-                        </button> */}
+                        </button>
                     </div>
                 ))}
             </section>
@@ -193,8 +197,9 @@ function useLayers() {
                 if (l.symbol === layer.symbol) {
                     l.opacity = l.opacity === 255 ? 0 : 255;
                 }
-                return layer;
+                return l;
             });
+
         activeFrame.layers = newLayers;
         setActiveFrame({ ...activeFrame });
     }

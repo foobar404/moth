@@ -39,11 +39,11 @@ export function App() {
 					onSelect={(index) => data.setTabIndex(index)}>
 					<TabList className="row-left">
 						<Tab data-tip="Colors" data-for="tooltip"
-							className={`w-16 h-8 row rounded-t-xl cursor-pointer text-primary-content ${data.tabIndex === 0 ? "bg-primary text-primary-content" : "bg-secondary text-secondary-content"}`}>
+							className={`w-16 h-8 row rounded-t-xl cursor-pointer ${data.tabIndex === 0 ? "bg-primary text-primary-content border-2 border-accent" : "bg-secondary text-secondary-content"}`}>
 							<IoMdColorPalette className="text-xl" />
 						</Tab>
 						<Tab data-tip="Layers" data-for="tooltip"
-							className={`w-16 h-8 row rounded-t-xl cursor-pointer ${data.tabIndex === 1 ? "bg-primary text-primary-content" : "bg-secondary text-secondary-content"}`}>
+							className={`w-16 h-8 row rounded-t-xl cursor-pointer ${data.tabIndex === 1 ? "bg-primary text-primary-content border-2 border-accent" : "bg-secondary text-secondary-content"}`}>
 							<IoLayers className="text-xl" />
 						</Tab>
 					</TabList>
