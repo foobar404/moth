@@ -177,7 +177,10 @@ export function useCanvas(props?: IProps) {
     }
 
     function drawPixel(x, y, size = 1, color?) {
-        if (color) ctx.current.fillStyle = tinycolor(color).toRgbString();
+        if (color) {
+            if (typeof color === 'string') ctx.current.fillStyle = color;
+            else ctx.current.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`;
+        }
 
         ctx.current.fillRect(x, y, size, size);
     }

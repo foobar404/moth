@@ -11,7 +11,7 @@ export function Frames() {
     const data = useFrames();
 
     return (<section className="!justify-between row-top p-app__block overflow-hidden">
-        <section className="flex-1">
+        <section className="flex-1 w-1/2">
             <nav className={"row !justify-between"}>
                 <section className="space-x-2 p-app__frame-controls-section bg-accent">
                     <button data-tip="new frame" data-for="tooltip"
@@ -50,6 +50,7 @@ export function Frames() {
                 <section className="flex items-center p-app__frame-controls-section bg-accent">
                     <label data-tip="FPS" data-for="tooltip">
                         <input type="number"
+                            min="1"
                             value={data.preview.fps}
                             className="w-16 mr-2 input input-xs"
                             onChange={e => data.setFps(Number(e.target.value))} />
@@ -81,7 +82,7 @@ export function Frames() {
                 </section>
             </nav>
 
-            <section className={`overflow-auto max-h-[300px] p-1 row-left ${data.enlargePreview ? "flex-wrap" : ""}`}>
+            <section className={`overflow-auto p-1 row-left max-h-[400px] ${data.enlargePreview ? "!row flex-wrap" : ""}`}>
                 {data.frames.map((frame, i) => (
                     <img key={i}
                         draggable
@@ -89,7 +90,7 @@ export function Frames() {
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => data.handleDrop(e, frame)}
                         onDragEnd={data.handleDragEnd}
-                        className={`p-app__frame m-1 hover:scale-105 h-[60px] shadow-md rounded-md cursor-pointer ${frame.symbol === data.activeFrame.symbol ? "border-2 border-black" : ""}`}
+                        className={`h-[60px] min-w-[60px] max-w-[106px] flex-shrink-0 p-app__grid m-1 hover:scale-105 shadow-md rounded-md cursor-pointer box-content ${frame.symbol === data.activeFrame.symbol ? "border-4 !border-black" : ""}`}
                         src={data.imageMap[frame.symbol]}
                         onClick={() => {
                             data.setActiveFrame(frame);
@@ -99,9 +100,8 @@ export function Frames() {
             </section>
         </section>
 
-        <div onClick={() => data.setEnlargePreview(!data.enlargePreview)}
-            className={`ml-2 cursor-pointer hover:scale-105 ${!data.enlargePreview ? "min-h-[100px] min-w-[100px]" : "min-h-[300px] min-w-[300px]"}`}>
-            <Preview {...data.preview} />
+        <div onClick={() => data.setEnlargePreview(!data.enlargePreview)} className={`ml-2 cursor-pointer hover:scale-95`}>
+            <Preview {...data.preview} className={`${data.enlargePreview ? "h-[300px] min-w-[300px] max-w-[534px]" : "h-[120px] min-w-[120px] max-w-[213px]"}`} />
         </div>
     </section>)
 }
@@ -117,7 +117,7 @@ function useFrames() {
     let [imageMap, setImageMap] = useState<any>({});
     let [enlargePreview, setEnlargePreview] = useState(false);
     let [draggedFrame, setDraggedFrame] = useState<IFrame | null>(null);
-    let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false });
+    let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false, className: "" });
 
     useEffect(() => {
         let map: { [s: symbol]: string } = {};
@@ -161,7 +161,7 @@ function useFrames() {
         let reversedLayers = frame.layers.slice(0).reverse();
         reversedLayers.forEach(layer => {
             canvas1.putImageData(layer.image);
-            canvas2!.drawImage(canvas1.getElement());
+            canvas2.drawImage(canvas1.getElement());
         });
 
         return canvas2.toDataURL();

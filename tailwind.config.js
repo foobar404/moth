@@ -118,19 +118,19 @@ module.exports = {
           "justify-content": "flex-end",
           "align-items": "center",
         },
-        "row-between": {
+        ".row-between": {
           "display": "flex",
           "flex-direction": "row",
           "justify-content": "space-between",
           "align-items": "center",
         },
-        "row-around": {
+        ".row-around": {
           "display": "flex",
           "flex-direction": "row",
           "justify-content": "space-around",
           "align-items": "center",
         },
-        "row-evenly": {
+        ".row-evenly": {
           "display": "flex",
           "flex-direction": "row",
           "justify-content": "space-evenly",

@@ -3,12 +3,11 @@
 
 # TODO
 - The zoom scroll zooms to the center, not the cursor
-- restyle color filters 
-- shortcuts dont prevent default 
 - add console error watch system
 - gif export not working 
 - switching tabs resets state
 - make selections standout
+- saved projects should have a preview img
 
 # Promotion
 - discord channels

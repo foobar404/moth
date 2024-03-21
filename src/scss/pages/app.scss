@@ -189,21 +189,8 @@
         }
     }
 
-    &__layer-img {
-        height: 40px;
-        width: auto;
-        margin: $spacing-1;
-        border-radius: $border-radius-rounded;
-        box-shadow: $shadow-normal;
-        padding: $spacing-1;
-        image-rendering: pixelated;
-        max-width: 50%;
-        object-fit: contain;
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><rect x="0" y="0" width="4" height="4" fill="%23ccc5" /><rect x="4" y="4" width="4" height="4" fill="%23ccc5" /></svg>');
-        background-size: 4px 4px;
-    }
-
     &__preview {
+        object-fit: contain;
         backface-visibility: hidden;
         image-rendering: pixelated;
         image-rendering: crisp-edges;
@@ -235,14 +222,6 @@
         width: 100%;
     }
 
-    &__frame {
-        image-rendering: pixelated;
-        object-fit: contain;
-
-        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8"><rect x="0" y="0" width="4" height="4" fill="%23ccc5" /><rect x="4" y="4" width="4" height="4" fill="%23ccc5" /></svg>');
-        background-size: 4px 4px;
-    }
-
     &__frames-controls {
         display: flex;
         justify-content: space-between;
@@ -255,6 +234,12 @@
         display: flex;
         padding: $spacing-1;
         width: fit-content;
+    }
+
+    &__grid {
+        image-rendering: pixelated;
+        object-fit: contain;
+        background: repeating-conic-gradient(#eee 0% 25%, #ccc 0% 50%) 50% / 10px 10px
     }
 
     &__block {

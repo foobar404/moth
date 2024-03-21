@@ -61,6 +61,18 @@ export function Tools() {
                     onMouseDown={(e) => data.updateTool(e, "light")}>
                     <FaLightbulb className="text-xl" />
                 </button>
+                <button data-tip={`line tool ( l​ ) ${data.getButtonTooltip("line")}`}
+                    data-for="tooltip"
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("line")}`}
+                    onMouseDown={(e) => data.updateTool(e, "line")}>
+                    <MdOutlineCallReceived className="text-xl" />
+                </button>
+                <button data-tip={`mirror tool ( m​ ) ${data.getButtonTooltip("mirror")}`}
+                    data-for="tooltip"
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("mirror")}`}
+                    onMouseDown={(e) => data.updateTool(e, "mirror")}>
+                    <GiMirrorMirror className="text-xl" />
+                </button>
                 <button data-tip={`eyedropper tool ( i​ ) ${data.getButtonTooltip("eyedropper")}`}
                     data-for="tooltip"
                     className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("eyedropper")}`}
@@ -97,18 +109,6 @@ export function Tools() {
                     onMouseDown={(e) => data.updateTool(e, "bone")}>
                     <FaBone />
                 </button> */}
-                <button data-tip={`line tool ( l​ ) ${data.getButtonTooltip("line")}`}
-                    data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("line")}`}
-                    onMouseDown={(e) => data.updateTool(e, "line")}>
-                    <MdOutlineCallReceived className="text-xl" />
-                </button>
-                <button data-tip={`mirror tool ( m​ ) ${data.getButtonTooltip("mirror")}`}
-                    data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("mirror")}`}
-                    onMouseDown={(e) => data.updateTool(e, "mirror")}>
-                    <GiMirrorMirror className="text-xl" />
-                </button>
             </section>
         )}
 

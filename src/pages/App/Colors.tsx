@@ -19,10 +19,14 @@ export function Colors() {
 
     return (
         <section className="mt-2">
-            <ChromePicker
-                className="!w-full !bg-base-100 !rounded-xl !shadow-xl border-4 border-accent overflow-hidden !box-border"
-                color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(2)) }}
-                onChange={(color: any) => data.setActiveColor({ r: color.rgb.r, g: color.rgb.g, b: color.rgb.b, a: Math.ceil(color.rgb.a * 255) })} />
+
+            <div onKeyDown={e => e.stopPropagation()}>
+                <ChromePicker
+                    disableAlpha
+                    className="!w-full !bg-base-100 !rounded-xl !shadow-xl border-4 border-accent overflow-hidden !box-border"
+                    color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(2)) }}
+                    onChange={(color: any) => data.setActiveColor({ r: color.rgb.r, g: color.rgb.g, b: color.rgb.b, a: Math.ceil(color.rgb.a * 255) })} />
+            </div>
 
             <nav className="my-2 p-app__color-controls !bg-accent">
                 <div className="w-full space-x-1 row">
@@ -34,7 +38,7 @@ export function Colors() {
                     </button>
                     <select data-tip="color pallete selection"
                         data-for="tooltip"
-                        className="w-1/2 select select-xs"
+                        className="w-1/3 select select-xs"
                         onChange={(e) => data.setColorPalette(Number(e.target.value))}
                         value={data.colorPalettes.findIndex(x => data.activeColorPalette.symbol === x.symbol)}>
 
@@ -46,97 +50,65 @@ export function Colors() {
                     <input type="text"
                         data-for="tooltip"
                         data-tip="color pallete name"
-                        className="w-1/2 input input-xs"
+                        className="w-1/3 input input-xs"
                         value={data.activeColorPalette.name}
+                        onKeyDown={e => e.stopPropagation()}
                         onChange={e => data.updatePaletteName(e.currentTarget.value)} />
                     <button data-tip="remove current pallete"
                         data-for="tooltip"
-                        onClick={data.deleteColorPalette}
-                        className="btn btn-xs">
+                        className="btn btn-xs"
+                        onClick={data.deleteColorPalette}>
                         <MdDelete className="text-lg" />
                     </button>
                 </div>
 
-                <button data-tip="add current color"
-                    data-for="tooltip"
-                    onClick={data.addColor}
-                    className="btn btn-xs">
-                    <BiPlusMedical className="text-lg" />
-                </button>
-
-                <Popover>
-                    <button data-tip="sort colors"
+                <div className="w-full space-x-1 row">
+                    <button data-tip="add current color"
                         data-for="tooltip"
+                        onClick={data.addColor}
                         className="btn btn-xs">
-                        <FaSortAlphaDown />
+                        <BiPlusMedical className="text-lg" />
                     </button>
 
-                    <section className="flex flex-col gap-2">
-                        <button className={`c-button --second --slim ${data.colorState.sort === "count" ? "--active-fourth" : ""}`}
-                            onClick={() => data.sortColorsByMostUsed()}>
-                            <BsTrophyFill className="c-button__icon" />
-                            Most Used
-                        </button>
-                        <button className={`c-button --second --slim ${data.colorState.sort === "recent" ? "--active-fourth" : ""}`}
-                            onClick={() => data.sortColorsByMostRecent()}>
-                            <MdAccessTimeFilled className="c-button__icon" />
-                            Recently Used
-                        </button>
-                        <button className={`c-button --second --slim ${data.colorState.sort === "hue" ? "--active-fourth" : ""}`}
-                            onClick={() => data.sortColorsByHue()}>
-                            <HiColorSwatch className="c-button__icon" />
-                            Hue
-                        </button>
-                    </section>
-                </Popover>
-
-                <Popover>
-                    <button data-tip="filter colors"
+                    <select data-tip="sort colors"
                         data-for="tooltip"
+                        className="w-1/3 select select-xs"
+                        value={data.colorState.sort}
+                        onChange={e => data.setColorState(s => ({ ...s, sort: e.target.value as any }))}>
+                        <option value="default">Default</option>
+                        <option value="count">Most Used</option>
+                        <option value="recent">Recently Used</option>
+                        <option value="hue">Hue</option>
+                    </select>
+
+                    <select className="w-1/3 select select-xs"
+                        data-tip="filter colors"
+                        data-for="tooltip"
+                        value={data.colorState.filter}
+                        onChange={e => data.setColorState(s => ({ ...s, filter: e.target.value as any }))}>
+                        <option value="all">All Colors</option>
+                        <option value="project">Project Colors</option>
+                        <option value="frame">Frame Colors</option>
+                        <option value="layer">Layer Colors</option>
+                    </select>
+
+                    <button data-tip="remove current color"
+                        data-for="tooltip"
+                        onClick={data.deleteColor}
                         className="btn btn-xs">
-                        <FaFilter />
+                        <MdDelete className="text-lg" />
                     </button>
-
-                    <section className="flex flex-col gap-2">
-                        <button className={`c-button --second --slim ${data.colorState.filter === "all" ? "--active-fourth" : ""}`}
-                            onClick={data.showColorsInPalette}>
-                            <HiColorSwatch className="c-button__icon" />
-                            All Colors
-                        </button>
-                        <button className={`c-button --second --slim ${data.colorState.filter === "project" ? "--active-fourth" : ""}`}
-                            onClick={data.showColorsInProject}>
-                            <MdMovieFilter className="c-button__icon" />
-                            Project Colors
-                        </button>
-                        <button className={`c-button --second --slim ${data.colorState.filter === "frame" ? "--active-fourth" : ""}`}
-                            onClick={data.showColorsInFrame}>
-                            <IoImage className="c-button__icon" />
-                            Frame Colors
-                        </button>
-                        <button className={`c-button --second --slim ${data.colorState.filter === "layer" ? "--active-fourth" : ""}`}
-                            onClick={data.showColorsInLayer}>
-                            <IoLayers className="c-button__icon" />
-                            Layer Colors
-                        </button>
-                    </section>
-                </Popover>
-
-                <button data-tip="remove current color"
-                    data-for="tooltip"
-                    onClick={data.deleteColor}
-                    className="btn btn-xs">
-                    <MdDelete className="text-lg" />
-                </button>
+                </div>
             </nav>
 
-            <section className="flex-wrap row-left">
+            <section className="flex-wrap row">
                 {data.visibleColors.map((color: IColor, i) => (
                     <div key={i}
                         data-for="tooltip"
                         onClick={() => data.setActiveColor(color)}
                         data-tip={`rgba(${color.r}, ${color.g}, ${color.b}, ${Number((color.a / 255).toFixed(2))})`}
                         style={{ background: `rgba(${color.r}, ${color.g}, ${color.b}, ${(color.a / 255).toFixed(2)})` }}
-                        className={`h-8 w-8 rounded shadow-xl mr-1 mb-1 ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "border-2 border-black" : ""}`}>
+                        className={`hover:scale-105 cursor-pointer h-8 w-8 rounded shadow-xl mr-1 mb-1 ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "border-2 border-black" : ""}`}>
                     </div>
                 ))}
             </section>
@@ -152,9 +124,9 @@ function useColors() {
         setActiveColor,
     } = useGlobalStore();
     let [visibleColors, setVisibleColors] = useState<IColor[]>(activeColorPalette.colors);
-    let [colorState, setColorState] = useState<{ filter: "all" | "project" | "frame" | "layer", sort: "hue" | "recent" | "count" }>({
+    let [colorState, setColorState] = useState<{ filter: "all" | "project" | "frame" | "layer", sort: "default" | "hue" | "recent" | "count" }>({
         filter: "all",
-        sort: "recent"
+        sort: "default"
     });
 
     useEffect(() => {
@@ -171,11 +143,10 @@ function useColors() {
         if (colorState.sort === "hue") sortColorsByHue(colors);
         if (colorState.sort === "recent") sortColorsByMostRecent(colors);
         if (colorState.sort === "count") sortColorsByMostUsed(colors);
-    }, [activeColorPalette, activeColor]);
+        if (colorState.sort === "default") sortColorsByDefault(colors);
+    }, [activeColorPalette, activeColor, colorState, colorStats]);
 
     function deleteColor() {
-        if (!window.confirm("Are you sure you want to delete this color?")) return;
-
         let colors = activeColorPalette.colors.filter(c => JSON.stringify(c) !== JSON.stringify(activeColor));
         activeColorPalette.colors = colors;
         setActiveColorPalette({ ...activeColorPalette });
@@ -185,6 +156,7 @@ function useColors() {
         if (!activeColorPalette.colors.find(c => JSON.stringify(c) === JSON.stringify(activeColor))) {
             let newColors = [...activeColorPalette.colors, activeColor];
             setActiveColorPalette({ ...activeColorPalette, colors: newColors });
+            setColorState({ ...colorState, filter: "all" });
         }
     }
 
@@ -223,7 +195,6 @@ function useColors() {
 
     function showColorsInPalette() {
         setVisibleColors(activeColorPalette.colors);
-        setColorState(s => ({ ...s, filter: "all" }));
 
         return activeColorPalette.colors;
     }
@@ -250,7 +221,6 @@ function useColors() {
         });
 
         setVisibleColors(colors);
-        setColorState(s => ({ ...s, filter: "project" }));
 
         return colors;
     }
@@ -275,7 +245,6 @@ function useColors() {
         });
 
         setVisibleColors(colors);
-        setColorState(s => ({ ...s, filter: "frame" }));
 
         return colors;
     }
@@ -298,27 +267,24 @@ function useColors() {
         });
 
         setVisibleColors(colors);
-        setColorState(s => ({ ...s, filter: "layer" }));
 
         return colors;
     }
 
-    function sortColorsByMostUsed(colorOverride?: IColor[]) {
-        let colors = [...(colorOverride ?? visibleColors)].sort((a, b) => {
+    function sortColorsByMostUsed(colors: IColor[]) {
+        let newColors = [...colors].sort((a, b) => {
             let colorString = `${a.r},${a.g},${a.b},${a.a}`;
             let colorString2 = `${b.r},${b.g},${b.b},${b.a}`;
 
             return (colorStats[colorString2]?.count ?? 0) - (colorStats[colorString]?.count ?? 0);
         });
 
-        setVisibleColors(colors);
-        setColorState(s => ({ ...s, sort: "count" }));
-
-        return colors;
+        setVisibleColors(newColors);
+        return newColors;
     }
 
-    function sortColorsByMostRecent(colorOverride?: IColor[]) {
-        let colors = [...(colorOverride ?? visibleColors)].sort((a, b) => {
+    function sortColorsByMostRecent(colors: IColor[]) {
+        let newColors = [...colors].sort((a, b) => {
             let colorString = `${a.r},${a.g},${a.b},${a.a}`;
             let colorString2: string = `${b.r},${b.g},${b.b},${b.a}`;
 
@@ -328,22 +294,24 @@ function useColors() {
             return (colorStats[colorString2]?.lastUsed ?? colorString2) > (colorStats[colorString]?.lastUsed ?? colorString) ? 1 : -1;
         });
 
-        setVisibleColors(colors);
-        setColorState(s => ({ ...s, sort: "recent" }));
-
-        return colors;
+        setVisibleColors(newColors);
+        return newColors;
     }
 
-    function sortColorsByHue(colorOverride?: IColor[]) {
-        let colors = [...(colorOverride ?? visibleColors)].sort((a, b) => {
+    function sortColorsByHue(colors: IColor[]) {
+        let newColors = [...colors].sort((a, b) => {
             let [h1, s1, l1] = rgbToHsl(a.r, a.g, a.b);
             let [h2, s2, l2] = rgbToHsl(b.r, b.g, b.b);
 
             return (h1 + (s1 * .1) + (l1 * .3)) - (h2 + (s2 * .1) + (l2 * .3));
         });
 
+        setVisibleColors(newColors);
+        return newColors;
+    }
+
+    function sortColorsByDefault(colors) {
         setVisibleColors(colors);
-        setColorState(s => ({ ...s, sort: "hue" }));
 
         return colors;
     }
@@ -378,6 +346,7 @@ function useColors() {
         colorState,
         deleteColor,
         visibleColors,
+        setColorState,
         setColorPalette,
         sortColorsByHue,
         showColorsInLayer,

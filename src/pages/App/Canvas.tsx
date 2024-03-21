@@ -25,7 +25,7 @@ export function Canvas() {
 
     return (
         <section className="p-app__canvas p-app__block">
-            <nav className={`absolute z-10 m-2 rounded-lg shadow-lg bg-accent text-accent-content top-left row ${["shape", "brush", "bucket", "eraser", "light", "line", "mirror"].includes(data.toolSettings.leftTool) ? "p-2" : ""}`}>
+            <nav className={`absolute h-[40px] z-10 m-2 rounded-lg shadow-lg bg-accent text-accent-content top-left row ${["shape", "brush", "bucket", "eraser", "light", "line", "mirror"].includes(data.toolSettings.leftTool) ? "p-2" : ""}`}>
                 {data.toolSettings.leftTool === "eraser" && (<>
                     <label data-tip="erase all"
                         data-for="tooltip"
@@ -173,7 +173,7 @@ export function Canvas() {
                 </>)}
             </nav>
 
-            <nav className="absolute z-10 p-2 m-2 space-x-2 rounded-lg shadow-lg bg-accent text-accent-content top-right row">
+            <nav className="absolute h-[40px] z-10 p-2 m-2 space-x-2 rounded-lg shadow-lg bg-accent text-accent-content top-right row">
                 <input type="range" min="1" max="50" step="1"
                     data-tip="grid zoom"
                     data-for="tooltip"
@@ -186,18 +186,24 @@ export function Canvas() {
                     <input data-tip="grid height"
                         data-for="tooltip"
                         type="number"
+                        min="1"
+                        max="512"
                         className="w-16 input input-xs text-base-content"
                         value={data.canvasSize.height}
-                        onChange={e => data.resizeHandler({ height: e.currentTarget.valueAsNumber })} />
+                        onClick={e => e.currentTarget.select()}
+                        onChange={e => data.resizeHandler({ height: Math.min(512, e.currentTarget.valueAsNumber) })} />
                 </label>
                 <label>
                     <p hidden>width</p>
                     <input data-tip="grid width"
                         data-for="tooltip"
                         type="number"
+                        min="1"
+                        max="512"
                         className="w-16 input input-xs text-base-content"
                         value={data.canvasSize.width}
-                        onChange={e => data.resizeHandler({ width: e.currentTarget.valueAsNumber })} />
+                        onClick={e => e.currentTarget.select()}
+                        onChange={e => data.resizeHandler({ width: Math.min(512, e.currentTarget.valueAsNumber) })} />
                 </label>
                 <button data-tip="undo ( ctrl + z )"
                     data-for="tooltip"
@@ -257,6 +263,8 @@ function useCanvas() {
         stage: ToolStage.PREVIEW,
         activePoints: [] as { x: number; y: number; }[], //remove 
         modifiedPoints: new Set(), // add key
+        brush: { previousPoint: { x: 0, y: 0 } },
+        eraser: { previousPoint: { x: 0, y: 0 } },
         selectionArea: {
             imgData: null as ImageData | null,
             points: [] as { x: number; y: number; }[],
@@ -273,26 +281,39 @@ function useCanvas() {
         "]": () => setBrushSize(1),
     });
     let toolHandlers = {
-        "brush": (x, y, toolButtonActive) => {
+        "brush": (x, y, toolButtonActive, preview) => {
             // center the mouse cursor in the brush 
             let width = stateCache.current.toolSettings.size;
             let height = stateCache.current.toolSettings.size;
-            let newX = x == 0 ? 0 : x - Math.floor(width / 2);
-            let newY = y == 0 ? 0 : y - Math.floor(height / 2);
+            let newX = x - Math.floor(width / 2);
+            let newY = y - Math.floor(height / 2);
 
             if (toolButtonActive) {
-                saveCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size);
+                if (toolState.current.brush.previousPoint.x === 0 && toolState.current.brush.previousPoint.y === 0) {
+                    toolState.current.brush.previousPoint.x = newX;
+                    toolState.current.brush.previousPoint.y = newY;
+                }
+
+                let start = toolState.current.brush.previousPoint;
+                let end = { x: newX, y: newY };
+
+                saveCanvas.drawLine(start, end, stateCache.current.toolSettings.size);
+
+                toolState.current.brush.previousPoint.x = newX;
+                toolState.current.brush.previousPoint.y = newY;
             } else {
-                previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size);
+                toolState.current.brush.previousPoint.x = 0;
+                toolState.current.brush.previousPoint.y = 0;
+                if (preview) previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size);
             }
         },
-        "eraser": (x, y, toolButtonActive) => {
+        "eraser": (x, y, toolButtonActive, preview) => {
             let size = stateCache.current.toolSettings.eraseAll
                 ? 1 : stateCache.current.toolSettings.size;
             let width = size;
             let height = size;
-            let newX = x == 0 ? 0 : x - Math.floor(width / 2);
-            let newY = y == 0 ? 0 : y - Math.floor(height / 2);
+            let newX = x - Math.floor(width / 2);
+            let newY = y - Math.floor(height / 2);
 
             if (toolButtonActive) {
                 if (stateCache.current.toolSettings.eraseAll) {
@@ -301,13 +322,25 @@ function useCanvas() {
 
                     points.forEach(point => saveCanvas.erasePixel(point.x, point.y, size));
                 } else {
-                    saveCanvas.erasePixel(newX, newY, size);
+                    if (toolState.current.eraser.previousPoint.x === 0 && toolState.current.eraser.previousPoint.y === 0) {
+                        toolState.current.eraser.previousPoint.x = newX;
+                        toolState.current.eraser.previousPoint.y = newY;
+                    }
+                    let start = toolState.current.eraser.previousPoint;
+                    let end = { x: newX, y: newY };
+
+                    saveCanvas.drawLine(start, end, size, "rgba(0, 0, 0, .004)");
+
+                    toolState.current.eraser.previousPoint.x = newX;
+                    toolState.current.eraser.previousPoint.y = newY;
                 }
             } else {
-                previewCanvas.erasePixel(newX, newY, size);
+                toolState.current.eraser.previousPoint.x = 0;
+                toolState.current.eraser.previousPoint.y = 0;
+                if (preview) previewCanvas.erasePixel(newX, newY, size);
             }
         },
-        "bucket": (x, y, toolButtonActive) => {
+        "bucket": (x, y, toolButtonActive, preview) => {
             if (toolButtonActive) {
                 if (stateCache.current.toolSettings.fillAll) {
                     const imgData = stateCache.current.activeLayer.image;
@@ -337,10 +370,10 @@ function useCanvas() {
                     });
                 }
             } else {
-                previewCanvas.drawPixel(x, y, 1);
+                if (preview) previewCanvas.drawPixel(x, y, 1);
             }
         },
-        "line": (x, y, toolButtonActive) => {
+        "line": (x, y, toolButtonActive, preview) => {
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
                 toolState.current.stage = ToolStage.ADJUSTING;
@@ -351,7 +384,7 @@ function useCanvas() {
                     const startPoint = activePoints[0];
                     const endPoint = { x: Math.floor(x), y: Math.floor(y) };
 
-                    previewCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
+                    if (preview) previewCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
 
                     if (!toolButtonActive) {
                         saveCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
@@ -361,7 +394,7 @@ function useCanvas() {
                 }
             }
         },
-        "mirror": (x, y, toolButtonActive) => {
+        "mirror": (x, y, toolButtonActive, preview) => {
             const { size, mirror } = stateCache.current.toolSettings;
             // Calculate starting positions to center drawing on (x, y)
             let newX = x - Math.floor(size / 2);
@@ -389,10 +422,10 @@ function useCanvas() {
             if (toolButtonActive) {
                 saveCanvas.putImageData(tempCanvas1.getImageData());
             } else {
-                previewCanvas.putImageData(tempCanvas1.getImageData());
+                if (preview) previewCanvas.putImageData(tempCanvas1.getImageData());
             }
         },
-        "move": (x, y, toolButtonActive) => {
+        "move": (x, y, toolButtonActive, preview) => {
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.stage = ToolStage.ADJUSTING;
 
@@ -429,8 +462,8 @@ function useCanvas() {
                 tempCanvas2.drawImage(tempCanvas1.getElement());
 
                 if (toolButtonActive) {
-                    previewCanvas.putImageData(eraseImageData);
-                    previewCanvas.drawImage(tempCanvas2.getElement());
+                    if (preview) previewCanvas.putImageData(eraseImageData);
+                    if (preview) previewCanvas.drawImage(tempCanvas2.getElement());
                 } else {
                     saveCanvas.putImageData(eraseImageData);
                     saveCanvas.drawImage(tempCanvas2.getElement());
@@ -441,7 +474,7 @@ function useCanvas() {
                 }
             }
         },
-        "eyedropper": (x, y, toolButtonActive) => {
+        "eyedropper": (x, y, toolButtonActive, preview) => {
             if (toolState.current.stage === ToolStage.PREVIEW) {
                 let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
                 reversedLayers.forEach((layer) => {
@@ -468,14 +501,14 @@ function useCanvas() {
                 } else {
                     let { width, height } = stateCache.current.canvasSize;
                     let { r, g, b, a } = currentColor;
-                    previewCanvas.drawRect(0, 0, width - 1, height - 1, `rgba(${r},${g},${b},${a / 255})`);
+                    if (preview) previewCanvas.drawRect(0, 0, width - 1, height - 1, `rgba(${r},${g},${b},${a / 255})`);
                 }
             }
             if (toolState.current.stage = ToolStage.ADJUSTING) {
                 if (!toolButtonActive) toolState.current.stage = ToolStage.PREVIEW;
             }
         },
-        "shape": (x, y, toolButtonActive) => {
+        "shape": (x, y, toolButtonActive, preview) => {
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
                 toolState.current.stage = ToolStage.ADJUSTING;
@@ -511,7 +544,7 @@ function useCanvas() {
                     }
 
                     if (toolButtonActive) {
-                        previewCanvas.putImageData(tempCanvas1.getImageData());
+                        if (preview) previewCanvas.putImageData(tempCanvas1.getImageData());
                     } else {
                         saveCanvas.putImageData(tempCanvas1.getImageData());
                         toolState.current.stage = ToolStage.PREVIEW;
@@ -520,7 +553,7 @@ function useCanvas() {
                 }
             }
         },
-        "light": (x, y, toolButtonActive) => {
+        "light": (x, y, toolButtonActive, preview) => {
             // Put the active layer image onto canvas2 for manipulation
             tempCanvas1.putImageData(stateCache.current.activeLayer.image);
             const brushSize = stateCache.current.toolSettings.size;
@@ -582,12 +615,12 @@ function useCanvas() {
                 saveCanvas.putImageData(imgData, startX, startY);
             } else {
                 toolState.current.modifiedPoints.clear();
-                previewCanvas.putImageData(imgData, startX, startY);
+                if (preview) previewCanvas.putImageData(imgData, startX, startY);
             }
         },
-        "box": (x, y, toolButtonActive) => {
+        "box": (x, y, toolButtonActive, preview) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                previewCanvas.drawPixel(x, y);
+                if (preview) previewCanvas.drawPixel(x, y);
                 return;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
@@ -602,7 +635,7 @@ function useCanvas() {
                 const width = endX - startX;
                 const height = endY - startY;
 
-                previewCanvas.drawRect(startX, startY, width, height, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.drawRect(startX, startY, width, height, "rgba(0,0,0,1)");
             }
             if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
                 const startX = Math.min(toolState.current.selectionArea.rectSelection.startPoint.x, x);
@@ -683,9 +716,9 @@ function useCanvas() {
                 );
                 tempCanvas2.drawImage(tempCanvas1.getElement());
 
-                previewCanvas.putImageData(eraseImageData);
-                previewCanvas.drawImage(tempCanvas2.getElement());
-                previewCanvas.drawRect(newStartX, newStartY, selectionWidth, selectionheight, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.putImageData(eraseImageData);
+                if (preview) previewCanvas.drawImage(tempCanvas2.getElement());
+                if (preview) previewCanvas.drawRect(newStartX, newStartY, selectionWidth, selectionheight, "rgba(0,0,0,1)");
 
                 //preview
                 if (pointIsInsideBoundery && toolButtonActive) {
@@ -710,9 +743,9 @@ function useCanvas() {
                 }
             }
         },
-        "wand": (x, y, toolButtonActive) => {
+        "wand": (x, y, toolButtonActive, preview) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                previewCanvas.drawPixel(x, y);
+                if (preview) previewCanvas.drawPixel(x, y);
                 return;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
@@ -787,9 +820,9 @@ function useCanvas() {
                 );
                 tempCanvas2.drawImage(tempCanvas1.getElement());
 
-                previewCanvas.putImageData(eraseImageData);
-                previewCanvas.drawImage(tempCanvas2.getElement());
-                previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.putImageData(eraseImageData);
+                if (preview) previewCanvas.drawImage(tempCanvas2.getElement());
+                if (preview) previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
 
                 if (pointIsInsideBoundery && toolButtonActive) {
                     toolState.current.selectionArea.currentPosition.x = x - toolState.current.selectionArea.startPosition.x;
@@ -812,9 +845,9 @@ function useCanvas() {
                 }
             }
         },
-        "lasso": (x, y, toolButtonActive) => {
+        "lasso": (x, y, toolButtonActive, preview) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                previewCanvas.drawPixel(x, y);
+                if (preview) previewCanvas.drawPixel(x, y);
                 return;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
@@ -827,7 +860,7 @@ function useCanvas() {
                     toolState.current.selectionArea.lassoSelection.points.push({ x, y });
 
                 let points = toolState.current.selectionArea.lassoSelection.points;
-                previewCanvas.drawPolygon(points, true, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.drawPolygon(points, true, "rgba(0,0,0,1)");
             }
             if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
                 let points = toolState.current.selectionArea.lassoSelection.points;
@@ -904,9 +937,9 @@ function useCanvas() {
                 );
                 tempCanvas2.drawImage(tempCanvas1.getElement());
 
-                previewCanvas.putImageData(eraseImageData);
-                previewCanvas.drawImage(tempCanvas2.getElement());
-                previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.putImageData(eraseImageData);
+                if (preview) previewCanvas.drawImage(tempCanvas2.getElement());
+                if (preview) previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
 
                 if (pointIsInsideBoundery && toolButtonActive) {
                     toolState.current.selectionArea.currentPosition.x = x - toolState.current.selectionArea.startPosition.x;
@@ -1157,7 +1190,6 @@ function useCanvas() {
         saveCanvas.clear();
         previewCanvas.clear();
         mainCanvas.clear();
-
         mainCanvas.drawGrid();
 
         // position relative to the canvas element
@@ -1180,9 +1212,13 @@ function useCanvas() {
         let { r, g, b, a } = stateCache.current.activeColor;
         saveCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
         previewCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+        tempCanvas1.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+        tempCanvas2.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
 
         // run current tool
-        toolHandlers[tool](x, y, toolButtonActive);
+        if (middleTool) toolHandlers[middleTool](x, y, mouseState.current.middleDown, false);
+        if (rightTool) toolHandlers[rightTool](x, y, mouseState.current.rightDown, false);
+        if (leftTool) toolHandlers[leftTool](x, y, mouseState.current.leftDown, true);
 
         // color related operations
         const existingColor = stateCache.current.activeColorPalette.colors

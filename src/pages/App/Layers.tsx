@@ -6,6 +6,7 @@ import { useCanvas, useGlobalStore } from "../../utils";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
+import ReactTooltip from "react-tooltip";
 
 
 export function Layers() {
@@ -76,18 +77,24 @@ export function Layers() {
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
                     <div className="row">
                         <div key={i}
-                            draggable
-                            onDragEnd={data.handleDragEnd}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={(e) => data.handleDrop(e, layer)}
-                            onClick={() => data.setActiveLayer(layer)}
-                            onDragStart={(e) => data.handleDragStart(e, layer)}
-                            className={`row rounded-md cursor-pointer hover:scale-105 hover:border-2 border-black/25 cursor-grab ${layer.symbol === data.activeLayer.symbol ? "!border-2 !border-black" : ""}`}>
+                            className={`overflow-hidden row-left flex-1 rounded-md hover:scale-105 border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
 
-                            <img src={data.imageMap[layer.symbol]} className="p-app__layer-img" />
-                            <input type="text"
-                                className="c-input --xs !w-9/12"
+                            <img src={data.imageMap[layer.symbol]}
+                                draggable
+                                onDragEnd={data.handleDragEnd}
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => data.handleDrop(e, layer)}
+                                onClick={() => data.setActiveLayer(layer)}
+                                onDragStart={(e) => data.handleDragStart(e, layer)}
+                                className="w-12 h-12 mx-1 rounded-sm shadow-md p-app__grid cursor-grab" />
+                            <input
+                                data-tip={`${layer.name}`}
+                                data-for="tooltip"
+                                type="text"
                                 value={layer.name}
+                                className="flex-1 input w-[70px] m-[4px]"
+                                onKeyDown={e => e.stopPropagation()}
+                                onClick={() => data.setActiveLayer(layer)}
                                 onChange={e => {
                                     let value = e.target.value;
                                     data.setActiveLayer({
@@ -130,6 +137,8 @@ function useLayers() {
     }, [activeFrame]);
 
     useEffect(() => {
+        ReactTooltip.rebuild();
+
         if (previousActiveLayer.current !== activeLayer.symbol) {
             previousActiveLayer.current = activeLayer.symbol;
             onionSkinHandler(allLayersOpacity);

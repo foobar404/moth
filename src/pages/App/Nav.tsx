@@ -193,9 +193,10 @@ export function Nav(props: IProps) {
             <input data-tip="project name"
                 data-for="tooltip"
                 type="text"
-                className="input input-sm min-w-[250px]"
                 placeholder="Enter Name"
                 value={data.projectName}
+                onKeyDown={e => e.stopPropagation()}
+                className="input input-sm min-w-[250px]"
                 onChange={e => data.saveProjectName(e.target.value)} />
 
             <a data-tip="report a bug"
@@ -553,4 +554,5 @@ function useNav(props: IProps) {
         setExportSettings,
         loadProjectFromLocalStorage,
     }
+
 }
