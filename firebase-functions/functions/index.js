@@ -7,7 +7,7 @@ admin.initializeApp();
 
 
 exports.generateKey = functions.https.onCall(async (data, context) => {
-    if (data.key != "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYXVzdGludGhlbWljaGF1ZEBnbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjIsIm1vbnRoc1ZhbGlkIjoxMDAwMDAwMCwicHJvIjp0cnVlfQ.t2zfuJGZgngcyZYcAhqrtkll30NNNJiYsx_ZKTXU7kE") {
+    if (data.key != functions.config().bugpack.admin_key) {
         throw new functions.https.HttpsError('invalid-argument', 'Invalid key.');
     }
 
@@ -15,7 +15,7 @@ exports.generateKey = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('invalid-argument', 'Missing required field.');
     }
 
-    const secret = '%2Y3ypZURpcV9s';
+    const secret = functions.config().bugpack.jwt_secret;
     const iat = Math.floor(Date.now() / 1000);
     const token = jwt.sign({
         iat: iat,

@@ -1,17 +1,10 @@
-import { IColor, IColorPalette } from "../../types";
+import { IColor } from "../../types";
 import ReactTooltip from 'react-tooltip';
-import { useGlobalStore } from '../../utils';
-import { BsTrophyFill } from "react-icons/bs";
-import { BiPlusMedical } from "react-icons/bi";
-import { HiColorSwatch } from "react-icons/hi";
-import { MdMovieFilter } from "react-icons/md";
-import React, { useEffect, useState } from 'react';
-import { IoImage, IoLayers } from "react-icons/io5";
-import { Popover, ColorPicker } from "../../components/";
-import { FaSortAlphaDown, FaFilter } from "react-icons/fa";
-import { MdDelete, MdAccessTimeFilled } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { ChromePicker } from "react-color";
-import tinycolor from "tinycolor2";
+import { useGlobalStore } from '../../utils';
+import { BiPlusMedical } from "react-icons/bi";
+import React, { useEffect, useState } from 'react';
 
 
 export function Colors() {

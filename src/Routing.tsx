@@ -9,10 +9,12 @@ export function Routing() {
     <BrowserRouter>
       <Routes>
         <Route path="/beta" element={<Beta />} />
+
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<App />} />
           <Route path="/key" element={<Key />} />
         </Route>
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
