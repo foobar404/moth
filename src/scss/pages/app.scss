@@ -52,40 +52,6 @@
         flex-direction: column;
     }
 
-    &__color-swatch {
-        align-items: center;
-        border-radius: $border-radius-rounded;
-        display: flex;
-        flex-direction: column-reverse;
-        overflow-y: auto;
-        overflow-x: hidden;
-        max-height: 100%;
-        padding: $spacing-6 0;
-        position: relative;
-        width: 52px;
-
-        &::-webkit-scrollbar {
-            display: none;
-        }
-    }
-
-    &__color-swatch-layer {
-        border-radius: $border-radius-rounded;
-        box-shadow: $shadow-normal;
-        cursor: pointer;
-        margin-top: -14px;
-        min-height: 36px;
-        min-width: 36px;
-        position: relative;
-        transition: all .1s ease;
-        transform: rotate(45deg);
-
-        &:hover {
-            transform: rotate(0deg) scale(1.1);
-            z-index: 99999999;
-        }
-    }
-
     &__sidebar-left {
         display: flex;
         flex-direction: column;
@@ -106,87 +72,34 @@
 
         @media screen and (max-width: 768px) {
             display: none;
-            padding-top: $spacing-15 !important;
+            padding-top: 60px !important;
         }
-    }
-
-    &__tab {
-        background-color: $color-black;
-        border-top-left-radius: $border-radius-rounded;
-        border-top-right-radius: $border-radius-rounded;
-        color: $color-white;
-        display: inline-block;
-        padding: $spacing-2 $spacing-3;
-        text-align: center;
-
-        &.--active {
-            background: $color-fourth;
-        }
-    }
-
-    &__color-bar {
-        cursor: pointer;
-        height: 50px;
-        margin-bottom: $spacing-2;
-    }
-
-    &__color-picker {
-        width: 100% !important;
     }
 
     &__color-controls {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        gap: $spacing-1;
-        box-shadow: $shadow-normal;
-        padding: $spacing-1;
-        border-radius: $border-radius-rounded;
+        gap: 4px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        padding: 4px;
+        border-radius: 10px;
     }
 
     &__color {
         &.--active {
-            border: 2px solid $color-white;
+            border: 2px solid #fff;
         }
-    }
-
-    &__color-box {
-        padding: $spacing-1 $spacing-2;
-        max-height: 92px;
-        overflow: auto;
     }
 
     &__layer-controls {
         align-items: center;
-        border-radius: $border-radius-rounded;
-        box-shadow: $shadow-normal;
+        border-radius: 10px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         display: flex;
         flex-wrap: wrap;
-        gap: $spacing-1;
-        padding: $spacing-1;
-    }
-
-    &__layer-container {
-        max-height: 250px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding: 0 $spacing-1;
-    }
-
-    &__layer {
-        align-items: center;
-        border-radius: $border-radius-rounded;
-        border: 2px solid rgba(0, 0, 0, 0);
-        cursor: pointer;
-        display: flex;
-
-        &:hover {
-            transform: scale(1.05);
-        }
-
-        &.--active {
-            border: 2px solid $color-second;
-        }
+        gap: 4px;
+        padding: 4px;
     }
 
     &__preview {
@@ -198,41 +111,11 @@
         will-change: contents;
     }
 
-    &__frames {
-        grid-area: footer;
-        max-width: 100%;
-        overflow-x: auto;
-        overflow-y: hidden;
-        display: flex;
-        justify-content: space-between;
-
-        &::-webkit-scrollbar {
-            display: none;
-        }
-
-        &>* {
-            flex: 1;
-        }
-    }
-
-    &__frames-container {
-        align-items: center;
-        display: flex;
-        overflow-x: auto;
-        width: 100%;
-    }
-
-    &__frames-controls {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
     &__frame-controls-section {
-        border-radius: $border-radius-rounded;
-        box-shadow: $shadow-normal;
+        border-radius: 10px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         display: flex;
-        padding: $spacing-1;
+        padding: 4px;
         width: fit-content;
     }
 
@@ -243,10 +126,10 @@
     }
 
     &__block {
-        border-radius: $border-radius-rounded;
-        margin: $spacing-1;
-        padding: $spacing-2;
+        border-radius: 10px;
+        margin: 4px;
+        padding: 8px;
         background: oklch(var(--b1) / .2);
-        box-shadow: $shadow-normal;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     }
 }

@@ -2,18 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "./base/variables.scss";
 @import "./base/global.scss";
 
-@import "./components/c-button.scss";
-@import "./components/c-color-card.scss";
 @import "./components/c-color-picker.scss";
-@import "./components/c-icon.scss";
-@import "./components/c-input.scss";
 @import "./components/c-modal.scss";
-@import "./components/c-panel.scss";
-@import "./components/c-popover.scss";
-@import "./components/c-text.scss";
-@import "./components/c-token.scss";
 
 @import "./pages/app.scss";

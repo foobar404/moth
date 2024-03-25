@@ -25,7 +25,7 @@ export function Tools() {
                 onClick={() => data.setView("tools")} />
             <AiFillFire data-tip="actions"
                 data-for="tooltip"
-                className={`c-icon ${data.view == "actions" ? "text-primary" : "text-secondary-content"}`}
+                className={`text-lg ${data.view == "actions" ? "text-primary" : "text-secondary-content"}`}
                 onClick={() => data.setView("actions")} />
         </nav>
 

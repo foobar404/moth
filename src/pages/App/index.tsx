@@ -28,13 +28,7 @@ export function App() {
 
 			<Canvas />
 
-			<section className={`p-app__sidebar-right p-app__block c-panel --right ${data.showMobilePanel ? "--show" : ""}`}>
-				{/* mobile buttons */}
-				<button onClick={() => data.setShowMobilePanel(false)}
-					className="c-modal__exit c-button --sm --danger md:!hidden">
-					<ImCross />
-				</button>
-
+			<section className={`p-app__sidebar-right p-app__block --right ${data.showMobilePanel ? "--show" : ""}`}>
 				<Tabs selectedIndex={data.tabIndex}
 					onSelect={(index) => data.setTabIndex(index)}>
 					<TabList className="row-left">
@@ -48,15 +42,8 @@ export function App() {
 						</Tab>
 					</TabList>
 
-					{/* color panel */}
-					<TabPanel>
-						<Colors />
-					</TabPanel>
-
-					{/* layers panel */}
-					<TabPanel>
-						<Layers />
-					</TabPanel>
+					<TabPanel><Colors /></TabPanel>
+					<TabPanel><Layers /></TabPanel>
 				</Tabs>
 			</section>
 

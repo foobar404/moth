@@ -25,6 +25,18 @@
 - (Hard) Add contour tool 
 - (Austin) add console error watch system
 
+- add delete button for local projects
+- shortcuts for tools / actions
+    - undo for mac
+- change circle tool
+- light tool is to strong and doesint work on black
+- line doesint have preview
+- when duplicating, place new layer under current
+- increase / decrease active frame in animation
+- get color picker working again
+    - lights / darks 
+    - add opacity 
+
 # Promotion
 - discord channels
 - google ads

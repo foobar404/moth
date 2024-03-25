@@ -12,11 +12,11 @@ module.exports = {
           "left": "50%",
           "transform": "translateX(-50%)",
         },
-        ".top-left":{
+        ".top-left": {
           "top": 0,
           "left": 0,
         },
-        ".top-right":{
+        ".top-right": {
           "top": 0,
           "right": 0,
         },
@@ -30,11 +30,11 @@ module.exports = {
           "left": "50%",
           "transform": "translateX(-50%)",
         },
-        ".bottom-left":{
+        ".bottom-left": {
           "bottom": 0,
           "left": 0,
         },
-        ".bottom-right":{
+        ".bottom-right": {
           "bottom": 0,
           "right": 0,
         },
@@ -193,7 +193,7 @@ module.exports = {
           "accent": "#009E60", // Vibrant green, for lively accents, reflecting the colorful gaming experiences
           "neutral": "#A5A5A5", // Medium grey, for text and neutral elements, ensuring readability and contrast
           "base-100": "#bfbbbc", // Clean white background, keeping the design light and engaging
-        
+
           "--rounded-box": "10px",
           "--rounded-btn": "10px",
           "--rounded-badge": "1rem",
@@ -227,7 +227,7 @@ module.exports = {
           "accent": "#FFD500", // Vivid yellow, for eye-catching highlights and interactive elements
           "neutral": "#005A9C", // Deep blue, offering a solid base for text and detailed UI elements
           "base-100": "#FFFFFF", // Classic white, ensuring a bright and clean backdrop for contrast
-        
+
           "--rounded-box": "50px", // Subtly rounded corners to soften the overall look
           "--rounded-btn": "50px",
           "--rounded-badge": "1.25rem",

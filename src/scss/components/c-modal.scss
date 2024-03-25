@@ -18,10 +18,10 @@
     &__body {
         cursor: default;
         position: relative;
-        background: $color-gray-dark;
-        padding: $spacing-4;
-        border-radius: $border-radius-rounded;
-        box-shadow: $shadow-normal;
+        background: #eee;
+        padding: 16px;
+        border-radius: 10px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -29,8 +29,8 @@
 
     &__exit {
         position: absolute;
-        top: $spacing-4;
-        right: $spacing-4;
+        top: 16px;
+        right: 16px;
     }
 }
 

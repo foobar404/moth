@@ -62,7 +62,7 @@ export function ColorPicker(props: IProps) {
                     type="number"
                     data-tip="opacity"
                     data-for="tooltip"
-                    className='c-input --xs c-color-picker__input'
+                    className=''
                     value={Number((data.currentColor.a * 255).toFixed(4))}
                     onChange={(e) => {
                         let newColor = { ...data.currentColor };
@@ -88,7 +88,7 @@ export function ColorPicker(props: IProps) {
                     type="number"
                     data-tip="hue"
                     data-for="tooltip"
-                    className='c-input --xs c-color-picker__input'
+                    className=''
                     value={Math.ceil(tinycolor(data.currentColor).toHsl().h)}
                     onChange={(e) => {
                         let newColor = tinycolor(data.currentColor).toHsl();
@@ -123,7 +123,7 @@ export function ColorPicker(props: IProps) {
                     type="number"
                     data-for="tooltip"
                     data-tip="saturation"
-                    className="c-input --xs c-color-picker__input"
+                    className=""
                     value={Math.ceil(tinycolor(data.currentColor).toHsl().s * 100)}
                     onChange={(e) => {
                         let newColor = tinycolor(data.currentColor).toHsl();
@@ -155,7 +155,7 @@ export function ColorPicker(props: IProps) {
                         data.setCurrentColor(tinycolor(newColor).toRgb());
                     }} value={tinycolor(data.currentColor).toHsl().l * 100} />
                 </div>
-                <input className='c-input --xs c-color-picker__input'
+                <input className=''
                     data-tip="lightness"
                     data-for="tooltip"
                     min="0"
@@ -180,7 +180,7 @@ export function ColorPicker(props: IProps) {
                         data.setCurrentColor(newColor);
                     }} value={data.currentColor.r} />
                 </div>
-                <input className='c-input --xs c-color-picker__input'
+                <input className=''
                     data-tip="red"
                     data-for="tooltip"
                     min="0"
@@ -211,7 +211,7 @@ export function ColorPicker(props: IProps) {
                     data-tip="green"
                     data-for="tooltip"
                     value={Math.ceil(data.currentColor.g)}
-                    className='c-input --xs c-color-picker__input'
+                    className=''
                     onChange={(e) => {
                         let newColor = tinycolor(data.currentColor).toRgb();
                         newColor.g = e.currentTarget.valueAsNumber;
@@ -237,7 +237,7 @@ export function ColorPicker(props: IProps) {
                     data-tip="blue"
                     data-for="tooltip"
                     value={Math.ceil(data.currentColor.b)}
-                    className='c-input --xs c-color-picker__input'
+                    className=''
                     onChange={(e) => {
                         let newColor = tinycolor(data.currentColor).toRgb();
                         newColor.b = e.currentTarget.valueAsNumber;
@@ -260,7 +260,7 @@ export function ColorPicker(props: IProps) {
                 {[tinycolor(data.drawerColor).lighten(30), tinycolor(data.drawerColor).lighten(20), tinycolor(data.drawerColor).lighten(10), tinycolor(data.drawerColor).darken(10), tinycolor(data.drawerColor).darken(20), tinycolor(data.drawerColor).darken(30)]
                     .map((color, i) => (
                         <div key={i}
-                            className="mr-2 c-color-card"
+                            className="mr-2"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -270,7 +270,7 @@ export function ColorPicker(props: IProps) {
                 {[tinycolor(data.drawerColor).complement()]
                     .map((color, i) => (
                         <div key={i}
-                            className="mr-2 c-color-card"
+                            className="mr-2"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -280,7 +280,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).splitcomplement()
                     .map((color, i) => (
                         <div key={i}
-                            className="mr-2 c-color-card"
+                            className="mr-2"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -290,7 +290,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).triad()
                     .map((color, i) => (
                         <div key={i}
-                            className="mr-2 c-color-card"
+                            className="mr-2"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -300,7 +300,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).tetrad()
                     .map((color, i) => (
                         <div key={i}
-                            className="mr-2 c-color-card"
+                            className="mr-2"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -310,7 +310,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).analogous()
                     .map((color, i) => (
                         <div key={i}
-                            className="mr-2 c-color-card"
+                            className="mr-2"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -320,7 +320,7 @@ export function ColorPicker(props: IProps) {
                 {tinycolor(data.drawerColor).monochromatic()
                     .map((color, i) => (
                         <div key={i}
-                            className="mr-2 c-color-card"
+                            className="mr-2"
                             onClick={() => data.setCurrentColor(color.toRgb())}
                             style={{ backgroundColor: color.toRgbString() }}></div>
                     ))
@@ -332,7 +332,7 @@ export function ColorPicker(props: IProps) {
                 style={{
                     backgroundColor: tinycolor(data.currentColor).toRgbString()
                 }}>
-                <FaChevronDown className="c-text --xl" style={{
+                <FaChevronDown className="" style={{
                     position: 'absolute',
                     bottom: "4px",
                     left: '50%',

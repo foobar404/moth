@@ -4,15 +4,13 @@ import pngText from "png-chunk-text";
 import { FaBug } from "react-icons/fa";
 import { IProject } from '../../types';
 import { HiStar } from "react-icons/hi";
-import { ImCross } from "react-icons/im";
 import { Modal } from "../../components";
 import pngEncode from "png-chunks-encode";
-import { PiGifFill } from "react-icons/pi";
 import pngExtract from "png-chunks-extract";
 import { Buffer as pngBuffer } from "buffer";
 import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
-import { IoImage, IoLayers, IoColorPalette } from "react-icons/io5";
+import { IoImage, IoLayers } from "react-icons/io5";
 import { useCanvas, useModal, useGlobalStore, useIntervalEffect } from '../../utils';
 
 
@@ -60,23 +58,23 @@ export function Nav(props: IProps) {
 
                     <button className="btn min-w-[250px] text-left"
                         onClick={() => data.exportProject({ layerOnly: true })}>
-                        <i className="c-button__icon"><IoLayers /></i>
+                        <IoLayers className="text-2xl" />
                         Export Current Layer
                     </button>
                     <button className="btn min-w-[250px]"
                         onClick={() => data.exportProject({ frameOnly: true })}>
-                        <i className="c-button__icon"><IoImage /></i>
+                        <IoImage className="text-2xl" />
                         Export Current Frame
                     </button>
                     {/* <button className="btn min-w-[250px]"
                         onClick={() => data.createGif()}>
-                        <i className="c-button__icon --first"><PiGifFill /></i>
+                        <PiGifFill className="text-2xl"/>
                         Export as GIF
                     </button> */}
                     <section className="p-4 rounded-lg shadow-inner col bg-base-200">
                         <button className="btn btn-accent min-w-[250px] mb-2"
                             onClick={() => data.exportProject()}>
-                            <i className="c-button__icon --first"><MdMovieFilter /></i>
+                            <MdMovieFilter className="2xl" />
                             Export as Spritesheet
                         </button>
 
@@ -147,21 +145,11 @@ export function Nav(props: IProps) {
         <nav className="space-x-2 row-left !flex-nowrap p-app__nav p-app__block w-max">
             <button onClick={() => data.modalImport.setIsOpen(true)}
                 className="btn btn-sm box-content py-1 btn-primary !hidden md:!inline-flex">
-                <i className="c-button__icon"> <IoImage /></i> Import
+                <IoImage className="text-2xl" /> Import
             </button>
             <button onClick={() => data.modalExport.setIsOpen(true)}
                 className="btn btn-sm box-content py-1 btn-secondary !hidden md:!inline-flex">
-                <i className="c-button__icon"><HiStar /></i> Export
-            </button>
-
-            {/* mobile buttons */}
-            <button onClick={() => data.modalImport.setIsOpen(true)}
-                className="c-button --secondary --sm md:!hidden">
-                <IoImage />
-            </button>
-            <button onClick={() => data.modalExport.setIsOpen(true)}
-                className="c-button --primary --sm md:!hidden">
-                <HiStar />
+                <HiStar className="text-2xl" /> Export
             </button>
 
             <select className="select select-bordered"
@@ -169,7 +157,6 @@ export function Nav(props: IProps) {
                 onChange={(e) => data.changeTheme(e.currentTarget.value)}>
 
                 <option value="light">Light</option>
-
                 <option value="n64-light">N64 Light</option>
                 <option value="gbc-light">GBC Light</option>
                 <option value="atari-light">Atari Light</option>
@@ -215,12 +202,6 @@ export function Nav(props: IProps) {
                     </>)}
                 </div>
             </section>
-
-            {/* mobile buttons */}
-            <button className="c-button --secondary --sm md:!hidden"
-                onClick={() => props.setShowMobilePanel(true)}>
-                <IoColorPalette />
-            </button>
         </nav>
     </>)
 }
