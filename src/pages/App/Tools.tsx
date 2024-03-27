@@ -19,11 +19,11 @@ export function Tools() {
 
     return (<>
         <nav className="flex items-center p-1 mb-1 border-2 rounded-md border-primary">
-            <FaTools data-tip="tools"
+            <FaTools data-tip="tools (1)"
                 data-for="tooltip"
                 className={`text-lg ${data.view == "tools" ? "text-primary" : "text-secondary-content"}`}
                 onClick={() => data.setView("tools")} />
-            <AiFillFire data-tip="actions"
+            <AiFillFire data-tip="actions (2)"
                 data-for="tooltip"
                 className={`text-lg ${data.view == "actions" ? "text-primary" : "text-secondary-content"}`}
                 onClick={() => data.setView("actions")} />
@@ -264,6 +264,8 @@ function useTools() {
         },
     }
     let keys = useShortcuts({
+        "1": () => setView("tools"),
+        "2": () => setView("actions"),
         "b": () => updateTool(null, "brush", 0),
         "e": () => updateTool(null, "eraser", 0),
         "s": () => updateTool(null, "shape", 0),

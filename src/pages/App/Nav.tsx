@@ -1,22 +1,24 @@
 import GIF from "gif.js";
+import RgbQuant from "rgbquant";
 import { Base64 } from 'js-base64';
 import pngText from "png-chunk-text";
 import { FaBug } from "react-icons/fa";
 import { IProject } from '../../types';
 import { HiStar } from "react-icons/hi";
 import { Modal } from "../../components";
+import { ImCross } from "react-icons/im";
 import pngEncode from "png-chunks-encode";
+import { PiGifFill } from "react-icons/pi";
 import pngExtract from "png-chunks-extract";
 import { Buffer as pngBuffer } from "buffer";
 import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
 import { IoImage, IoLayers } from "react-icons/io5";
 import { useCanvas, useModal, useGlobalStore, useIntervalEffect } from '../../utils';
+import ReactTooltip from "react-tooltip";
 
 
-interface IProps {
-    setShowMobilePanel: (show: boolean) => void;
-}
+interface IProps { }
 
 
 interface IExportSettings {
@@ -37,6 +39,7 @@ export function Nav(props: IProps) {
 
     return (<>
         <Modal {...data.modalExport}>
+            <ReactTooltip id="tooltip" />
             <main className="p-12">
                 <section className="space-y-2 col">
                     <div>
@@ -48,7 +51,7 @@ export function Nav(props: IProps) {
                                 onChange={(e) => data.setExportSettings({ ...data.exportSettings, scale: e.currentTarget.valueAsNumber })} />
                         </label>
                         <label className="label">
-                            <p className="">Include Moth Data</p>
+                            <p className="mr-2">Include Moth Data:</p>
                             <input type="checkbox"
                                 className="checkbox"
                                 checked={data.exportSettings.mothData}
@@ -66,33 +69,42 @@ export function Nav(props: IProps) {
                         <IoImage className="text-2xl" />
                         Export Current Frame
                     </button>
-                    {/* <button className="btn min-w-[250px]"
-                        onClick={() => data.createGif()}>
-                        <PiGifFill className="text-2xl"/>
-                        Export as GIF
-                    </button> */}
+                    <section className="p-4 rounded-lg shadow-inner col bg-base-200">
+                        <button className="btn btn-outline min-w-[250px] mb-2"
+                            onClick={() => data.createGif()}>
+                            <PiGifFill className="text-2xl" />
+                            Export as GIF
+                        </button>
+                        <input data-tip="fps"
+                            data-for="tooltip"
+                            type="number"
+                            className="w-20 input input-sm"
+                            defaultValue={data.exportSettings.fps}
+                            onKeyUp={e => e.stopPropagation()}
+                            onChange={e => data.setExportSettings({ ...data.exportSettings, fps: e.currentTarget.valueAsNumber })} />
+                    </section>
                     <section className="p-4 rounded-lg shadow-inner col bg-base-200">
                         <button className="btn btn-accent min-w-[250px] mb-2"
                             onClick={() => data.exportProject()}>
-                            <MdMovieFilter className="2xl" />
+                            <MdMovieFilter className="text-2xl" />
                             Export as Spritesheet
                         </button>
 
                         <section className="space-x-2 row">
-                            <label>
-                                <p>Padding X</p>
-                                <input type="number"
-                                    className="w-20 input input-sm"
-                                    value={data.exportSettings.paddingX}
-                                    onChange={e => data.setExportSettings({ ...data.exportSettings, paddingX: e.currentTarget.valueAsNumber })} />
-                            </label>
-                            <label>
-                                <p>Padding Y</p>
-                                <input type="number"
-                                    className="w-20 input input-sm"
-                                    value={data.exportSettings.paddingY}
-                                    onChange={e => data.setExportSettings({ ...data.exportSettings, paddingY: e.currentTarget.valueAsNumber })} />
-                            </label>
+                            <input data-tip="padding x"
+                                data-for="tooltip"
+                                type="number"
+                                className="w-20 input input-sm"
+                                value={data.exportSettings.paddingX}
+                                onKeyUp={e => e.stopPropagation()}
+                                onChange={e => data.setExportSettings({ ...data.exportSettings, paddingX: e.currentTarget.valueAsNumber })} />
+                            <input data-tip="padding y"
+                                data-for="tooltip"
+                                type="number"
+                                className="w-20 input input-sm"
+                                value={data.exportSettings.paddingY}
+                                onKeyUp={e => e.stopPropagation()}
+                                onChange={e => data.setExportSettings({ ...data.exportSettings, paddingY: e.currentTarget.valueAsNumber })} />
                             {/* <label>
                                 <p>Data File</p>
                                 <input type="checkbox"
@@ -107,6 +119,7 @@ export function Nav(props: IProps) {
         </Modal>
 
         <Modal {...data.modalImport}>
+            <ReactTooltip id="tooltip" />
             <main className="p-12">
                 <section className="space-y-2 col">
                     <button className="px-14 btn btn-accent"
@@ -116,26 +129,58 @@ export function Nav(props: IProps) {
                         }}>
                         Import Project
                     </button>
-                    <button className="px-14 btn btn-outline"
-                        onClick={() => {
-                            data.importImage();
-                            data.modalImport.setIsOpen(false);
-                        }}>
-                        Import Image
-                    </button>
+                    <section className="p-4 rounded-lg shadow-inner col bg-base-200">
+                        <button className="px-14 btn btn-outline"
+                            onClick={() => {
+                                data.importImage();
+                                data.modalImport.setIsOpen(false);
+                            }}>
+                            Import Image
+                        </button>
+
+                        <div className="mt-2 space-x-2 row">
+                            <input data-tip="max size"
+                                data-for="tooltip"
+                                type="number"
+                                max="512"
+                                min="8"
+                                className="input input-sm w-[70px]"
+                                defaultValue={data.imageImportSettings.size}
+                                onKeyUp={e => e.stopPropagation()}
+                                onClick={e => e.currentTarget.select()}
+                                onChange={e => data.setImageImportSettings(s => ({ ...s, size: Number(e.currentTarget?.value ?? 512) }))} />
+                            <input data-tip="max colors"
+                                data-for="tooltip"
+                                type="number"
+                                max="128"
+                                min="2"
+                                className="input input-sm w-[70px]"
+                                defaultValue={data.imageImportSettings.colors}
+                                onKeyUp={e => e.stopPropagation()}
+                                onClick={e => e.currentTarget.select()}
+                                onChange={e => data.setImageImportSettings(s => ({ ...s, colors: Number(e.currentTarget?.value ?? 128) }))} />
+                        </div>
+                    </section>
+
 
                     <div className="divider">Local Projects</div>
 
                     <ul className="w-56 rounded-lg menu bg-base-200">
                         {[...data.projectList].reverse().map((project) => (
-                            <li key={project}
-                                onClick={() => {
-                                    data.loadProjectFromLocalStorage(project);
-                                    data.modalImport.setIsOpen(false);
-                                }}
-                                className="p-1 text-center rounded-md cursor-pointer hover:bg-slate-400 hover:text-white">
-                                {project}
-                            </li>
+                            <div className="row">
+                                <li key={project}
+                                    onClick={() => {
+                                        data.loadProjectFromLocalStorage(project);
+                                        data.modalImport.setIsOpen(false);
+                                    }}
+                                    className="flex-1 p-1 text-center rounded-md cursor-pointer hover:bg-slate-400 hover:text-white">
+                                    {project}
+                                </li>
+                                <button className="btn btn-xs"
+                                    onClick={() => data.deleteProject(project)}>
+                                    <ImCross />
+                                </button>
+                            </div>
                         ))}
                     </ul>
                 </section>
@@ -217,16 +262,21 @@ function useNav(props: IProps) {
         activeLayer, canvasSize, colorPalettes,
         setProjectName, setFrames, setColorPalettes,
         setCanvasSize, setActiveLayer, setActiveColorPalette,
-        setActiveFrame, canvasChangeCount
+        setActiveFrame, canvasChangeCount,
     } = useGlobalStore();
     let [projectList, setProjectList] = useState<string[]>([]);
     let [theme, setTheme] = useState("light");
     let [exportSettings, setExportSettings] = useState({
         scale: 1,
+        fps: 24,
         paddingX: 0,
         paddingY: 0,
         mothData: true,
         dataFile: false,
+    });
+    let [imageImportSettings, setImageImportSettings] = useState({
+        colors: 32,
+        size: 256,
     });
     let [saving, setSaving] = useState(false);
     let [message, setMessage] = useState("");
@@ -351,39 +401,59 @@ function useNav(props: IProps) {
     }
 
     async function importImage() {
-        let [fileHandle] = await (window as any).showOpenFilePicker({
-            types: [{ accept: { 'image/*': [".png", ".jpg", ".jpeg"] } }],
-        });
+        try {
+            let [fileHandle] = await (window as any).showOpenFilePicker({
+                types: [{ accept: { 'image/*': [".png", ".jpg", ".jpeg"] } }],
+            });
 
-        let file = await fileHandle.getFile();
-        let fileReader = new FileReader();
-        fileReader.readAsArrayBuffer(file);
-        fileReader.onload = async () => {
-            let data = new Uint8Array(fileReader.result as ArrayBuffer);
+            let file = await fileHandle.getFile();
+            // Convert the file reading process to use async/await syntax
+            let arrayBuffer = await file.arrayBuffer();
+            let data = new Uint8Array(arrayBuffer);
             let blob = new Blob([data], { type: file.type });
             let url = URL.createObjectURL(blob);
             let img = new Image();
             img.src = url;
-
             await img.decode();
-            let canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
 
-            let ctx = canvas.getContext('2d');
-            ctx!.drawImage(img, 0, 0);
+            // Calculate the scaling factor and adjust dimensions if necessary
+            let scale = Math.min(1, imageImportSettings.size / Math.max(img.width, img.height));
+            let scaledWidth = img.width * scale;
+            let scaledHeight = img.height * scale;
 
-            let imageData = ctx!.getImageData(0, 0, canvas.width, canvas.height);
+            // Use createImageBitmap for efficient downsizing
+            let imageBitmap = await createImageBitmap(img, 0, 0, img.width, img.height, {
+                resizeWidth: scaledWidth,
+                resizeHeight: scaledHeight,
+                resizeQuality: 'high'
+            });
+
+            // Draw the resized image on canvas
+            canvas1.clear();
+            canvas1.resize(scaledWidth, scaledHeight);
+            canvas1.drawImage(imageBitmap);
+
+            // limit color palette
+            let q = new RgbQuant({
+                colors: imageImportSettings.colors,
+            });
+            q.sample(canvas1.getElement());
+
+            let imageData = new ImageData(scaledWidth, scaledHeight);
+            imageData.data.set(q.reduce(canvas1.getElement()));
             let layer = {
-                name: "Layer 1",
+                name: file.name,
                 image: imageData,
                 symbol: Symbol(),
                 opacity: 255,
             };
+
             setActiveLayer(layer);
-            setCanvasSize({ width: img.width, height: img.height });
-            setProjectName(file.name);
-        }
+            setCanvasSize({
+                width: (scaledWidth > canvasSize.width) ? scaledWidth : canvasSize.width,
+                height: (scaledHeight > canvasSize.height) ? scaledHeight : canvasSize.height,
+            });
+        } catch (error) { }
     }
 
     function exportProject(settings?: IExportSettings) {
@@ -482,21 +552,43 @@ function useNav(props: IProps) {
     }
 
     function createGif() {
+        // Scaling the dimensions
+        let scaledWidth = canvasSize.width * exportSettings.scale;
+        let scaledHeight = canvasSize.height * exportSettings.scale;
+
         var gif = new GIF({
             workerScript: '/js/gif.worker.js',
+            quality: 1,
             workers: 2,
-            quality: 10
+            background: '#fff',
+            transparent: '#fff',
+            height: scaledHeight,
+            width: scaledWidth,
+            repeat: 0
         });
 
+        canvas1.resize(canvasSize.width, canvasSize.height);
+        canvas2.resize(canvasSize.width, canvasSize.height);
+        canvas3.resize(scaledWidth, scaledHeight);
+
         frames.forEach(frame => {
+            canvas1.clear();
+            canvas2.clear();
+            canvas3.clear();
+
             let layersRevered = frame.layers.slice().reverse();
             layersRevered.forEach(layer => {
-                canvas3.resize(canvasSize.width, canvasSize.height);
-                canvas3.putImageData(layer.image);
-                canvas2.drawImage(canvas3.getElement());
+                canvas1.putImageData(layer.image);
+                canvas2.drawImage(canvas1.getElement());
             });
-            gif.addFrame(canvas2.getElement(), { delay: 200 });
-        })
+
+            canvas3.drawImage(canvas2.getElement(), 0, 0, scaledWidth, scaledHeight);
+
+            gif.addFrame(canvas3.getElement(), {
+                copy: true,
+                delay: 1000 / exportSettings.fps,
+            });
+        });
 
         gif.on('finished', function (blob) {
             let anchor = document.createElement("a");
@@ -524,6 +616,8 @@ function useNav(props: IProps) {
         projectName,
         projectList,
         exportSettings,
+        imageImportSettings,
+        setImageImportSettings,
         setTheme,
         createGif,
         changeTheme,

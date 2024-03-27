@@ -53,6 +53,7 @@ export function Frames() {
                             min="1"
                             value={data.preview.fps}
                             className="w-16 mr-2 input input-xs"
+                            onKeyUp={e => e.stopPropagation()}
                             onChange={e => data.setFps(Number(e.target.value))} />
                     </label>
                     <button data-tip={`${data.preview.playing ? "stop" : "play"} animation`}

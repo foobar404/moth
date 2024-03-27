@@ -12,6 +12,7 @@ export function useCanvas(props?: IProps) {
     let canvas = useRef<HTMLCanvasElement>(makeCanvas());
     let ctx = useRef<CanvasRenderingContext2D>(canvas.current.getContext('2d')!);
 
+    canvas.current.style.imageRendering = "pixelated";
     ctx.current.imageSmoothingEnabled = false;
 
     function makeCanvas() {
@@ -54,6 +55,7 @@ export function useCanvas(props?: IProps) {
     function resize(width, height) {
         canvas.current.width = width;
         canvas.current.height = height;
+        ctx.current.imageSmoothingEnabled = false;
     }
 
     function putImageData(imageData, x = 0, y = 0) {

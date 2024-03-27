@@ -157,18 +157,21 @@ export function Canvas() {
 
                 {["brush", "eraser", "light", "line", "mirror"].includes(data.toolSettings.leftTool) && (<>
                     <div className="space-x-1 row">
-                        <input data-tip="brush slider"
+                        <input data-tip="brush slider ( [ ) ( ] )"
                             data-for="tooltip"
                             type="range" min="1" max="10" step="1"
                             className="range range-xs range-secondary w-[60px]"
                             value={data.toolSettings.size}
                             onChange={(e) => data.setToolSettings({ ...data.toolSettings, size: e.currentTarget.valueAsNumber })} />
                         <input type="number"
-                            data-tip="brush size"
+                            data-tip="brush size ( [ ) ( ] )"
                             data-for="tooltip"
                             value={data.toolSettings.size}
                             className="input input-xs text-base-content w-[50px]"
-                            onChange={e => data.setToolSettings({ ...data.toolSettings, size: e.currentTarget.valueAsNumber })} />
+                            onKeyUp={e => e.stopPropagation()}
+                            onChange={e => {
+                                data.setToolSettings({ ...data.toolSettings, size: e.currentTarget.valueAsNumber });
+                            }} />
                     </div>
                 </>)}
             </nav>
@@ -190,6 +193,7 @@ export function Canvas() {
                         max="512"
                         className="w-16 input input-xs text-base-content"
                         value={data.canvasSize.height}
+                        onKeyUp={e => e.stopPropagation()}
                         onClick={e => e.currentTarget.select()}
                         onChange={e => data.resizeHandler({ height: Math.min(512, e.currentTarget.valueAsNumber) })} />
                 </label>
@@ -202,6 +206,7 @@ export function Canvas() {
                         max="512"
                         className="w-16 input input-xs text-base-content"
                         value={data.canvasSize.width}
+                        onKeyUp={e => e.stopPropagation()}
                         onClick={e => e.currentTarget.select()}
                         onChange={e => data.resizeHandler({ width: Math.min(512, e.currentTarget.valueAsNumber) })} />
                 </label>
@@ -277,6 +282,9 @@ function useCanvas() {
     let stateCache = useRef({ activeColorPalette, activeColor, activeFrame, colorStats, toolSettings, activeLayer, canvasSize, onionSkin, frames, canvasChangeCount });
     let keys = useShortcuts({
         "control+z": undo,
+        "meta+z": undo,
+        "control+shift+z": redo,
+        "meta+shift+z": redo,
         "[": () => setBrushSize(-1),
         "]": () => setBrushSize(1),
     });
@@ -374,6 +382,13 @@ function useCanvas() {
             }
         },
         "line": (x, y, toolButtonActive, preview) => {
+            if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                let width = stateCache.current.toolSettings.size;
+                let height = stateCache.current.toolSettings.size;
+                let newX = x - Math.floor(width / 2);
+                let newY = y - Math.floor(height / 2);
+                if (preview) previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size);
+            }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
                 toolState.current.stage = ToolStage.ADJUSTING;
@@ -381,8 +396,18 @@ function useCanvas() {
                 const activePoints = toolState.current.activePoints;
 
                 if (activePoints.length > 0) {
-                    const startPoint = activePoints[0];
+                    let width = stateCache.current.toolSettings.size;
+                    let height = stateCache.current.toolSettings.size;
+
+                    // center start point
+                    const startPoint = { ...activePoints[0] };
+                    startPoint.x -= Math.floor(width / 2);
+                    startPoint.y -= Math.floor(height / 2);
+
+                    // center end point
                     const endPoint = { x: Math.floor(x), y: Math.floor(y) };
+                    endPoint.x -= Math.floor(width / 2);
+                    endPoint.y -= Math.floor(height / 2);
 
                     if (preview) previewCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
 
@@ -509,6 +534,9 @@ function useCanvas() {
             }
         },
         "shape": (x, y, toolButtonActive, preview) => {
+            if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                if (preview) previewCanvas.drawPixel(x, y);
+            }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
                 toolState.current.stage = ToolStage.ADJUSTING;
@@ -519,24 +547,38 @@ function useCanvas() {
                     const start = activePoints[0];
                     const end = { x: Math.floor(x), y: Math.floor(y) };
 
-                    if (stateCache.current.toolSettings.shape == "square" || stateCache.current.toolSettings.shape == "rect") {
-                        const width = stateCache.current.toolSettings.shape == "square" ?
-                            Math.max(Math.abs(end.x - start.x), Math.abs(end.y - start.y)) :
-                            Math.abs(end.x - start.x);
-                        const height = stateCache.current.toolSettings.shape == "square" ?
-                            width :
-                            Math.abs(end.y - start.y);
+                    if (stateCache.current.toolSettings.shape == "square") {
+                        const size = Math.max(Math.abs(end.x - start.x), Math.abs(end.y - start.y));
+                        const width = size;
+                        const height = size;
+                        const left = end.x >= start.x ? start.x : start.x - size;
+                        const top = end.y >= start.y ? start.y : start.y - size;
+
+                        tempCanvas1.drawRect(left, top, width, height, stateCache.current.activeColor);
+                    }
+                    if (stateCache.current.toolSettings.shape == "rect") {
+                        const width = Math.abs(end.x - start.x);
+                        const height = Math.abs(end.y - start.y);
                         const left = Math.min(start.x, end.x);
                         const top = Math.min(start.y, end.y);
 
                         tempCanvas1.drawRect(left, top, width, height, stateCache.current.activeColor);
-                    } else if (stateCache.current.toolSettings.shape == "circle" || stateCache.current.toolSettings.shape == "oval") {
-                        const radiusX = stateCache.current.toolSettings.shape == "circle" ?
-                            Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)) :
-                            Math.abs(end.x - start.x) / 2;
-                        const radiusY = stateCache.current.toolSettings.shape == "circle" ?
-                            radiusX :
-                            Math.abs(end.y - start.y) / 2;
+                    }
+                    if (stateCache.current.toolSettings.shape === "circle") {
+                        const width = Math.abs(end.x - start.x);
+                        const height = Math.abs(end.y - start.y);
+                        const size = Math.max(width, height);
+                        const radius = size / 2;
+                        const centerX = start.x + (end.x >= start.x ? radius : -radius);
+                        const centerY = start.y + (end.y >= start.y ? radius : -radius);
+
+                        tempCanvas1.drawOval(centerX, centerY, radius, radius, stateCache.current.activeColor);
+                    }
+                    if (stateCache.current.toolSettings.shape === "oval") {
+                        const width = Math.abs(end.x - start.x);
+                        const height = Math.abs(end.y - start.y);
+                        const radiusX = width / 2;
+                        const radiusY = height / 2;
                         const centerX = (start.x + end.x) / 2;
                         const centerY = (start.y + end.y) / 2;
 

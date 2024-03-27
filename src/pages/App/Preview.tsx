@@ -8,7 +8,7 @@ export function Preview(props: IPreview) {
 
     return (
         <img src={data.previewImg}
-            className={`p-app__grid w-full h-full border-4 rounded-md shadow-2xl border-accent p-app__preview ${props.className}`} />
+            className={`p-app__grid p-app__preview border-4 rounded-md shadow-2xl border-accent ${props.className}`} />
     )
 }
 

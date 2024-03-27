@@ -1,41 +1,29 @@
 # Doing
-- (Austin)(Urgent)(Medium) When I was using many different layers, and some were hidden, I went back to the layer tabs and all the other layers were blank
+- (Austin) refactor the beta page
+- (Austin)(Easy) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
+- (Austin)(Medium) Fill in for shapes
+- (Austin) get color picker working again
+    - lights / darks 
+    - add opacity 
+- (Nate) The zoom scroll zooms to the center, not the cursor
 
 # TODO
+- (Easy) Use the same icons set across the app
 - (Easy) Join multiple similer tool into one iterface
-- (Easy) The zoom scroll zooms to the center, not the cursor
-- (Easy) gif export not working 
 - (Easy) switching tabs resets state
-- (Easy) I don't know what to call this glitch but set your brush to 10, put it in the center of the canvas, and slowly move your cursor to the side of the canvas (update: some of the selection tools do similar when moving selections)
-- (Easy) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
 - (Easy) Saveable color palettes 
-- (Easy) Exports are blurry 
+- (Easy) increase / decrease active frame in animation
+- (Medium) light tool is to strong and doesint work on black
+- (Medium) insert duplicated frame after the current frame
 - (Medium) saved projects should have a preview img
-- (Medium) Importing other image types just don’t do anything and then crashes
-- (Medium) Importing some image types can crash the software
-- (Medium) More brushes
-- (Medium) Fill in for shapes
 - (Hard) make selections standout
 - (Hard) Ctrl-z undos brush strokes and last canvas resize {urgent} (update: this glitch only happens when actually typing in the changes, and only works when the change makes the value more than the base 32)
     - CTRL-Z undos and changes in text (title, color palette name, ect)
     - When you undo layer joins, the number of layers does not change, the layer just disappears.
     - Undo redo wont work with layers
-- (Hard) Color picker dot is slow when changing the color 
 - (Hard) Add blur / jumble tool
 - (Hard) Add contour tool 
 - (Austin) add console error watch system
-
-- add delete button for local projects
-- shortcuts for tools / actions
-    - undo for mac
-- change circle tool
-- light tool is to strong and doesint work on black
-- line doesint have preview
-- when duplicating, place new layer under current
-- increase / decrease active frame in animation
-- get color picker working again
-    - lights / darks 
-    - add opacity 
 
 # Promotion
 - discord channels
@@ -54,28 +42,7 @@
 - pricing page
 - bugpack home page
 
-# Stretch 
-- Multiple sprite tabs
-- Layer groups / frame groups
-- multiple sprite tabs
-- add data file for export
-- node based editor
-- online gallery 
-- tools
-    - erase mirror
-    - perfect mode for brush
-    - custom brushes 
-    - fonts
-    - A spray brush
-- theme
-    - retro game consoles
-    - grid colors
-    - custom layout, custom shortcut
-    - minimize UI
-- selection areas
-    - rotate and scale selection areas
-    - duplicate selection 
-    - move selection to new layer new layer 
+# Pro Features
 - rig system 
     - mesh deformation tool (points, weights)
     - bones arnt visible in final render 
@@ -90,6 +57,34 @@
     - choose how many frames to create 
     - button to generate tweening frames based on "move" tool or "bone" tool 
     - provide types of progression arcs 
+- ai sprite gen
+- non-destructive "Effects"    
+    - color filter
+    - outline effect        
+    - The "sun" effect is a ball, that is placed somewhere on the canvas, and affects the colors of the sprites with a specific falloff
+        - light source tool, creates highlights and shadows for you 
+- theme
+    - retro game consoles
+    - grid colors
+    - custom layout, custom shortcut
+    - minimize UI
+
+# Stretch 
+- Multiple sprite tabs
+- Layer groups / frame groups
+- add data file for export
+- node based editor
+- online gallery 
+- tools
+    - erase mirror
+    - perfect mode for brush
+    - custom brushes 
+    - fonts
+    - A spray brush
+- selection areas
+    - rotate and scale selection areas
+    - duplicate selection 
+    - move selection to new layer new layer 
 - shortcuts 
     - custom shortcuts override default
     - reset shortcuts to default
@@ -110,11 +105,7 @@
             - start with most common colors
             - squash similer colors?
     - deleting a color from the pallette doesint effect layers
-- non-destructive "Effects"    
-    - color filter
-    - outline effect        
-    - The "sun" effect is a ball, that is placed somewhere on the canvas, and affects the colors of the sprites with a specific falloff
-        - light source tool, creates highlights and shadows for you 
+
 
 
 

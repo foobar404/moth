@@ -291,6 +291,8 @@ function useLayers() {
         let image = canvas1.getCtx().createImageData(activeLayer.image.width, activeLayer.image.height);
         image.data.set(activeLayer.image.data);
 
+        let index = activeFrame.layers.findIndex(l => l.symbol === activeLayer.symbol);
+        let newFrame = { ...activeFrame };
         let newLayer: ILayer = {
             symbol: Symbol(),
             name: "Copy of " + activeLayer.name,
@@ -298,6 +300,8 @@ function useLayers() {
             opacity: activeLayer.opacity,
         };
 
+        newFrame.layers.splice(index + 1, 0, newLayer);
+        setActiveFrame(newFrame);
         setActiveLayer(newLayer);
     }
 

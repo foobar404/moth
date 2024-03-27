@@ -7,6 +7,7 @@ interface IProps {
     children: any;
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
+    blur?: boolean;
 }
 
 export function Modal(props: IProps) {
@@ -14,7 +15,7 @@ export function Modal(props: IProps) {
 
     return (
         <Portal>
-            <main className="c-modal"
+            <main className={`c-modal ${props.blur ? "!bg-gradient-to-r !backdrop-blur-sm" : ""}`}
                 onClick={() => props.setIsOpen(false)}>
                 <section className="c-modal__body !bg-base-100"
                     onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
