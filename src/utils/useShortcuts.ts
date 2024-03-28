@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 
 interface IProps {
@@ -7,37 +7,47 @@ interface IProps {
 
 
 export function useShortcuts(props: IProps) {
+
     let [keys, setKeys] = useState(new Set());
 
     useEffect(() => {
-        document.body.addEventListener("keydown", (e) => {
-            setKeys(prevKeys => {
-                if (prevKeys.has(e.key.toLowerCase())) return prevKeys;
+        document.body.addEventListener("keydown", handleKeyDown);
+        document.body.addEventListener("keyup", handleKeyUp);
 
-                const newKeys = new Set(prevKeys);
-                newKeys.add(e.key.toLowerCase());
+        return () => {
+            document.body.removeEventListener("keydown", handleKeyDown);
+            document.body.removeEventListener("keyup", handleKeyUp);
+        };
+    }, [keys]);
 
-                let permutations = generatePermutations(Array.from(newKeys) as string[]);
-                permutations.forEach(permutation => {
-                    if (permutation.join("+") in props) {
-                        e.preventDefault();
-                        props[permutation.join("+")]();
-                    }
-                });
+    const handleKeyDown = (e: KeyboardEvent) => {
+        setKeys(prevKeys => {
+            if (prevKeys.has(e.key.toLowerCase())) return prevKeys;
 
-                return newKeys;
+            const newKeys = new Set(prevKeys);
+            newKeys.add(e.key.toLowerCase());
+
+            let permutations = generatePermutations(Array.from(newKeys) as string[]);
+            permutations.forEach(permutation => {
+                if (permutation.join("+") in props) {
+                    e.preventDefault();
+                    props[permutation.join("+")]();
+                }
             });
-        });
 
-        document.body.addEventListener("keyup", (e) => {
-            e.preventDefault();
-            setKeys(prevKeys => {
-                const newKeys = new Set(prevKeys);
-                newKeys.delete(e.key.toLowerCase());
-                return newKeys;
-            });
+            return newKeys;
+        })
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+        e.preventDefault();
+        setKeys(prevKeys => {
+            const newKeys = new Set(prevKeys);
+            newKeys.delete(e.key.toLowerCase());
+            console.log(newKeys, "newkeys keyup");
+            return newKeys;
         });
-    }, []);
+    };
 
     function generatePermutations(arr: string[]): string[][] {
         if (arr.length <= 1) return [arr];
