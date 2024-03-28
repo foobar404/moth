@@ -1,9 +1,9 @@
 const plugin = require("tailwindcss/plugin");
 
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   plugins: [
+    import('@midudev/tailwind-animations').then((module) => module.default),
     require("daisyui"),
     plugin(function ({ addUtilities }) {
       addUtilities({
