@@ -329,19 +329,41 @@ function useTools() {
         return tooltip;
     }
 
-    function updateTool(e: any, tool: ITool, mouseButton?: number) {
+    function updateTool(e: any, newTool: ITool, mouseButton?: number) {
         const btn = e ? e.button : mouseButton;
         const { leftTool, middleTool, rightTool } = toolSettings;
 
-        // Directly check if the tool is already assigned to any button
-        if (tool === leftTool || tool === middleTool || tool === rightTool) {
-            return; // Stop execution if the tool is already assigned
+        // Check if the tool is already assigned to a button
+        if (newTool === leftTool || newTool === middleTool || newTool === rightTool) {
+            // Swap the tools if already assigned
+            if (btn === 0 && newTool !== leftTool) {
+                setToolSettings({
+                    ...toolSettings,
+                    leftTool: newTool,
+                    ...(newTool === middleTool && { middleTool: leftTool }),
+                    ...(newTool === rightTool && { rightTool: leftTool }),
+                });
+            } else if (btn === 1 && newTool !== middleTool) {
+                setToolSettings({
+                    ...toolSettings,
+                    middleTool: newTool,
+                    ...(newTool === leftTool && { leftTool: middleTool }),
+                    ...(newTool === rightTool && { rightTool: middleTool }),
+                });
+            } else if (btn === 2 && newTool !== rightTool) {
+                setToolSettings({
+                    ...toolSettings,
+                    rightTool: newTool,
+                    ...(newTool === leftTool && { leftTool: rightTool }),
+                    ...(newTool === middleTool && { middleTool: rightTool }),
+                });
+            }
+        } else {
+            // Assign the tool as before if not already assigned
+            if (btn === 0) setToolSettings({ ...toolSettings, leftTool: newTool });
+            else if (btn === 1) setToolSettings({ ...toolSettings, middleTool: newTool });
+            else if (btn === 2) setToolSettings({ ...toolSettings, rightTool: newTool });
         }
-
-        // Assign the tool based on the button clicked
-        if (btn === 0) setToolSettings({ ...toolSettings, leftTool: tool });
-        else if (btn === 1) setToolSettings({ ...toolSettings, middleTool: tool });
-        else if (btn === 2) setToolSettings({ ...toolSettings, rightTool: tool });
     }
 
     return {

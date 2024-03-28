@@ -1,6 +1,4 @@
 # Doing
-- (Austin) refactor the beta page
-- (Austin)(Easy) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
 - (Austin)(Medium) Fill in for shapes
 - (Austin) get color picker working again
     - lights / darks 
@@ -24,14 +22,15 @@
 - (Hard) Add blur / jumble tool
 - (Hard) Add contour tool 
 - (Austin) add console error watch system
+- (Austin)(Easy) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
+
+- shortcuts dont work consistently
+- combine layers and colors into one panel
 
 # Promotion
-- discord channels
-- google ads
 - reddit
 - itch game jam
 - twitch channels
-- product hunt
 
 # Kickstarter Launch
 - setup alpha / beta test branch
