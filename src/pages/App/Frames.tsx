@@ -1,8 +1,8 @@
 import { Preview } from './Preview';
 import { IFrame, IPreview } from '../../types';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCanvas, useGlobalStore } from '../../utils';
-import { IoCopy, IoPlay, IoStop } from "react-icons/io5";
+import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
 
@@ -56,6 +56,19 @@ export function Frames() {
                             onKeyUp={e => e.stopPropagation()}
                             onChange={e => data.setFps(Number(e.target.value))} />
                     </label>
+
+                    <button data-tip={"animation frame left"}
+                        data-for="tooltip"
+                        onClick={data.previewFrameLeft}
+                        className="btn btn-xs">
+                        {<IoChevronBack className="text-lg" />}
+                    </button>
+                    <button data-tip={"animation frame right"}
+                        data-for="tooltip"
+                        onClick={data.previewFrameRight}
+                        className="btn btn-xs">
+                        {<IoChevronForward className="text-lg" />}
+                    </button>
                     <button data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
                         data-for="tooltip"
                         onClick={data.togglePlay}
@@ -118,7 +131,8 @@ function useFrames() {
     let [imageMap, setImageMap] = useState<any>({});
     let [enlargePreview, setEnlargePreview] = useState(false);
     let [draggedFrame, setDraggedFrame] = useState<IFrame | null>(null);
-    let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false, className: "" });
+    const frameCount = useRef(0);
+    let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false, frameCount });
 
     useEffect(() => {
         let map: { [s: symbol]: string } = {};
@@ -230,6 +244,14 @@ function useFrames() {
     function togglePlay() {
         setPreview({ ...preview, playing: !preview.playing });
     }
+    function previewFrameLeft() {
+        setPreview({ ...preview, playing: false });
+        frameCount.current -= 1;
+    }
+    function previewFrameRight() {
+        setPreview({ ...preview, playing: false });
+        frameCount.current += 1;
+    }
 
     function setFps(fps: number) {
         setPreview({ ...preview, fps });
@@ -248,6 +270,8 @@ function useFrames() {
         setOnionSkin,
         moveFrameLeft,
         moveFrameRight,
+        previewFrameLeft,
+        previewFrameRight,
         handleDrop,
         handleDragStart,
         handleDragEnd,

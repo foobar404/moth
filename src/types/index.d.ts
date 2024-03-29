@@ -82,7 +82,8 @@ export interface IToolSettings {
 export interface IPreview {
 	fps: number;
 	playing: boolean;
-	className: string;
+	className?: string;
+	frameCount: useRef<number>;
 }
 
 
