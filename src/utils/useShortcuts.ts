@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 
 interface IProps {
@@ -7,7 +7,6 @@ interface IProps {
 
 
 export function useShortcuts(props: IProps) {
-
     let [keys, setKeys] = useState(new Set());
 
     useEffect(() => {
@@ -20,7 +19,7 @@ export function useShortcuts(props: IProps) {
         };
     }, [keys]);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
+    function handleKeyDown(e) {
         setKeys(prevKeys => {
             if (prevKeys.has(e.key.toLowerCase())) return prevKeys;
 
@@ -39,12 +38,11 @@ export function useShortcuts(props: IProps) {
         })
     };
 
-    const handleKeyUp = (e: KeyboardEvent) => {
+    function handleKeyUp(e) {
         e.preventDefault();
         setKeys(prevKeys => {
             const newKeys = new Set(prevKeys);
             newKeys.delete(e.key.toLowerCase());
-            console.log(newKeys, "newkeys keyup");
             return newKeys;
         });
     };

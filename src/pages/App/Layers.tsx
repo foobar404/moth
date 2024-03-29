@@ -1,12 +1,12 @@
 import { ILayer } from "../../types";
 import { MdDelete } from "react-icons/md";
+import ReactTooltip from "react-tooltip";
 import { RiGitMergeFill } from "react-icons/ri";
 import { IoEye, IoCopy } from "react-icons/io5";
 import { useCanvas, useGlobalStore } from "../../utils";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
-import ReactTooltip from "react-tooltip";
 
 
 export function Layers() {
@@ -64,7 +64,7 @@ export function Layers() {
                             value={data.allLayersOpacity}
                             onChange={e => data.setAllLayersOpacity(e.currentTarget.valueAsNumber)} />
                     </label>
-                    <button data-tip={`${data.layersAreVisible ? "hide other layers" : "show all layers"}`}
+                    <button data-tip={`${data.layersAreVisible ? "hide non-active layers" : "show all layers"}`}
                         data-for="tooltip"
                         onClick={data.toggleAllLayerVisibility}
                         className="btn btn-xs">
@@ -75,10 +75,8 @@ export function Layers() {
 
             <section>
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
-                    <div className="row">
-                        <div key={i}
-                            className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
-
+                    <div className="row" key={i}>
+                        <div className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
                             <img src={data.imageMap[layer.symbol]}
                                 draggable
                                 onDragEnd={data.handleDragEnd}

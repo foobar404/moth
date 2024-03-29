@@ -239,38 +239,38 @@ module.exports = {
           "--tab-radius": "0.25rem"
         },
         "gbc-dark": {
-          "primary": "#1B5E20", // Dark green, evoking the dense colors of Game Boy Color games at night
-          "secondary": "#4CAF50", // Vibrant green, standing out against the dark theme
-          "accent": "#CDDC39", // Lime green, for highlighted elements
-          "neutral": "#C0CA33", // Olive green, ensuring text and details are soft yet readable
-          "base-100": "#1E1E1E", // Deep black, for a modern twist on retro gaming
+          "primary": "#FF1F5A", // Adopting the bright red from the light theme for vibrant spirit
+          "secondary": "#00B3B1", // Bringing in the refreshing teal for a complementary secondary color
+          "accent": "#FFD500", // Using the vivid yellow for eye-catching highlights, consistent with the light theme
+          "neutral": "#007BB5", // A lighter shade of blue compared to the light theme, for balance in the dark theme
+          "base-100": "#2E2E2E", // A softer dark base than deep black, making for a less harsh contrast
 
-          "--rounded-box": "0rem",
-          "--rounded-btn": "0rem",
-          "--rounded-badge": "0rem",
-          "--animation-btn": "0.2s",
-          "--animation-input": "0.15s",
-          "--btn-focus-scale": "0.95",
-          "--border-btn": "1px solid var(--neutral)",
-          "--tab-border": "1px solid var(--accent)",
-          "--tab-radius": "0rem"
+          "--rounded-box": "50px", // Matching the light theme's subtly rounded corners
+          "--rounded-btn": "50px", // Consistency in button rounding
+          "--rounded-badge": "1.25rem", // Unifying badge rounding with the light theme
+          "--animation-btn": "0.2s", // Keeping animation timings consistent
+          "--animation-input": "0.15s", // Same as the light theme, for cohesion
+          "--btn-focus-scale": "0.97", // Aligning the focus scale with the light theme for uniformity
+          "--border-btn": "2px solid var(--neutral)", // Adjusted border thickness for coherence
+          "--tab-border": "2px solid var(--accent)", // Matching the accent color and border thickness with the light theme
+          "--tab-radius": "0.25rem" //
         },
         "atari-light": {
-          "primary": "#E41E20", // Bright red, iconic to the Atari logo
-          "secondary": "#F2B705", // Golden yellow, for a retro look and feel
-          "accent": "#5E8C6A", // Forest green, providing a contrast reminiscent of classic Atari game covers
-          "neutral": "#333333", // Dark gray, ensuring legibility and depth
-          "base-100": "#FFFFFF", // Crisp white, offering a clean backdrop
+          "primary": "#D11124", // A slightly deeper red, adding a modern twist while staying true to the Atari logo
+          "secondary": "#F2C94C", // A lighter golden yellow, for a fresher, modern retro look
+          "accent": "#669977", // A softer green, balancing the retro and modern aesthetic
+          "neutral": "#2D2D2D", // A slightly lighter dark gray, improving readability without losing depth
+          "base-100": "#FAFAFA", // Off-white, softening the overall look for modern sensibilities
 
-          "--rounded-box": "0rem", // Square edges, reflecting the angular Atari console and joystick design
-          "--rounded-btn": "0rem",
-          "--rounded-badge": "0rem",
-          "--animation-btn": "0.3s",
-          "--animation-input": "0.2s",
-          "--btn-focus-scale": "0.97",
-          "--border-btn": "1px solid var(--neutral)",
-          "--tab-border": "2px solid var(--primary)",
-          "--tab-radius": "0rem"
+          "--rounded-box": "0.2rem", // Slightly rounded edges for a subtle modern touch
+          "--rounded-btn": "0.2rem",
+          "--rounded-badge": "0.2rem",
+          "--animation-btn": "0.25s", // Slightly faster, for a more responsive feel
+          "--animation-input": "0.15s",
+          "--btn-focus-scale": "0.95", // A more noticeable scale change for focused buttons
+          "--border-btn": "2px solid var(--neutral)", // Thicker borders for buttons, enhancing their prominence
+          "--tab-border": "3px solid var(--primary)", // Thicker and more pronounced tab borders
+          "--tab-radius": "0.2rem" // Sli
         },
         "atari-dark": {
           "primary": "#FF6347", // Tomato red, vibrant against the dark theme
@@ -324,21 +324,21 @@ module.exports = {
           "--tab-radius": "0.25rem"
         },
         "genesis-light": {
-          "primary": "#6B6B6B", // Metallic silver, reflecting the console's futuristic design
-          "secondary": "#0072CE", // Bright Sega blue, vibrant and eye-catching
-          "accent": "#FFD400", // Electric yellow, for energetic highlights
-          "neutral": "#333333", // Dark gray, for readable text
-          "base-100": "#FFFFFF", // Pure white, offering a clean and modern background
+          "primary": "#5A5A5A", // A slightly darker shade of silver for enhanced contrast against other elements
+          "secondary": "#0057B8", // A deeper shade of blue for a more sophisticated look while maintaining vibrancy
+          "accent": "#FFC300", // A richer shade of yellow, adding depth to the energetic highlights
+          "neutral": "#2E2E2E", // A tad lighter for better contrast and readability against the white background
+          "base-100": "#FAFAFA", // A slightly off-white background for reducing glare and enhancing visual comfort
 
-          "--rounded-box": "0.2rem",
-          "--rounded-btn": "0.1rem",
-          "--rounded-badge": "1rem",
-          "--animation-btn": "0.2s",
-          "--animation-input": "0.15s",
-          "--btn-focus-scale": "0.97",
-          "--border-btn": "1px solid var(--neutral)",
-          "--tab-border": "2px solid var(--primary)",
-          "--tab-radius": "0.2rem"
+          "--rounded-box": "0.25rem", // Uniformly rounded edges for boxes to soften the overall look slightly
+          "--rounded-btn": "0.25rem", // Matching rounded buttons for consistency across interactive elements
+          "--rounded-badge": "0.5rem", // Less pronounced rounding for badges to align with the theme's modernity
+          "--animation-btn": "0.25s", // A touch slower for a smoother transition effect
+          "--animation-input": "0.2s", // Slightly slower to match button animation, creating a cohesive feel
+          "--btn-focus-scale": "0.98", // A subtle change in scale to keep focus effect noticeable yet refined
+          "--border-btn": "2px solid var(--neutral)", // Thicker borders for a more defined look
+          "--tab-border": "3px solid var(--secondary)", // Emphasizing the tab selection with a thicker and colored border
+          "--tab-radius": "0.25rem" // Cons
         },
         "genesis-dark": {
           "primary": "#8A8A8A", // Lighter silver, stands out against dark backgrounds
@@ -392,21 +392,21 @@ module.exports = {
           "--tab-radius": "0.3rem"
         },
         "dreamcast-light": {
-          "primary": "#F7981D", // Bright orange, reminiscent of the Dreamcast logo
-          "secondary": "#209CEE", // Sky blue, for a vibrant contrast
-          "accent": "#FFFFFF", // Pure white, capturing the console's casing
-          "neutral": "#E1E1E1", // Light grey, for background and UI elements
-          "base-100": "#FFFFFF", // White background, reflecting the Dreamcast's innovative spirit
+          "primary": "#FF8C00", // A slightly deeper orange, adding a modern edge while staying true to the Dreamcast vibe
+          "secondary": "#1E90FF", // A more vivid sky blue, enhancing visibility and contrast
+          "accent": "#E6E6E6", // A soft off-white, offering a subtle contrast against pure white elements
+          "neutral": "#DCDCDC", // A slightly darker shade of grey for improved contrast and depth
+          "base-100": "#FAFAFA", // A softer white for the background, reducing glare and enhancing visual comfort
 
-          "--rounded-box": "0.25rem",
-          "--rounded-btn": "0.25rem",
-          "--rounded-badge": "1rem",
-          "--animation-btn": "0.2s",
-          "--animation-input": "0.15s",
-          "--btn-focus-scale": "0.98",
-          "--border-btn": "1px solid var(--neutral)",
-          "--tab-border": "1px solid var(--secondary)",
-          "--tab-radius": "0.25rem"
+          "--rounded-box": "0.3rem", // Slightly more rounded edges for boxes, aligning with modern design trends
+          "--rounded-btn": "0.3rem", // Uniformly rounded buttons for a cohesive look across interactive elements
+          "--rounded-badge": "0.75rem", // Moderately rounded badges, providing a balanced appearance
+          "--animation-btn": "0.25s", // A smoother transition effect for buttons
+          "--animation-input": "0.2s", // A uniform animation speed for inputs, matching the button animation for consistency
+          "--btn-focus-scale": "0.99", // A subtle yet noticeable focus effect, enhancing usability without distracting
+          "--border-btn": "2px solid var(--neutral)", // Thicker borders for buttons, making them more defined against the background
+          "--tab-border": "2px solid var(--secondary)", // A bolder tab border for increased prominence and clarity
+          "--tab-radius": "0.3rem" // S
         },
         "dreamcast-dark": {
           "primary": "#F7981D", // Bright orange, stands out against dark themes
@@ -426,21 +426,21 @@ module.exports = {
           "--tab-radius": "0.25rem"
         },
         "xbox-light": {
-          "primary": "#107C10", // Vibrant Xbox green, for a dynamic and energetic feel
-          "secondary": "#3A3A3A", // Dark grey, providing a strong contrast
-          "accent": "#F2F2F2", // Almost white, for highlights and UI elements
-          "neutral": "#D0D0D0", // Light grey, for background and less prominent UI
-          "base-100": "#FFFFFF", // White, ensuring a bright and clean interface
+          "primary": "#0E6B0E", // A slightly deeper green, enhancing the Xbox's signature color for sophistication
+          "secondary": "#404040", // A slightly darker grey, offering better contrast and depth
+          "accent": "#E8E8E8", // A softer near-white, reducing the starkness while maintaining brightness
+          "neutral": "#CCCCCC", // Medium grey, balancing the contrast between the primary and secondary colors
+          "base-100": "#F7F7F7", // A warmer shade of white, offering a more inviting and less clinical backdrop
 
-          "--rounded-box": "0.5rem",
-          "--rounded-btn": "0.3rem",
-          "--rounded-badge": "1.5rem",
-          "--animation-btn": "0.25s",
-          "--animation-input": "0.2s",
-          "--btn-focus-scale": "0.98",
-          "--border-btn": "2px solid var(--neutral)",
-          "--tab-border": "1px solid var(--secondary)",
-          "--tab-radius": "0.5rem"
+          "--rounded-box": "0.6rem", // Increasing the rounding for a more modern, friendly appearance
+          "--rounded-btn": "0.4rem", // Slightly more rounded buttons for consistency with the box styling
+          "--rounded-badge": "1rem", // Reducing the badge rounding for a subtler, more contemporary look
+          "--animation-btn": "0.3s", // A smoother animation for buttons, enhancing the user experience
+          "--animation-input": "0.25s", // A slightly longer animation for inputs, matching the overall feel
+          "--btn-focus-scale": "0.99", // A more subtle focus effect, reducing visual jitters on click
+          "--border-btn": "2px solid var(--secondary)", // Using the secondary color for button borders for enhanced contrast
+          "--tab-border": "2px solid var(--primary)", // Thicker, more visible borders for tabs to stand out
+          "--tab-radius": "0.6rem" // I
         },
         "xbox-dark": {
           "primary": "#107C10", // Bright Xbox green, glowing against dark backgrounds

@@ -12,10 +12,10 @@ export default function ModalBeta(props) {
     const data = useModalBeta(props);
 
     return (<Modal {...props} blur>
-        <main className="m-8 max-w-[500px] mx-auto p-6 rounded-lg ">
+        <main className="m-8 max-w-[500px] mx-auto p-6 rounded-lg">
             <img src="/logo.png" className="relative -mb-6 w-14 h-14 center" />
-            <h1 className="mb-4 text-3xl font-bold text-blue-900 row">Welcome to Moth (Beta) </h1>
-            <p className="mb-6 text-blue-800 ">
+            <h1 className="mb-4 text-3xl font-bold text-base-content row">Welcome to Moth (Beta) </h1>
+            <p className="mb-6 text-base-content">
                 Explore Moth, our pixel art editor. Encountering bugs? Your feedback is essential for improvements. Let's refine Moth together.
             </p>
             <div className="flex flex-col gap-4 z-90">

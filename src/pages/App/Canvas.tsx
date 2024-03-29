@@ -279,6 +279,8 @@ function useCanvas() {
         modifiedPoints: new Set(), // add key
         brush: { previousPoint: { x: 0, y: 0 } },
         eraser: { previousPoint: { x: 0, y: 0 } },
+        mirror: { previousPoint: { x: 0, y: 0 } },
+        smudge: { previousPoint: { x: 0, y: 0 }, previousColor: { r: 0, g: 0, b: 0, a: 0 } },
         selectionArea: {
             imgData: null as ImageData | null,
             points: [] as { x: number; y: number; }[],
@@ -289,14 +291,6 @@ function useCanvas() {
         }
     });
     let stateCache = useRef({ activeColorPalette, activeColor, activeFrame, colorStats, toolSettings, activeLayer, canvasSize, onionSkin, frames, canvasChangeCount });
-    let keys = useShortcuts({
-        "control+z": undo,
-        "meta+z": undo,
-        "control+shift+z": redo,
-        "meta+shift+z": redo,
-        "[": () => setBrushSize(-1),
-        "]": () => setBrushSize(1),
-    });
     let toolHandlers = {
         "brush": (x, y, toolButtonActive, preview) => {
             // center the mouse cursor in the brush 
@@ -430,33 +424,79 @@ function useCanvas() {
         },
         "mirror": (x, y, toolButtonActive, preview) => {
             const { size, mirror } = stateCache.current.toolSettings;
-            // Calculate starting positions to center drawing on (x, y)
             let newX = x - Math.floor(size / 2);
             let newY = y - Math.floor(size / 2);
 
-            const mirrorX = mirror.x;
-            const mirrorY = mirror.y;
+            if (toolState.current.mirror.previousPoint.x === 0 && toolState.current.mirror.previousPoint.y === 0) {
+                toolState.current.mirror.previousPoint.x = newX;
+                toolState.current.mirror.previousPoint.y = newY;
+            }
 
-            // Draw the initial pixel block centered around (x, y)
-            tempCanvas1.drawPixel(newX, newY, size);
+            let start = toolState.current.mirror.previousPoint;
+            let end = { x: newX, y: newY };
 
-            // For mirroring on the X-axis, adjust newX for mirroring and consider size for proper alignment
-            if (mirrorX)
-                tempCanvas1.drawPixel(mainCanvas.getWidth() - newX - size, newY, size);
+            // Draw line for initial point
+            tempCanvas1.drawLine(start, end, size);
 
-            // For mirroring on the Y-axis, adjust newY for mirroring and consider size for proper alignment
-            if (mirrorY)
-                tempCanvas1.drawPixel(newX, mainCanvas.getHeight() - newY - size, size);
+            // Calculate mirrored positions and draw lines for X and Y axis mirroring
+            if (mirror.x) {
+                let mirroredStartX = mainCanvas.getWidth() - start.x - size;
+                let mirroredEndX = mainCanvas.getWidth() - end.x - size;
+                tempCanvas1.drawLine({ x: mirroredStartX, y: start.y }, { x: mirroredEndX, y: end.y }, size);
+            }
+            if (mirror.y) {
+                let mirroredStartY = mainCanvas.getHeight() - start.y - size;
+                let mirroredEndY = mainCanvas.getHeight() - end.y - size;
+                tempCanvas1.drawLine({ x: start.x, y: mirroredStartY }, { x: end.x, y: mirroredEndY }, size);
+            }
+            if (mirror.x && mirror.y) {
+                let mirroredStartXY = { x: mainCanvas.getWidth() - start.x - size, y: mainCanvas.getHeight() - start.y - size };
+                let mirroredEndXY = { x: mainCanvas.getWidth() - end.x - size, y: mainCanvas.getHeight() - end.y - size };
+                tempCanvas1.drawLine(mirroredStartXY, mirroredEndXY, size);
+            }
 
-            // For mirroring on both X and Y axes, adjust both newX and newY and consider size for alignment
-            if (mirrorX && mirrorY)
-                tempCanvas1.drawPixel(mainCanvas.getWidth() - newX - size, mainCanvas.getHeight() - newY - size, size);
+            toolState.current.mirror.previousPoint.x = newX;
+            toolState.current.mirror.previousPoint.y = newY;
 
-            // Decide on which canvas to save the drawn pixels
             if (toolButtonActive) {
                 saveCanvas.putImageData(tempCanvas1.getImageData());
             } else {
+                toolState.current.mirror.previousPoint.x = 0;
+                toolState.current.mirror.previousPoint.y = 0;
+
                 if (preview) previewCanvas.putImageData(tempCanvas1.getImageData());
+            }
+        },
+        "smudge": (x, y, toolButtonActive, preview) => {
+            let brushSize = stateCache.current.toolSettings.size; // Or a specific size for the smudge tool
+            let halfBrushSize = Math.floor(brushSize / 2);
+            let newX = x - halfBrushSize;
+            let newY = y - halfBrushSize;
+
+            if (toolButtonActive) {
+                if (toolState.current.smudge.previousPoint.x === 0 && toolState.current.smudge.previousPoint.y === 0) {
+                    toolState.current.smudge.previousColor = tempCanvas1.getColor(newX, newY);
+                    toolState.current.smudge.previousPoint.x = newX;
+                    toolState.current.smudge.previousPoint.y = newY;
+                } else {
+                    let currentColor = tempCanvas1.getColor(newX, newY);
+                    let blendedColor = tinycolor.mix(toolState.current.smudge.previousColor, currentColor, 50);
+
+                    // Apply the blended color to the canvas
+                    tempCanvas1.drawPixel(newX, newY, brushSize, blendedColor.toRgbString());
+
+                    toolState.current.smudge.previousColor = blendedColor.toRgb();
+                    toolState.current.smudge.previousPoint.x = newX;
+                    toolState.current.smudge.previousPoint.y = newY;
+                }
+            } else {
+                toolState.current.smudge.previousPoint.x = 0;
+                toolState.current.smudge.previousPoint.y = 0;
+                toolState.current.smudge.previousColor = { r: 0, g: 0, b: 0, a: 0 };
+            }
+
+            if (preview) {
+                previewCanvas.putImageData(tempCanvas1.getImageData());
             }
         },
         "move": (x, y, toolButtonActive, preview) => {
@@ -1043,6 +1083,15 @@ function useCanvas() {
         },
     };
 
+    useShortcuts({
+        "control+z": undo,
+        "meta+z": undo,
+        "control+shift+z": redo,
+        "meta+shift+z": redo,
+        "[": () => setBrushSize(-1),
+        "]": () => setBrushSize(1),
+    });
+
     // animation loop
     useEffect(() => {
         (function render() {
@@ -1153,7 +1202,6 @@ function useCanvas() {
     // rebuild tooltip
     useEffect(() => { ReactTooltip.rebuild() }, [toolSettings]);
 
-    //! move to tools
     function setBrushSize(delta: number) {
         setToolSettings({ ...toolSettings, size: (toolSettings.size + delta < 1) ? 1 : (toolSettings.size + delta) });
     }

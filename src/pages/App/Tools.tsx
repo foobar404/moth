@@ -3,6 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import { IoMdMove } from "react-icons/io";
 import { AiFillFire } from "react-icons/ai";
 import { GiMirrorMirror } from "react-icons/gi";
+import { RxBlendingMode } from "react-icons/rx";
 import { IoBandageSharp } from "react-icons/io5";
 import React, { useEffect, useState } from 'react';
 import { BsBucketFill, BsEraserFill } from "react-icons/bs";
@@ -73,6 +74,12 @@ export function Tools() {
                     onMouseDown={(e) => data.updateTool(e, "mirror")}>
                     <GiMirrorMirror className="text-xl" />
                 </button>
+                {/* <button data-tip={`smudge tool ( d​ ) ${data.getButtonTooltip("smudge")}`}
+                    data-for="tooltip"
+                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("smudge")}`}
+                    onMouseDown={(e) => data.updateTool(e, "smudge")}>
+                    <RxBlendingMode className="text-xl" />
+                </button> */}
                 <button data-tip={`eyedropper tool ( i​ ) ${data.getButtonTooltip("eyedropper")}`}
                     data-for="tooltip"
                     className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("eyedropper")}`}
@@ -263,7 +270,8 @@ function useTools() {
             });
         },
     }
-    let keys = useShortcuts({
+
+    useShortcuts({
         "1": () => setView("tools"),
         "2": () => setView("actions"),
         "b": () => updateTool(null, "brush", 0),
@@ -271,6 +279,7 @@ function useTools() {
         "s": () => updateTool(null, "shape", 0),
         "g": () => updateTool(null, "bucket", 0),
         "t": () => updateTool(null, "light", 0),
+        "d": () => updateTool(null, "smudge", 0),
         "i": () => updateTool(null, "eyedropper", 0),
         "v": () => updateTool(null, "move", 0),
         "x": () => updateTool(null, "box", 0),

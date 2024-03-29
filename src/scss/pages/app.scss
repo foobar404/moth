@@ -4,20 +4,11 @@
     width: 100vw;
     overflow: hidden;
     grid-template-rows: 60px 1fr max-content;
-    grid-template-columns: 60px calc(100% - (310px + 60px)) 310px;
+    grid-template-columns: 60px minmax(720px, calc(100% - (310px + 60px))) 310px;
     grid-template-areas:
         "left header right"
         "left content right"
         "left footer right";
-
-    @media screen and (max-width: 768px) {
-        grid-template-rows: 60px 1fr 130px;
-        grid-template-columns: 60px 1fr;
-        grid-template-areas:
-            "header header"
-            "left content"
-            "footer footer";
-    }
 
     &__nav {
         grid-area: header;
@@ -69,11 +60,6 @@
         max-height: 100%;
         overflow-y: auto;
         overflow-x: hidden;
-
-        @media screen and (max-width: 768px) {
-            display: none;
-            padding-top: 60px !important;
-        }
     }
 
     &__color-controls {

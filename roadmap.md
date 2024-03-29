@@ -1,4 +1,5 @@
 # Doing
+- (Hard) Add blur / jumble tool
 - (Austin) get color picker working again
     - lights / darks 
     - add opacity 
@@ -21,7 +22,6 @@
     - CTRL-Z undos and changes in text (title, color palette name, ect)
     - When you undo layer joins, the number of layers does not change, the layer just disappears.
     - Undo redo wont work with layers
-- (Hard) Add blur / jumble tool
 - (Hard) Add contour tool 
 - (Austin) add console error watch system
 - (Austin)(Easy) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
