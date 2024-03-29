@@ -8,6 +8,7 @@ import { HiStar } from "react-icons/hi";
 import { Modal } from "../../components";
 import { ImCross } from "react-icons/im";
 import pngEncode from "png-chunks-encode";
+import ReactTooltip from "react-tooltip";
 import { PiGifFill } from "react-icons/pi";
 import pngExtract from "png-chunks-extract";
 import { Buffer as pngBuffer } from "buffer";
@@ -15,7 +16,6 @@ import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
 import { IoImage, IoLayers } from "react-icons/io5";
 import { useCanvas, useModal, useGlobalStore, useIntervalEffect } from '../../utils';
-import ReactTooltip from "react-tooltip";
 
 
 interface IProps { }
@@ -71,7 +71,7 @@ export function Nav(props: IProps) {
                     </button>
                     <section className="p-4 rounded-lg shadow-inner col bg-base-200">
                         <button className="btn btn-outline min-w-[250px] mb-2"
-                            onClick={() => data.createGif()}>
+                            onClick={data.createGif}>
                             <PiGifFill className="text-2xl" />
                             Export as GIF
                         </button>
@@ -79,10 +79,24 @@ export function Nav(props: IProps) {
                             data-for="tooltip"
                             type="number"
                             className="w-20 input input-sm"
-                            defaultValue={data.exportSettings.fps}
+                            defaultValue={data.exportSettings.gifFps}
                             onKeyUp={e => e.stopPropagation()}
-                            onChange={e => data.setExportSettings({ ...data.exportSettings, fps: e.currentTarget.valueAsNumber })} />
+                            onChange={e => data.setExportSettings({ ...data.exportSettings, gifFps: e.currentTarget.valueAsNumber })} />
                     </section>
+                    {/* <section className="p-4 rounded-lg shadow-inner col bg-base-200">
+                        <button className="btn btn-outline min-w-[250px] mb-2"
+                            onClick={data.createVideo}>
+                            <PiGifFill className="text-2xl" />
+                            Export as Video
+                        </button>
+                        <input data-tip="fps"
+                            data-for="tooltip"
+                            type="number"
+                            className="w-20 input input-sm"
+                            defaultValue={data.exportSettings.videoFps}
+                            onKeyUp={e => e.stopPropagation()}
+                            onChange={e => data.setExportSettings({ ...data.exportSettings, videoFps: e.currentTarget.valueAsNumber })} />
+                    </section> */}
                     <section className="p-4 rounded-lg shadow-inner col bg-base-200">
                         <button className="btn btn-accent min-w-[250px] mb-2"
                             onClick={() => data.exportProject()}>
@@ -146,7 +160,7 @@ export function Nav(props: IProps) {
                                 min="8"
                                 className="input input-sm w-[70px]"
                                 defaultValue={data.imageImportSettings.size}
-                                onKeyUp={e => e.stopPropagation()}
+                                onKeyDown={e => e.stopPropagation()}
                                 onClick={e => e.currentTarget.select()}
                                 onChange={e => data.setImageImportSettings(s => ({ ...s, size: Number(e.currentTarget?.value ?? 512) }))} />
                             <input data-tip="max colors"
@@ -156,12 +170,11 @@ export function Nav(props: IProps) {
                                 min="2"
                                 className="input input-sm w-[70px]"
                                 defaultValue={data.imageImportSettings.colors}
-                                onKeyUp={e => e.stopPropagation()}
+                                onKeyDown={e => e.stopPropagation()}
                                 onClick={e => e.currentTarget.select()}
                                 onChange={e => data.setImageImportSettings(s => ({ ...s, colors: Number(e.currentTarget?.value ?? 128) }))} />
                         </div>
                     </section>
-
 
                     <div className="divider">Local Projects</div>
 
@@ -189,11 +202,11 @@ export function Nav(props: IProps) {
 
         <nav className="space-x-2 row-left !flex-nowrap p-app__nav p-app__block w-max">
             <button onClick={() => data.modalImport.setIsOpen(true)}
-                className="btn btn-sm box-content py-1 btn-primary !hidden md:!inline-flex">
+                className="box-content py-1 btn btn-sm btn-primary">
                 <IoImage className="text-2xl" /> Import
             </button>
             <button onClick={() => data.modalExport.setIsOpen(true)}
-                className="btn btn-sm box-content py-1 btn-secondary !hidden md:!inline-flex">
+                className="box-content py-1 btn btn-sm btn-secondary">
                 <HiStar className="text-2xl" /> Export
             </button>
 
@@ -251,6 +264,7 @@ export function Nav(props: IProps) {
     </>)
 }
 
+
 function useNav(props: IProps) {
     const modalExport = useModal();
     const modalImport = useModal();
@@ -268,7 +282,8 @@ function useNav(props: IProps) {
     let [theme, setTheme] = useState("light");
     let [exportSettings, setExportSettings] = useState({
         scale: 1,
-        fps: 24,
+        gifFps: 24,
+        videoFps: 24,
         paddingX: 0,
         paddingY: 0,
         mothData: true,
@@ -403,7 +418,7 @@ function useNav(props: IProps) {
     async function importImage() {
         try {
             let [fileHandle] = await (window as any).showOpenFilePicker({
-                types: [{ accept: { 'image/*': [".png", ".jpg", ".jpeg"] } }],
+                types: [{ accept: { 'image/*': [".png", ".jpg", ".jpeg", ".gif"] } }],
             });
 
             let file = await fileHandle.getFile();
@@ -418,20 +433,13 @@ function useNav(props: IProps) {
 
             // Calculate the scaling factor and adjust dimensions if necessary
             let scale = Math.min(1, imageImportSettings.size / Math.max(img.width, img.height));
-            let scaledWidth = img.width * scale;
-            let scaledHeight = img.height * scale;
-
-            // Use createImageBitmap for efficient downsizing
-            let imageBitmap = await createImageBitmap(img, 0, 0, img.width, img.height, {
-                resizeWidth: scaledWidth,
-                resizeHeight: scaledHeight,
-                resizeQuality: 'high'
-            });
+            let scaledWidth = Math.round(img.width * scale); // Ensure scaledWidth is a whole number
+            let scaledHeight = Math.round(img.height * scale); // Ensure scaledHeight is a whole number
 
             // Draw the resized image on canvas
             canvas1.clear();
             canvas1.resize(scaledWidth, scaledHeight);
-            canvas1.drawImage(imageBitmap);
+            canvas1.drawImage(img, 0, 0, scaledWidth, scaledHeight);
 
             // limit color palette
             let q = new RgbQuant({
@@ -441,6 +449,7 @@ function useNav(props: IProps) {
 
             let imageData = new ImageData(scaledWidth, scaledHeight);
             imageData.data.set(q.reduce(canvas1.getElement()));
+
             let layer = {
                 name: file.name,
                 image: imageData,
@@ -586,7 +595,7 @@ function useNav(props: IProps) {
 
             gif.addFrame(canvas3.getElement(), {
                 copy: true,
-                delay: 1000 / exportSettings.fps,
+                delay: 1000 / exportSettings.gifFps,
             });
         });
 
@@ -598,6 +607,63 @@ function useNav(props: IProps) {
         });
 
         gif.render();
+    }
+
+    function createVideo() {
+        // Ensure the canvas size is set for capturing
+        let scaledWidth = canvasSize.width * exportSettings.scale;
+        let scaledHeight = canvasSize.height * exportSettings.scale;
+        canvas3.resize(scaledWidth, scaledHeight); // Assuming canvas3 is used for drawing frames
+
+        // Prepare the stream from the canvas to be recorded
+        const stream = canvas3.getElement().captureStream(exportSettings.videoFps);
+        let recordedChunks: any[] = [];
+
+        const options = { mimeType: "video/webm" }; // Common video format for the web
+        const mediaRecorder = new MediaRecorder(stream, options);
+
+        mediaRecorder.ondataavailable = function (event) {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = function () {
+            const blob = new Blob(recordedChunks, {
+                type: "video/webm"
+            });
+            let anchor = document.createElement("a");
+            anchor.href = URL.createObjectURL(blob);
+            anchor.download = `${projectName}.webm`; // Set your project name here
+            anchor.click();
+        };
+
+        // Start recording
+        mediaRecorder.start();
+
+        // Draw and add each frame to the video
+        frames.forEach((frame, index) => {
+            setTimeout(() => {
+                canvas1.clear();
+                canvas2.clear();
+                canvas3.clear();
+
+                // Drawing logic similar to the GIF creation
+                let layersRevered = frame.layers.slice().reverse();
+                layersRevered.forEach(layer => {
+                    canvas1.putImageData(layer.image);
+                    canvas2.drawImage(canvas1.getElement());
+                });
+                canvas3.drawImage(canvas2.getElement(), 0, 0, scaledWidth, scaledHeight);
+
+                // If it's the last frame, stop the recorder after drawing
+                if (index === frames.length - 1) {
+                    setTimeout(() => {
+                        mediaRecorder.stop();
+                    }, 1000 / exportSettings.videoFps); // Ensure the last frame is captured
+                }
+            }, index * 1000 / exportSettings.videoFps);
+        });
     }
 
     function changeTheme(themeName) {
@@ -620,6 +686,7 @@ function useNav(props: IProps) {
         setImageImportSettings,
         setTheme,
         createGif,
+        createVideo,
         changeTheme,
         deleteProject,
         exportProject,

@@ -198,6 +198,9 @@ export function useCanvas(props?: IProps) {
         callback: ((x: number, y: number) => void) | null = null,
         tolerance = 0
     ) {
+        startX = Math.round(startX); // Ensure startX is a whole number
+        startY = Math.round(startY); // Ensure startY is a whole number
+
         const startColor = getColorAtPixel(startX, startY);
         let pointsToCheck: { x: number, y: number }[] = [{ x: startX, y: startY }];
         let matchingPoints: { x: number, y: number }[] = [];

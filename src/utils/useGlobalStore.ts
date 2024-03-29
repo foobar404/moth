@@ -61,6 +61,7 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
             middleTool: "" as ITool,
             mirror: { x: true, y: false },
             shape: "rect" as any,
+            fillShape: false,
             lightMode: "light" as any,
             lightIntensity: 10,
             eraseAll: false,

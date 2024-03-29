@@ -7,11 +7,11 @@ import { Layers } from './Layers';
 import ModalBeta from "./ModalBeta";
 import mixpanel from 'mixpanel-browser';
 import ReactTooltip from 'react-tooltip';
-import { IoLayers } from "react-icons/io5";
+import React, { useEffect } from 'react';
 import { useModal, useShortcuts } from "../../utils";
+import { Drawer } from "../../components";
 import { IoMdColorPalette } from "react-icons/io";
-import React, { useEffect, useState } from 'react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import { IoLayers } from "react-icons/io5";
 
 
 export function App() {
@@ -32,22 +32,23 @@ export function App() {
 			<Canvas />
 
 			<section className={`p-app__sidebar-right p-app__block --right}`}>
-				<Tabs selectedIndex={data.tabIndex}
-					onSelect={(index) => data.setTabIndex(index)}>
-					<TabList className="row-left">
-						<Tab data-tip="Colors (3)" data-for="tooltip"
-							className={`w-16 h-8 row rounded-t-xl cursor-pointer ${data.tabIndex === 0 ? "bg-primary text-primary-content border-2 border-accent" : "bg-secondary text-secondary-content"}`}>
-							<IoMdColorPalette className="text-xl" />
-						</Tab>
-						<Tab data-tip="Layers (4)" data-for="tooltip"
-							className={`w-16 h-8 row rounded-t-xl cursor-pointer ${data.tabIndex === 1 ? "bg-primary text-primary-content border-2 border-accent" : "bg-secondary text-secondary-content"}`}>
-							<IoLayers className="text-xl" />
-						</Tab>
-					</TabList>
+				<Drawer isOpen className="p-2 border-4 rounded-lg border-secondary">
+					<h2 className="p-2 duration-100 cursor-pointer text-secondary-content row bg-secondary rounded-box hover:scale-105">
+						<IoMdColorPalette className="mr-1 text-xl" /> Colors
+					</h2>
 
-					<TabPanel><Colors /></TabPanel>
-					<TabPanel><Layers /></TabPanel>
-				</Tabs>
+					<Colors />
+				</Drawer>
+
+				<div className="my-1"></div>
+
+				<Drawer className="p-2 border-4 rounded-lg border-secondary">
+					<h2 className="p-2 duration-100 cursor-pointer text-secondary-content row bg-secondary rounded-box hover:scale-105">
+						<IoLayers className="mr-1 text-xl" /> Layers
+					</h2>
+
+					<Layers />
+				</Drawer>
 			</section>
 
 			<Frames />
@@ -55,13 +56,13 @@ export function App() {
 	</>)
 }
 
+
 function useApp() {
-	let [tabIndex, setTabIndex] = useState(0);
 	const modalBeta = useModal(true);
-	const keys = useShortcuts({
-		"3": () => setTabIndex(0),
-		"4": () => setTabIndex(1),
-	});
+	// const keys = useShortcuts({
+	// 	"3": () => setTabIndex(0),
+	// 	"4": () => setTabIndex(1),
+	// });
 
 	useEffect(() => {
 		mixpanel.track('Page: App');
@@ -73,12 +74,10 @@ function useApp() {
 
 	useEffect(() => {
 		ReactTooltip.rebuild();
-	}, [tabIndex]);
+	}, []);
 
 	return {
-		tabIndex,
 		modalBeta,
-		setTabIndex,
 	};
 }
 

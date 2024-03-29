@@ -4,7 +4,7 @@
     width: 100vw;
     overflow: hidden;
     grid-template-rows: 60px 1fr max-content;
-    grid-template-columns: 60px calc(100% - (285px + 60px)) 285px;
+    grid-template-columns: 60px calc(100% - (310px + 60px)) 310px;
     grid-template-areas:
         "left header right"
         "left content right"
@@ -81,7 +81,6 @@
         align-items: center;
         flex-wrap: wrap;
         gap: 4px;
-        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         padding: 4px;
         border-radius: 10px;
     }

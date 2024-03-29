@@ -77,7 +77,7 @@ export function Layers() {
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
                     <div className="row">
                         <div key={i}
-                            className={`overflow-hidden row-left flex-1 rounded-md hover:scale-105 border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
+                            className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
 
                             <img src={data.imageMap[layer.symbol]}
                                 draggable

@@ -7,7 +7,7 @@ import { BsCircleFill, BsCircleHalf } from "react-icons/bs";
 import React, { useEffect, useRef } from 'react';
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
 import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
-import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV } from "react-icons/fa";
+import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV, FaFill } from "react-icons/fa";
 
 
 enum ToolStage {
@@ -34,8 +34,8 @@ export function Canvas() {
 
                         <input type="checkbox" checked={data.toolSettings.eraseAll} />
 
-                        <BsCircleHalf className="text-xl swap-off text-secondary" />
-                        <BsCircleFill className="text-xl swap-on text-secondary" />
+                        <BsCircleHalf className="text-xl swap-off text-accent-content" />
+                        <BsCircleFill className="text-xl swap-on text-accent-content" />
                     </label>
                 </>)}
 
@@ -43,14 +43,14 @@ export function Canvas() {
                     <label data-tip="fill all"
                         data-for="tooltip"
                         className="p-1 space-x-1 bg-base rounded-xl row">
-                        <BsCircleHalf className={`text-secondary`} />
+                        <BsCircleHalf className={`text-accent-content`} />
                         <input
                             type="checkbox"
                             value="synthwave"
                             className="toggle toggle-sm toggle-secondary"
                             checked={data.toolSettings.fillAll}
                             onChange={(e) => data.setToolSettings({ ...data.toolSettings, fillAll: e.currentTarget.checked })} />
-                        <BsCircleFill className={`text-secondary`} />
+                        <BsCircleFill className={`text-accent-content`} />
                     </label>
                 </>)}
 
@@ -58,7 +58,7 @@ export function Canvas() {
                     <label className="mr-2 row"
                         data-tip="mirror x & y axis"
                         data-for="tooltip">
-                        <FaArrowsAlt className="inline mr-1 text-lg text-secondary" />
+                        <FaArrowsAlt className="inline mr-1 text-lg text-accent-content" />
                         <input type="radio"
                             className="radio radio-xs radio-secondary"
                             name="mirror-type"
@@ -68,7 +68,7 @@ export function Canvas() {
                     <label className="mr-2 row"
                         data-tip="mirror x axis"
                         data-for="tooltip">
-                        <FaArrowsAltH className="inline mr-1 text-lg text-secondary" />
+                        <FaArrowsAltH className="inline mr-1 text-lg text-accent-content" />
                         <input type="radio"
                             className="radio radio-xs radio-secondary"
                             name="mirror-type"
@@ -78,7 +78,7 @@ export function Canvas() {
                     <label className="mr-2 row"
                         data-tip="mirror y axis"
                         data-for="tooltip">
-                        <FaArrowsAltV className="inline mr-1 text-lg text-secondary" />
+                        <FaArrowsAltV className="inline mr-1 text-lg text-accent-content" />
                         <input type="radio"
                             className="radio radio-xs radio-secondary"
                             name="mirror-type"
@@ -91,7 +91,16 @@ export function Canvas() {
                     <label data-tip="square"
                         data-for="tooltip"
                         className="flex mr-2 row">
-                        <TbSquareFilled className="mr-1 text-lg text-secondary" />
+                        <FaFill className="mr-1 text-lg text-accent-content" />
+                        <input type="checkbox"
+                            className="checkbox checkbox-xs checkbox-secondary"
+                            checked={data.toolSettings.fillShape}
+                            onChange={e => data.setToolSettings({ ...data.toolSettings, fillShape: e.currentTarget.checked })} />
+                    </label>
+                    <label data-tip="square"
+                        data-for="tooltip"
+                        className="flex mr-2 row">
+                        <TbSquareFilled className="mr-1 text-lg text-accent-content" />
                         <input type="radio"
                             name="shape"
                             className="radio radio-xs radio-secondary"
@@ -102,7 +111,7 @@ export function Canvas() {
                     <label data-tip="rectangle"
                         data-for="tooltip"
                         className="flex mr-2 row">
-                        <TbRectangleFilled className="mr-1 text-lg text-secondary" />
+                        <TbRectangleFilled className="mr-1 text-lg text-accent-content" />
                         <input type="radio"
                             name="shape"
                             className="radio radio-xs radio-secondary"
@@ -114,7 +123,7 @@ export function Canvas() {
                     <label data-tip="circle"
                         data-for="tooltip"
                         className="flex mr-2 row">
-                        <TbCircleFilled className="mr-1 text-lg text-secondary" />
+                        <TbCircleFilled className="mr-1 text-lg text-accent-content" />
                         <input type="radio"
                             name="shape"
                             className="radio radio-xs radio-secondary"
@@ -125,7 +134,7 @@ export function Canvas() {
                     <label data-tip="oval"
                         data-for="tooltip"
                         className="flex mr-2 row">
-                        <TbOvalFilled className="mr-1 text-lg text-secondary" />
+                        <TbOvalFilled className="mr-1 text-lg text-accent-content" />
                         <input type="radio"
                             name="shape"
                             className="radio radio-xs radio-secondary"
@@ -144,8 +153,8 @@ export function Canvas() {
 
                             <input type="checkbox" checked={data.toolSettings.lightMode === "light"} />
 
-                            <FaSun className="text-xl swap-on text-secondary" />
-                            <FaMoon className="text-xl swap-off text-secondary" />
+                            <FaSun className="text-xl swap-on text-accent-content" />
+                            <FaMoon className="text-xl swap-off text-accent-content" />
                         </div>
                         <input data-tip="dark/light intensity"
                             data-for="tooltip"
@@ -555,6 +564,14 @@ function useCanvas() {
                         const top = end.y >= start.y ? start.y : start.y - size;
 
                         tempCanvas1.drawRect(left, top, width, height, stateCache.current.activeColor);
+
+                        if (stateCache.current.toolSettings.fillShape) {
+                            let x = left + width / 2;
+                            let y = top + height / 2;
+                            tempCanvas1.floodFill(x, y, (pointX, pointY) => {
+                                tempCanvas1.drawPixel(pointX, pointY, 1, stateCache.current.activeColor);
+                            });
+                        }
                     }
                     if (stateCache.current.toolSettings.shape == "rect") {
                         const width = Math.abs(end.x - start.x);
@@ -563,6 +580,14 @@ function useCanvas() {
                         const top = Math.min(start.y, end.y);
 
                         tempCanvas1.drawRect(left, top, width, height, stateCache.current.activeColor);
+
+                        if (stateCache.current.toolSettings.fillShape) {
+                            let x = left + width / 2;
+                            let y = top + height / 2;
+                            tempCanvas1.floodFill(x, y, (pointX, pointY) => {
+                                tempCanvas1.drawPixel(pointX, pointY, 1, stateCache.current.activeColor);
+                            });
+                        }
                     }
                     if (stateCache.current.toolSettings.shape === "circle") {
                         const width = Math.abs(end.x - start.x);
@@ -573,6 +598,12 @@ function useCanvas() {
                         const centerY = start.y + (end.y >= start.y ? radius : -radius);
 
                         tempCanvas1.drawOval(centerX, centerY, radius, radius, stateCache.current.activeColor);
+
+                        if (stateCache.current.toolSettings.fillShape) {
+                            tempCanvas1.floodFill(centerX, centerY, (pointX, pointY) => {
+                                tempCanvas1.drawPixel(pointX, pointY, 1, stateCache.current.activeColor);
+                            });
+                        }
                     }
                     if (stateCache.current.toolSettings.shape === "oval") {
                         const width = Math.abs(end.x - start.x);
@@ -583,6 +614,12 @@ function useCanvas() {
                         const centerY = (start.y + end.y) / 2;
 
                         tempCanvas1.drawOval(centerX, centerY, radiusX, radiusY, stateCache.current.activeColor);
+
+                        if (stateCache.current.toolSettings.fillShape) {
+                            tempCanvas1.floodFill(centerX, centerY, (pointX, pointY) => {
+                                tempCanvas1.drawPixel(pointX, pointY, 1, stateCache.current.activeColor);
+                            });
+                        }
                     }
 
                     if (toolButtonActive) {

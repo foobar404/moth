@@ -13,14 +13,13 @@ html {
 }
 
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 4px;
+    height: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: oklch(var(--s));
+    background-color: oklch(var(--p));
     border-radius: 4px;
-    border: 2px solid oklch(var(--a));
 }
 
 ::-webkit-scrollbar-thumb:hover {

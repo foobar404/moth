@@ -71,6 +71,7 @@ export interface IToolSettings {
 		y: boolean;
 	};
 	shape: "rect" | "circle" | "oval" | "square",
+	fillShape: boolean;
 	lightMode: "dark" | "light";
 	lightIntensity: number;
 	eraseAll: boolean;

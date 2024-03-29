@@ -1,20 +1,22 @@
 # Doing
-- (Austin)(Medium) Fill in for shapes
 - (Austin) get color picker working again
     - lights / darks 
     - add opacity 
-- (Nate) The zoom scroll zooms to the center, not the cursor
+- (Austin)(Medium) The zoom scroll zooms to the center, not the cursor
 
 # TODO
 - (Easy) Use the same icons set across the app
 - (Easy) Join multiple similer tool into one iterface
-- (Easy) switching tabs resets state
 - (Easy) Saveable color palettes 
 - (Easy) increase / decrease active frame in animation
 - (Medium) light tool is to strong and doesint work on black
 - (Medium) insert duplicated frame after the current frame
 - (Medium) saved projects should have a preview img
 - (Hard) make selections standout
+    - rotate
+    - scale
+    - draw only in selection
+    - move to new layer / frame
 - (Hard) Ctrl-z undos brush strokes and last canvas resize {urgent} (update: this glitch only happens when actually typing in the changes, and only works when the change makes the value more than the base 32)
     - CTRL-Z undos and changes in text (title, color palette name, ect)
     - When you undo layer joins, the number of layers does not change, the layer just disappears.
@@ -23,9 +25,6 @@
 - (Hard) Add contour tool 
 - (Austin) add console error watch system
 - (Austin)(Easy) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
-
-- shortcuts dont work consistently
-- combine layers and colors into one panel
 
 # Promotion
 - reddit
