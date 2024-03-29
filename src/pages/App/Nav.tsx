@@ -167,7 +167,7 @@ export function Nav(props: IProps) {
 
                     <ul className="w-56 rounded-lg menu bg-base-200">
                         {[...data.projectList].reverse().map((project) => (
-                            <div className="row">
+                            <div key={project} className="row">
                                 <li key={project}
                                     onClick={() => {
                                         data.loadProjectFromLocalStorage(project);
