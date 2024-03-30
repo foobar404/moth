@@ -1,6 +1,6 @@
 import { useCanvas } from "./useCanvas";
 import { useGlobalStore } from "./useGlobalStore";
-import { useIntervalEffect } from "./useIntervalEffect";
+import { useSetInterval } from "./useSetInterval";
 import { useModal } from "./useModal";
 import { useShortcuts } from './useShortcuts';
 
@@ -8,7 +8,7 @@ import { useShortcuts } from './useShortcuts';
 export {
     useCanvas,
     useGlobalStore,
-    useIntervalEffect,
+    useSetInterval,
     useModal,
     useShortcuts,
 };

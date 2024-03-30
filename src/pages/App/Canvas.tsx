@@ -1347,37 +1347,19 @@ function useCanvas() {
         if (rightTool) toolHandlers[rightTool](x, y, mouseState.current.rightDown, false);
         if (leftTool) toolHandlers[leftTool](x, y, mouseState.current.leftDown, true);
 
-        // color related operations
-        const existingColor = stateCache.current.activeColorPalette.colors
-            .find(c => JSON.stringify(c) === JSON.stringify(stateCache.current.activeColor));
-        if (!existingColor && toolButtonActive) {
-            const newColors = [...stateCache.current.activeColorPalette.colors, stateCache.current.activeColor];
-            setActiveColorPalette({ ...stateCache.current.activeColorPalette, colors: newColors });
-        }
-        if (toolButtonActive) {
-            let { r, g, b, a } = stateCache.current.activeColor;
-            let colorString = `${r},${g},${b},${a}`;
-
-            // Access the colorStats object once to avoid repeated lookups
-            const currentColorStats = stateCache.current.colorStats[colorString] || { count: 0 };
-
-            setColorStats({
-                ...stateCache.current.colorStats,
-                [colorString]: {
-                    count: currentColorStats.count + 1,
-                    lastUsed: (new Date()).toUTCString()
-                },
-            });
-        }
-
         // save pixels from saveCanvas to active layer
         {
             let savedImg = saveCanvas.getImageData();
-
-            const uint32View = new Uint32Array(savedImg.data.buffer);
-            let newChange = !uint32View.every(value => value === 0);
+            let newChange = new Uint32Array(savedImg.data.buffer).some(value => value !== 0);
             if (newChange) {
                 setCanvasChangeCount(stateCache.current.canvasChangeCount + 1);
+
+                const existingColor = stateCache.current.activeColorPalette.colors
+                    .find(c => JSON.stringify(c) === JSON.stringify(stateCache.current.activeColor));
+                if (!existingColor && toolButtonActive) {
+                    const newColors = [...stateCache.current.activeColorPalette.colors, stateCache.current.activeColor];
+                    setActiveColorPalette({ ...stateCache.current.activeColorPalette, colors: newColors });
+                }
             }
 
             for (let i = 0; i < savedImg.data.length; i += 4) {

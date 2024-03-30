@@ -55,7 +55,7 @@ export interface IColorPalette {
 }
 
 
-export interface IColorStats { [color: string]: { count: number, lastUsed: string } }
+export interface IColorStats { [color: string]: { count: number, lastUsed: number } } // key is rgba() string
 
 
 export type ITool = "brush" | "eraser" | "shape" | "light" | "smudge" | "eyedropper" | "bucket" | "move" | "wand" | "box" | "lasso" | "bone" | "line" | "mirror";

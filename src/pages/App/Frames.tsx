@@ -91,7 +91,7 @@ export function Frames() {
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => data.handleDrop(e, frame)}
                         onDragEnd={data.handleDragEnd}
-                        className={`h-[60px] min-w-[60px] max-w-[106px] flex-shrink-0 p-app__grid m-1 hover:scale-105 shadow-md rounded-md cursor-pointer box-content ${frame.symbol === data.activeFrame.symbol ? "border-4 !border-black" : ""}`}
+                        className={`h-[60px] min-w-[60px] max-w-[106px] flex-shrink-0 p-app__grid m-1 hover:scale-105 shadow-md rounded-md cursor-pointer box-content border-4 border-base-100 ${frame.symbol === data.activeFrame.symbol ? "!border-base-content" : ""}`}
                         src={data.imageMap[frame.symbol]}
                         onClick={() => {
                             data.setActiveFrame(frame);

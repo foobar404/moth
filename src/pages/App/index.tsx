@@ -33,7 +33,7 @@ export function App() {
 
 			<section className={`p-app__sidebar-right p-app__block --right}`}>
 				<Drawer isOpen className="p-2 border-4 rounded-lg border-secondary">
-					<h2 className="p-2 duration-100 cursor-pointer text-secondary-content row bg-secondary rounded-box hover:scale-105">
+					<h2 className="p-2 duration-100 border-4 cursor-pointer border-base-100 text-secondary-content row bg-secondary rounded-box hover:scale-105">
 						<IoMdColorPalette className="mr-1 text-xl" /> Colors
 					</h2>
 
@@ -43,7 +43,7 @@ export function App() {
 				<div className="my-1"></div>
 
 				<Drawer className="p-2 border-4 rounded-lg border-secondary">
-					<h2 className="p-2 duration-100 cursor-pointer text-secondary-content row bg-secondary rounded-box hover:scale-105">
+					<h2 className="p-2 duration-100 border-4 cursor-pointer border-base-100 text-secondary-content row bg-secondary rounded-box hover:scale-105">
 						<IoLayers className="mr-1 text-xl" /> Layers
 					</h2>
 

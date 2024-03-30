@@ -15,7 +15,7 @@ import { Buffer as pngBuffer } from "buffer";
 import { MdMovieFilter } from "react-icons/md";
 import React, { useEffect, useState } from 'react';
 import { IoImage, IoLayers } from "react-icons/io5";
-import { useCanvas, useModal, useGlobalStore, useIntervalEffect } from '../../utils';
+import { useCanvas, useModal, useGlobalStore, useSetInterval } from '../../utils';
 
 
 interface IProps { }
@@ -307,7 +307,7 @@ function useNav(props: IProps) {
     }, [canvasChangeCount]);
 
     // save project locally
-    useIntervalEffect(() => {
+    useSetInterval(() => {
         try {
             let localProject = getProject();
 
@@ -569,8 +569,7 @@ function useNav(props: IProps) {
             workerScript: '/js/gif.worker.js',
             quality: 1,
             workers: 2,
-            background: '#fff',
-            transparent: '#fff',
+            transparent: 0x000000,
             height: scaledHeight,
             width: scaledWidth,
             repeat: 0

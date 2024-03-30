@@ -1,10 +1,11 @@
+import tinycolor from "tinycolor2";
 import { IColor } from "../../types";
 import ReactTooltip from 'react-tooltip';
 import { MdDelete } from "react-icons/md";
 import { ChromePicker } from "react-color";
-import { useGlobalStore } from '../../utils';
 import { BiPlusMedical } from "react-icons/bi";
 import React, { useEffect, useState } from 'react';
+import { useGlobalStore, useSetInterval, useShortcuts } from '../../utils';
 
 
 export function Colors() {
@@ -12,13 +13,21 @@ export function Colors() {
 
     return (
         <section className="mt-2">
-
             <div onKeyDown={e => e.stopPropagation()}>
                 <ChromePicker
                     disableAlpha
                     className="!w-full !bg-base-100 !rounded-xl !shadow-xl border-4 border-accent overflow-hidden !box-border"
                     color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(2)) }}
                     onChange={(color: any) => data.setActiveColor({ r: color.rgb.r, g: color.rgb.g, b: color.rgb.b, a: Math.ceil(color.rgb.a * 255) })} />
+            </div>
+
+            <div data-tip="active / prev color toggle ( z )"
+                data-for="tooltip"
+                onClick={data.swapColors}
+                className={`h-10 row rounded-lg overflow-hidden my-2 hover:scale-95 cursor-pointer`}>
+
+                <div className="w-1/2 h-full" style={{ background: `${tinycolor(data.activeColor).toRgbString()}` }}></div>
+                <div className="w-1/2 h-full" style={{ background: `${tinycolor(data.recentColors[1]).toRgbString()}` }}></div>
             </div>
 
             <nav className="my-2 p-app__color-controls !bg-accent">
@@ -99,9 +108,12 @@ export function Colors() {
                     <div key={i}
                         data-for="tooltip"
                         onClick={() => data.setActiveColor(color)}
-                        data-tip={`rgba(${color.r}, ${color.g}, ${color.b}, ${Number((color.a / 255).toFixed(2))})`}
-                        style={{ background: `rgba(${color.r}, ${color.g}, ${color.b}, ${(color.a / 255).toFixed(2)})` }}
-                        className={`hover:scale-105 cursor-pointer h-8 w-8 rounded shadow-xl mr-1 mb-1 ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "border-2 border-black" : ""}`}>
+                        data-tip={`${tinycolor(color).toHexString()}`}
+                        style={{ background: `${tinycolor(color).toHexString()}` }}
+                        className={`hover:scale-105 overflow-hidden box-content row cursor-pointer h-7 w-7 rounded shadow-xl mr-1 mb-1 border-4 border-transparent ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "border-base-content" : ""}`}>
+                        <span className="text-xs" style={{ color: `${data.getTextColor(color)}`, fontSize: "9px" }}>
+                            {data.colorStats[tinycolor(color).toRgbString()]?.count ?? 0}
+                        </span>
                     </div>
                 ))}
             </section>
@@ -112,32 +124,74 @@ export function Colors() {
 
 function useColors() {
     const {
-        colorStats, colorPalettes, setColorPalettes, activeColorPalette,
+        colorStats, setColorStats, colorPalettes, setColorPalettes, activeColorPalette,
         setActiveColorPalette, activeColor, frames, activeFrame, activeLayer,
-        setActiveColor,
+        setActiveColor, canvasChangeCount
     } = useGlobalStore();
+    const recentColors = sortColorsByMostRecent(activeColorPalette.colors);
     let [visibleColors, setVisibleColors] = useState<IColor[]>(activeColorPalette.colors);
     let [colorState, setColorState] = useState<{ filter: "all" | "project" | "frame" | "layer", sort: "default" | "hue" | "recent" | "count" }>({
         filter: "all",
         sort: "default"
     });
 
-    useEffect(() => {
-        ReactTooltip.rebuild();
-    }, [activeColorPalette]);
+    useShortcuts({
+        "z": swapColors
+    });
 
     useEffect(() => {
+        ReactTooltip.rebuild();
+    }, [visibleColors]);
+
+    // adjust visible colors
+    useEffect(() => {
         let colors = visibleColors
+
         if (colorState.filter === "all") colors = showColorsInPalette();
         if (colorState.filter === "project") colors = showColorsInProject();
         if (colorState.filter === "frame") colors = showColorsInFrame();
         if (colorState.filter === "layer") colors = showColorsInLayer();
 
-        if (colorState.sort === "hue") sortColorsByHue(colors);
-        if (colorState.sort === "recent") sortColorsByMostRecent(colors);
-        if (colorState.sort === "count") sortColorsByMostUsed(colors);
-        if (colorState.sort === "default") sortColorsByDefault(colors);
+        if (colorState.sort === "hue") colors = sortColorsByHue(colors);
+        if (colorState.sort === "recent") colors = sortColorsByMostRecent(colors);
+        if (colorState.sort === "count") colors = sortColorsByMostUsed(colors);
+
+        setVisibleColors(colors);
     }, [activeColorPalette, activeColor, colorState, colorStats]);
+
+    // update color stats
+    useSetInterval(() => {
+        let statsCopy = { ...colorStats };
+        let colorString = tinycolor(activeColor).toRgbString();
+
+        if (statsCopy[colorString])
+            statsCopy[colorString].lastUsed = Date.now();
+        else
+            statsCopy[colorString] = { count: 0, lastUsed: Date.now() };
+
+        for (let key in statsCopy) {
+            statsCopy[key].count = 0;
+        }
+
+        frames.forEach(frame => {
+            frame.layers.forEach(layer => {
+                for (let i = 0; i < layer.image.data.length; i += 4) {
+                    let r = layer.image.data[i];
+                    let g = layer.image.data[i + 1];
+                    let b = layer.image.data[i + 2];
+                    let a = layer.image.data[i + 3];
+                    let c = tinycolor({ r, g, b, a }).toRgbString();
+
+                    if (statsCopy[c])
+                        statsCopy[c].count++;
+                    else
+                        statsCopy[c] = { count: 1, lastUsed: 0 };
+                }
+            });
+        });
+
+        setColorStats(statsCopy);
+    }, 500, [canvasChangeCount]);
 
     function deleteColor() {
         let colors = activeColorPalette.colors.filter(c => JSON.stringify(c) !== JSON.stringify(activeColor));
@@ -187,8 +241,6 @@ function useColors() {
     }
 
     function showColorsInPalette() {
-        setVisibleColors(activeColorPalette.colors);
-
         return activeColorPalette.colors;
     }
 
@@ -213,8 +265,6 @@ function useColors() {
             return allColors[colorString];
         });
 
-        setVisibleColors(colors);
-
         return colors;
     }
 
@@ -237,8 +287,6 @@ function useColors() {
             return allColors[colorString];
         });
 
-        setVisibleColors(colors);
-
         return colors;
     }
 
@@ -259,87 +307,84 @@ function useColors() {
             return allColors[colorString];
         });
 
-        setVisibleColors(colors);
-
         return colors;
     }
 
     function sortColorsByMostUsed(colors: IColor[]) {
         let newColors = [...colors].sort((a, b) => {
-            let colorString = `${a.r},${a.g},${a.b},${a.a}`;
-            let colorString2 = `${b.r},${b.g},${b.b},${b.a}`;
+            let colorString = tinycolor(a).toRgbString();
+            let colorString2 = tinycolor(b).toRgbString();
 
             return (colorStats[colorString2]?.count ?? 0) - (colorStats[colorString]?.count ?? 0);
         });
 
-        setVisibleColors(newColors);
         return newColors;
     }
 
     function sortColorsByMostRecent(colors: IColor[]) {
         let newColors = [...colors].sort((a, b) => {
-            let colorString = `${a.r},${a.g},${a.b},${a.a}`;
-            let colorString2: string = `${b.r},${b.g},${b.b},${b.a}`;
+            let colorString = tinycolor(a).toRgbString();
+            let colorString2 = tinycolor(b).toRgbString();
 
             if (colorStats[colorString2]?.lastUsed && !colorStats[colorString]?.lastUsed) return 1;
             if (!colorStats[colorString2]?.lastUsed && colorStats[colorString]?.lastUsed) return -1;
 
-            return (colorStats[colorString2]?.lastUsed ?? colorString2) > (colorStats[colorString]?.lastUsed ?? colorString) ? 1 : -1;
+            return (colorStats[colorString2]?.lastUsed ?? 0) > (colorStats[colorString]?.lastUsed ?? 0) ? 1 : -1;
         });
 
-        setVisibleColors(newColors);
         return newColors;
     }
 
     function sortColorsByHue(colors: IColor[]) {
-        let newColors = [...colors].sort((a, b) => {
-            let [h1, s1, l1] = rgbToHsl(a.r, a.g, a.b);
-            let [h2, s2, l2] = rgbToHsl(b.r, b.g, b.b);
+        return [...colors].sort((a, b) => {
+            let hslA = tinycolor(a).toHsl();
+            let hslB = tinycolor(b).toHsl();
 
-            return (h1 + (s1 * .1) + (l1 * .3)) - (h2 + (s2 * .1) + (l2 * .3));
+            if (hslA.h !== hslB.h) {
+                return hslA.h - hslB.h;
+            }
+
+            if (hslA.s !== hslB.s) {
+                return hslA.s - hslB.s;
+            }
+
+            return hslA.l - hslB.l;
         });
-
-        setVisibleColors(newColors);
-        return newColors;
     }
 
-    function sortColorsByDefault(colors) {
-        setVisibleColors(colors);
+    function getTextColor(backgroundColor) {
+        const color = tinycolor(backgroundColor);
+        const brightness = color.getBrightness();
 
-        return colors;
+        return brightness > 200 ? "#000000" : "#FFFFFF";
     }
 
-    function rgbToHsl(r: number, g: number, b: number) {
-        r /= 255;
-        g /= 255;
-        b /= 255;
-        const l = Math.max(r, g, b);
-        const s = l - Math.min(r, g, b);
-        const h = s
-            ? l === r
-                ? (g - b) / s
-                : l === g
-                    ? 2 + (b - r) / s
-                    : 4 + (r - g) / s
-            : 0;
-        return [
-            60 * h < 0 ? 60 * h + 360 : 60 * h,
-            100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0),
-            (100 * (2 * l - s)) / 2,
-        ];
-    };
+    function swapColors() {
+        let colors = sortColorsByMostRecent(activeColorPalette.colors);
+        setActiveColor(colors[1] ?? activeColor);
+        setColorStats({
+            ...colorStats,
+            [tinycolor(colors[1]).toRgbString()]: {
+                count: colorStats[tinycolor(colors[1]).toRgbString()].count,
+                lastUsed: Date.now()
+            }
+        });
+    }
 
     return {
+        colorStats,
+        colorState,
         activeColor,
-        setActiveColor,
+        recentColors,
+        visibleColors,
         colorPalettes,
         activeColorPalette,
-        setActiveColorPalette,
         addColor,
-        colorState,
+        swapColors,
+        getTextColor,
         deleteColor,
-        visibleColors,
         setColorState,
+        setActiveColor,
         setColorPalette,
         sortColorsByHue,
         showColorsInLayer,
@@ -350,6 +395,7 @@ function useColors() {
         showColorsInProject,
         showColorsInPalette,
         sortColorsByMostUsed,
+        setActiveColorPalette,
         sortColorsByMostRecent,
     };
 }
