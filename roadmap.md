@@ -7,7 +7,6 @@
     - (Medium) add spray tool
     - (Easy) make app comply with PWA standards
 - Nate
-    - (Easy) increase / decrease active frame in animation
 
 # TODO
 - (Easy) hide / show frame
@@ -79,22 +78,22 @@
 - node based editor
 - rig system 
     - mesh deformation tool (points, weights)
-    - bones arnt visible in final render 
-    - one bone per layer 
-    - pivit point for the layer becomes the start of the bone 
-    - choose parent bone when creating new bone 
-    - copy and paste layer copies bones aswell 
+    - bones arnt visible in final render
+    - one bone per layer
+    - pivit point for the layer becomes the start of the bone
+    - choose parent bone when creating new bone
+    - copy and paste layer copies bones aswell
     - when animating bones, use index of bone to figure out which bones should move
-    - parent bones move child bones on other layers 
-- tweening 
-    - generate tweening frame via AI  
-    - choose how many frames to create 
-    - button to generate tweening frames based on "move" tool or "bone" tool 
-    - provide types of progression arcs 
+    - parent bones move child bones on other layers
+- tweening
+    - generate tweening frame via AI
+    - choose how many frames to create
+    - button to generate tweening frames based on "move" tool or "bone" tool
+    - provide types of progression arcs
 - ai sprite gen
-- non-destructive "Effects"    
+- non-destructive "Effects"
     - color filter
-    - outline effect        
+    - outline effect
     - The "sun" effect is a ball, that is placed somewhere on the canvas, and affects the colors of the sprites with a specific falloff
         - light source tool, creates highlights and shadows for you 
 - themes
@@ -110,3 +109,4 @@
     - rotate and scale selection areas
     - duplicate selection 
     - move selection to new layer
+

@@ -8,14 +8,13 @@ export function Preview(props: IPreview) {
 
     return (
         <img src={data.previewImg}
-            className={`p-app__grid p-app__preview border-4 rounded-md shadow-2xl border-accent ${props.className}`} />
+            className={`p-app__grid p-app__preview border-4 rounded-md shadow-2xl border-accent ${props?.className ?? ""}`} />
     )
 }
 
 
 function usePreview(props: IPreview) {
     let [previewImg, setPreviewImg] = useState("");
-    const frameCount = useRef(0);
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const { canvasSize, frames } = useGlobalStore();
@@ -35,20 +34,23 @@ function usePreview(props: IPreview) {
 
     useEffect(() => {
         let loop = setInterval(() => {
-            if (!playingRef.current) return;
-
-            if (frameCount.current >= framesRef.current.length)
-                frameCount.current = 0;
+            // check out of bounds
+            if (props.frameCount.current >= framesRef.current.length)
+                props.frameCount.current = 0;
+            if (props.frameCount.current < 0)
+                props.frameCount.current = framesRef.current.length - 1;
 
             canvas1.clear();
 
-            let frame = framesRef.current[frameCount.current];
+            let frame = framesRef.current[props.frameCount.current];
             let reversedLayers = frame.layers.slice().reverse();
             reversedLayers.forEach(layer => {
                 canvas2.putImageData(layer.image);
                 canvas1.drawImage(canvas2.getElement());
             })
-            frameCount.current += 1;
+            if (playingRef.current) {
+                props.frameCount.current += 1;
+            }
             updatePreviewImg();
         }, 1000 / props.fps);
 
