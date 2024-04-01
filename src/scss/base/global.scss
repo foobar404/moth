@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Varela+Round&display=swap');
 
 * {
     margin: 0;
@@ -7,7 +7,7 @@
 }
 
 html {
-    font-family: 'Varela Round', sans-serif;
+    font-family: "Varela Round", sans-serif;
     color: #222;
     font-size: 16px;
 }
@@ -24,4 +24,13 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
     cursor: pointer;
+}
+
+.no-scroll::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+}
+
+.no-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0);
 }
