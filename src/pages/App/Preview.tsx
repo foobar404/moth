@@ -20,7 +20,6 @@ function usePreview(props: IPreview) {
     const { canvasSize, frames } = useGlobalStore();
     const framesRef = useRef(frames);
     const playingRef = useRef<any>(props.playing);
-    console.log(props, ":usePreviewProps")
 
     useEffect(() => {
         framesRef.current = frames;

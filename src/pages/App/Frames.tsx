@@ -1,7 +1,7 @@
 import { Preview } from './Preview';
 import { IFrame, IPreview } from '../../types';
 import React, { useState, useEffect, useRef } from 'react';
-import { useCanvas, useGlobalStore } from '../../utils';
+import { useCanvas, useGlobalStore, useShortcuts } from '../../utils';
 import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
@@ -246,16 +246,52 @@ function useFrames() {
     }
     function previewFrameLeft() {
         setPreview({ ...preview, playing: false });
-        frameCount.current -= 1;
+        let activeFrameIndex = frames.findIndex(frame => frame.symbol === activeFrame.symbol);
+
+        let frame = frames[activeFrameIndex - 1];
+        frameCount.current = activeFrameIndex - 1
+
+        if ((activeFrameIndex - 1) < 0) {
+            frame = frames[frames.length - 1];
+            frameCount.current = frames.length - 1;
+        }
+        setActiveFrame(frame);
+        setActiveLayer(frame.layers[0]);
     }
     function previewFrameRight() {
         setPreview({ ...preview, playing: false });
-        frameCount.current += 1;
+        let activeFrameIndex = frames.findIndex(frame => frame.symbol === activeFrame.symbol);
+
+        let frame = frames[activeFrameIndex + 1];
+        frameCount.current = activeFrameIndex + 1
+
+        if ((activeFrameIndex + 1) >= frames.length) {
+            frame = frames[0];
+            frameCount.current = 0;
+        }
+        setActiveFrame(frame);
+        setActiveLayer(frame.layers[0]);
     }
 
     function setFps(fps: number) {
         setPreview({ ...preview, fps });
     }
+
+    function toggleAnimationMode() {
+        if (enlargePreview === false) {
+            setEnlargePreview(true);
+            setPreview({ ...preview, playing: true });
+        } else {
+            setEnlargePreview(false);
+            setPreview({ ...preview, playing: false })
+        }
+    }
+
+    useShortcuts({
+        "arrowright": previewFrameRight,
+        "arrowleft": previewFrameLeft,
+        " ": toggleAnimationMode
+    })
 
     return {
         frames,
