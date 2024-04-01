@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import tinycolor from 'tinycolor2';
 
 
 interface IProps {
@@ -98,8 +97,8 @@ export function useCanvas(props?: IProps) {
         }
     }
 
-    const drawLine = (start, end, size = 1, color?) => {
-        let points = [];
+    function drawLine(start, end, size = 1, color?, prefect = false) {
+        let points: { x: number, y: number }[] = [];
         let x0 = start.x;
         let y0 = start.y;
         let x1 = end.x;
@@ -109,12 +108,11 @@ export function useCanvas(props?: IProps) {
         let dy = -Math.abs(y1 - y0);
         let sx = x0 < x1 ? 1 : -1;
         let sy = y0 < y1 ? 1 : -1;
-        let err = dx + dy; // error value e_xy
+        let err = dx + dy;
 
         while (true) {
-            //@ts-ignore
-            points.push({ x: x0, y: y0 }); // Plot the current point
-            if (x0 === x1 && y0 === y1) break; // Check if the line has reached its end
+            points.push({ x: x0, y: y0 });
+            if (x0 === x1 && y0 === y1) break;
             let e2 = 2 * err;
             if (e2 >= dy) {
                 err += dy; // Update the error term
@@ -126,48 +124,61 @@ export function useCanvas(props?: IProps) {
             }
         }
 
-        // Draw pixels for all calculated points
         points.forEach((point: { x: any, y: any }) => {
-            drawPixel(point.x, point.y, size, color); // Assuming drawPixel is defined elsewhere
+            drawPixel(point.x, point.y, size, color);
         });
     };
 
-    const drawRect = (x, y, width, height, color?, fill = false) => {
-        if (!fill) {
+    function drawRect(x, y, width, height, color, fill = false) {
+        if (fill) {
+            // If fill is true, iterate over the rectangle area and draw pixels
+            for (let i = 0; i <= width; i++) {
+                for (let j = 0; j <= height; j++) {
+                    drawPixel(x + i, y + j, 1, color); // Fill pixel inside the rectangle
+                }
+            }
+        } else {
+            // Draw the outline of the rectangle
             for (let i = 0; i <= width; i++) {
                 drawPixel(x + i, y, 1, color); // Top
                 drawPixel(x + i, y + height, 1, color); // Bottom
             }
-            for (let i = 0; i <= height; i++) {
+            for (let i = 1; i < height; i++) { // Start from 1 and end before height to avoid double drawing the corners
                 drawPixel(x, y + i, 1, color); // Left
                 drawPixel(x + width, y + i, 1, color); // Right
             }
         }
-    };
+    }
 
-    const drawSquare = (x, y, sideLength, color?, fill = false) => {
+    function drawSquare(x, y, sideLength, color?, fill = false) {
         drawRect(x, y, sideLength, sideLength, color, fill);
     };
 
     function drawCircle(centerX, centerY, radius, color?, fill = false) {
-        for (let y = -radius; y <= radius; y++) {
-            for (let x = -radius; x <= radius; x++) {
-                if (x * x + y * y <= radius * radius) {
-                    if (fill || x * x + y * y >= (radius - 1) * (radius - 1)) {
-                        drawPixel(centerX + x, centerY + y, 1, color);
-                    }
-                }
-            }
-        }
+        drawOval(centerX, centerY, radius, radius, color, fill);
     }
 
-    function drawOval(centerX, centerY, radiusX, radiusY, color?, fill = false) {
-        const step = 0.01; // Adjust step for more or less detail
+    function drawOval(centerX, centerY, radiusX, radiusY, color, fill = false) {
+        if (fill) {
+            for (let y = Math.ceil(centerY - radiusY); y <= Math.floor(centerY + radiusY); y++) {
+                const preciseY = (y - centerY) / radiusY;
+                const xSpan = radiusX * Math.sqrt(1 - preciseY * preciseY);
 
-        for (let theta = 0; theta < 2 * Math.PI; theta += step) {
-            const x = centerX + radiusX * Math.cos(theta);
-            const y = centerY + radiusY * Math.sin(theta);
-            drawPixel(Math.round(x), Math.round(y), 1, color);
+                // Contract the filling bounds slightly by rounding startX up and endX down.
+                const startX = Math.ceil(centerX - xSpan + 0.5);
+                const endX = Math.floor(centerX + xSpan - 0.5);
+
+                for (let x = startX; x <= endX; x++) {
+                    drawPixel(x, y, 1, color);
+                }
+            }
+        } else {
+            const step = 0.01; // Step for a smooth outline.
+            for (let theta = 0; theta < 2 * Math.PI; theta += step) {
+                const x = centerX + radiusX * Math.cos(theta);
+                const y = centerY + radiusY * Math.sin(theta);
+                drawPixel(Math.round(x), Math.round(y), 1, color);
+            }
         }
     }
 

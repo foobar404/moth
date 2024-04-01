@@ -1,15 +1,16 @@
 # Doing
 - Austin
-    - (Easy) fill shape tooltip
+    - (Medium) The zoom scroll zooms to the center, not the cursor
     - (Easy) make frames & color/layers section collapsible
+    - (Easy) update shortcut keys
     - (Hard) Add blur / jumble tool
     - (Medium) add spray tool
-    - (Medium) The zoom scroll zooms to the center, not the cursor
     - (Easy) make app comply with PWA standards
 - Nate
     - (Easy) increase / decrease active frame in animation
 
 # TODO
+- (Easy) hide / show frame
 - (Easy) left right arrow for frames, up down arrow for layers
 - (Easy) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
 - (Easy) Use the same icons set across the app
@@ -23,8 +24,12 @@
 - (Medium) Multiple sprite tabs
 - (Medium) add pixel perfect mode to line tool
 - (Medium) allow custom brush shapes 
+- (Medium) line tool wasint working (tool state)
+- (Medium) new & duplicated frames go after current frame 
 - (Hard) Add contour tool 
 - (Hard) add font tool
+- (Hard) [ & ] tigger wrong shortcut
+- (Hard) shortcuts stop working after a while
 - (Hard) make selections standout
     - rotate
     - scale

@@ -88,7 +88,7 @@ export function Canvas() {
                 </>)}
 
                 {data.toolSettings.leftTool === "shape" && (<>
-                    <label data-tip="square"
+                    <label data-tip="fill shape"
                         data-for="tooltip"
                         className="flex mr-2 row">
                         <FaFill className="mr-1 text-lg text-accent-content" />
@@ -176,6 +176,7 @@ export function Canvas() {
                             data-tip="brush size ( [ ) ( ] )"
                             data-for="tooltip"
                             value={data.toolSettings.size}
+                            min={1}
                             className="input input-xs text-base-content w-[50px]"
                             onKeyUp={e => e.stopPropagation()}
                             onChange={e => {
@@ -249,9 +250,9 @@ export function Canvas() {
 function useCanvas() {
     const { toolSettings, setActiveColor, setToolSettings,
         activeColor, activeColorPalette, setActiveColorPalette,
-        colorStats, setColorStats, activeLayer, setActiveLayer,
-        activeFrame, canvasSize, setCanvasSize, onionSkin, frames,
-        canvasChangeCount, setCanvasChangeCount
+        colorStats, activeLayer, setActiveLayer, activeFrame,
+        canvasSize, setCanvasSize, onionSkin, frames,
+        canvasChangeCount, setCanvasChangeCount,
     } = useGlobalStore();
     const mainCanvasContainer = useRef<HTMLElement>(null);
     const mainCanvas = useCanvasHook();
@@ -308,7 +309,7 @@ function useCanvas() {
                 let start = toolState.current.brush.previousPoint;
                 let end = { x: newX, y: newY };
 
-                saveCanvas.drawLine(start, end, stateCache.current.toolSettings.size);
+                saveCanvas.drawLine(start, end, stateCache.current.toolSettings.size, false);
 
                 toolState.current.brush.previousPoint.x = newX;
                 toolState.current.brush.previousPoint.y = newY;
@@ -412,10 +413,10 @@ function useCanvas() {
                     endPoint.x -= Math.floor(width / 2);
                     endPoint.y -= Math.floor(height / 2);
 
-                    if (preview) previewCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
+                    if (preview) previewCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size, false);
 
                     if (!toolButtonActive) {
-                        saveCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size);
+                        saveCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size, false);
                         toolState.current.stage = ToolStage.PREVIEW;
                         toolState.current.activePoints = [];
                     }
@@ -436,23 +437,23 @@ function useCanvas() {
             let end = { x: newX, y: newY };
 
             // Draw line for initial point
-            tempCanvas1.drawLine(start, end, size);
+            tempCanvas1.drawLine(start, end, size, false);
 
             // Calculate mirrored positions and draw lines for X and Y axis mirroring
             if (mirror.x) {
                 let mirroredStartX = mainCanvas.getWidth() - start.x - size;
                 let mirroredEndX = mainCanvas.getWidth() - end.x - size;
-                tempCanvas1.drawLine({ x: mirroredStartX, y: start.y }, { x: mirroredEndX, y: end.y }, size);
+                tempCanvas1.drawLine({ x: mirroredStartX, y: start.y }, { x: mirroredEndX, y: end.y }, size, false);
             }
             if (mirror.y) {
                 let mirroredStartY = mainCanvas.getHeight() - start.y - size;
                 let mirroredEndY = mainCanvas.getHeight() - end.y - size;
-                tempCanvas1.drawLine({ x: start.x, y: mirroredStartY }, { x: end.x, y: mirroredEndY }, size);
+                tempCanvas1.drawLine({ x: start.x, y: mirroredStartY }, { x: end.x, y: mirroredEndY }, size, false);
             }
             if (mirror.x && mirror.y) {
                 let mirroredStartXY = { x: mainCanvas.getWidth() - start.x - size, y: mainCanvas.getHeight() - start.y - size };
                 let mirroredEndXY = { x: mainCanvas.getWidth() - end.x - size, y: mainCanvas.getHeight() - end.y - size };
-                tempCanvas1.drawLine(mirroredStartXY, mirroredEndXY, size);
+                tempCanvas1.drawLine(mirroredStartXY, mirroredEndXY, size, false);
             }
 
             toolState.current.mirror.previousPoint.x = newX;
@@ -603,15 +604,14 @@ function useCanvas() {
                         const left = end.x >= start.x ? start.x : start.x - size;
                         const top = end.y >= start.y ? start.y : start.y - size;
 
-                        tempCanvas1.drawRect(left, top, width, height, stateCache.current.activeColor);
-
-                        if (stateCache.current.toolSettings.fillShape) {
-                            let x = left + width / 2;
-                            let y = top + height / 2;
-                            tempCanvas1.floodFill(x, y, (pointX, pointY) => {
-                                tempCanvas1.drawPixel(pointX, pointY, 1, stateCache.current.activeColor);
-                            });
-                        }
+                        tempCanvas1.drawRect(
+                            left,
+                            top,
+                            width,
+                            height,
+                            stateCache.current.activeColor,
+                            stateCache.current.toolSettings.fillShape,
+                        );
                     }
                     if (stateCache.current.toolSettings.shape == "rect") {
                         const width = Math.abs(end.x - start.x);
@@ -619,47 +619,48 @@ function useCanvas() {
                         const left = Math.min(start.x, end.x);
                         const top = Math.min(start.y, end.y);
 
-                        tempCanvas1.drawRect(left, top, width, height, stateCache.current.activeColor);
-
-                        if (stateCache.current.toolSettings.fillShape) {
-                            let x = left + width / 2;
-                            let y = top + height / 2;
-                            tempCanvas1.floodFill(x, y, (pointX, pointY) => {
-                                tempCanvas1.drawPixel(pointX, pointY, 1, stateCache.current.activeColor);
-                            });
-                        }
+                        tempCanvas1.drawRect(
+                            left,
+                            top,
+                            width,
+                            height,
+                            stateCache.current.activeColor,
+                            stateCache.current.toolSettings.fillShape,
+                        );
                     }
                     if (stateCache.current.toolSettings.shape === "circle") {
                         const width = Math.abs(end.x - start.x);
                         const height = Math.abs(end.y - start.y);
                         const size = Math.max(width, height);
                         const radius = size / 2;
-                        const centerX = start.x + (end.x >= start.x ? radius : -radius);
-                        const centerY = start.y + (end.y >= start.y ? radius : -radius);
+                        let centerX = start.x + (end.x >= start.x ? radius : -radius);
+                        let centerY = start.y + (end.y >= start.y ? radius : -radius);
 
-                        tempCanvas1.drawOval(centerX, centerY, radius, radius, stateCache.current.activeColor);
-
-                        if (stateCache.current.toolSettings.fillShape) {
-                            tempCanvas1.floodFill(centerX, centerY, (pointX, pointY) => {
-                                tempCanvas1.drawPixel(pointX, pointY, 1, stateCache.current.activeColor);
-                            });
-                        }
+                        tempCanvas1.drawOval(
+                            centerX,
+                            centerY,
+                            radius,
+                            radius,
+                            stateCache.current.activeColor,
+                            stateCache.current.toolSettings.fillShape,
+                        );
                     }
                     if (stateCache.current.toolSettings.shape === "oval") {
                         const width = Math.abs(end.x - start.x);
                         const height = Math.abs(end.y - start.y);
                         const radiusX = width / 2;
                         const radiusY = height / 2;
-                        const centerX = (start.x + end.x) / 2;
-                        const centerY = (start.y + end.y) / 2;
+                        let centerX = (start.x + end.x) / 2;
+                        let centerY = (start.y + end.y) / 2;
 
-                        tempCanvas1.drawOval(centerX, centerY, radiusX, radiusY, stateCache.current.activeColor);
-
-                        if (stateCache.current.toolSettings.fillShape) {
-                            tempCanvas1.floodFill(centerX, centerY, (pointX, pointY) => {
-                                tempCanvas1.drawPixel(pointX, pointY, 1, stateCache.current.activeColor);
-                            });
-                        }
+                        tempCanvas1.drawOval(
+                            centerX,
+                            centerY,
+                            radiusX,
+                            radiusY,
+                            stateCache.current.activeColor,
+                            stateCache.current.toolSettings.fillShape,
+                        );
                     }
 
                     if (toolButtonActive) {
