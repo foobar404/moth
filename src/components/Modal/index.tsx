@@ -19,7 +19,8 @@ export function Modal(props: IProps) {
                 onClick={() => props.setIsOpen(false)}>
                 <section className="c-modal__body !bg-base-100"
                     onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
-                    <button onClick={() => props.setIsOpen(false)}
+                    <button aria-label="exit"
+                        onClick={() => props.setIsOpen(false)}
                         className="absolute top-2 right-2 btn btn-sm btn-error">
                         <ImCross />
                     </button>

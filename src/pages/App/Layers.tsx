@@ -15,44 +15,51 @@ export function Layers() {
     return (
         <section className="mt-2">
             <nav className="mb-2 p-app__layer-controls !bg-accent">
-                <button data-tip="add new layer"
+                <button aria-label="add new layer"
+                    data-tip="add new layer"
                     data-for="tooltip"
                     onClick={data.addNewLayer}
                     className="btn btn-xs">
                     <HiDocumentAdd className="text-lg" />
                 </button>
-                <button data-tip="delete current layer"
+                <button aria-label="delete current layer"
+                    data-tip="delete current layer"
                     data-for="tooltip"
                     onClick={data.deleteLayer}
                     className="btn btn-xs">
                     <MdDelete className="text-lg" />
                 </button>
-                <button data-tip="move layer up"
+                <button aria-label="move current layer up"
+                    data-tip="move layer up"
                     data-for="tooltip"
                     onClick={data.moveLayerUp}
                     className="btn btn-xs">
                     <BsFillCaretUpFill className="text-lg" />
                 </button>
-                <button data-tip="move layer down"
+                <button aria-label="move current layer down"
+                    data-tip="move layer down"
                     data-for="tooltip"
                     onClick={data.moveLayerDown}
                     className="btn btn-xs">
                     <BsFillCaretDownFill className="text-lg" />
                 </button>
-                <button data-tip="merge layer with layer below"
+                <button aria-label="merge current layer with layer below"
+                    data-tip="merge layer with layer below"
                     data-for="tooltip"
                     onClick={data.mergeLayer}
                     className="btn btn-xs">
                     <RiGitMergeFill className="text-lg" />
                 </button>
-                <button data-tip="duplicate layer"
+                <button aria-label="duplicate current layer"
+                    data-tip="duplicate layer"
                     data-for="tooltip"
                     onClick={data.duplicateLayer}
                     className="btn btn-xs">
                     <IoCopy className="text-lg" />
                 </button>
                 <div className="content-center w-full space-x-2 row">
-                    <button data-tip={`${data.layersAreVisible ? "hide non-active layers" : "show all layers"}`}
+                    <button aria-label="toggle all layers visibility"
+                        data-tip={`${data.layersAreVisible ? "hide non-active layers" : "show all layers"}`}
                         data-for="tooltip"
                         onClick={data.toggleAllLayerVisibility}
                         className="btn btn-xs">
@@ -62,7 +69,8 @@ export function Layers() {
                         data-for="tooltip"
                         className="w-full mt-1">
                         <p hidden>layers opacity lever</p>
-                        <input min="1"
+                        <input aria-label="non-active layers opacity slider"
+                            min="1"
                             step="1"
                             max="255"
                             type="range"
@@ -76,12 +84,14 @@ export function Layers() {
             <section className="space-y-2">
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
                     <div className="space-x-2 row" key={i}>
-                        <button onClick={() => data.toggleLayerVisibility(layer)}
+                        <button aria-label={`toggle visibility of layer ${layer.name}`}
+                            onClick={() => data.toggleLayerVisibility(layer)}
                             className="self-stretch h-auto ml-1 btn btn-xs btn-accent">
                             {layer.opacity === 255 ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
                         </button>
                         <div className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
                             <img src={data.imageMap[layer.symbol]}
+                                alt={`layer #${i + 1}`}
                                 draggable
                                 onDragEnd={data.handleDragEnd}
                                 onDragOver={(e) => e.preventDefault()}
@@ -89,7 +99,7 @@ export function Layers() {
                                 onClick={() => data.setActiveLayer(layer)}
                                 onDragStart={(e) => data.handleDragStart(e, layer)}
                                 className="w-12 h-12 mx-1 rounded-sm shadow-md p-app__grid cursor-grab" />
-                            <input
+                            <input aria-label={`${layer.name} layer`}
                                 data-tip={`${layer.name}`}
                                 data-for="tooltip"
                                 type="text"

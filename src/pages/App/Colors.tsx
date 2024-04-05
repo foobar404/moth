@@ -32,13 +32,15 @@ export function Colors() {
 
             <nav className="my-2 p-app__color-controls !bg-accent">
                 <div className="w-full space-x-1 row">
-                    <button data-tip="add new pallete"
+                    <button aria-label="add new color palette" 
+                        data-tip="add new pallete"
                         data-for="tooltip"
                         onClick={data.addNewColorPalette}
                         className="btn btn-xs">
                         <BiPlusMedical className="text-lg" />
                     </button>
-                    <select data-tip="color pallete selection"
+                    <select aria-label="color palettes" 
+                        data-tip="color pallete selection"
                         data-for="tooltip"
                         className="w-1/3 select select-xs"
                         onChange={(e) => data.setColorPalette(Number(e.target.value))}
@@ -49,14 +51,16 @@ export function Colors() {
                         ))}
                     </select>
 
-                    <input type="text"
+                    <input aria-label="color palette name" 
+                        type="text"
                         data-for="tooltip"
                         data-tip="color pallete name"
                         className="w-1/3 input input-xs"
                         value={data.activeColorPalette.name}
                         onKeyDown={e => e.stopPropagation()}
                         onChange={e => data.updatePaletteName(e.currentTarget.value)} />
-                    <button data-tip="remove current pallete"
+                    <button aria-label="remove current color palette" 
+                        data-tip="remove current pallete"
                         data-for="tooltip"
                         className="btn btn-xs"
                         onClick={data.deleteColorPalette}>
@@ -65,14 +69,16 @@ export function Colors() {
                 </div>
 
                 <div className="w-full space-x-1 row">
-                    <button data-tip="add current color"
+                    <button aria-label="add current color" 
+                        data-tip="add current color"
                         data-for="tooltip"
                         onClick={data.addColor}
                         className="btn btn-xs">
                         <BiPlusMedical className="text-lg" />
                     </button>
 
-                    <select data-tip="sort colors"
+                    <select aria-label="color sorting" 
+                        data-tip="sort colors"
                         data-for="tooltip"
                         className="w-1/3 select select-xs"
                         value={data.colorState.sort}
@@ -83,7 +89,8 @@ export function Colors() {
                         <option value="hue">Hue</option>
                     </select>
 
-                    <select className="w-1/3 select select-xs"
+                    <select aria-label="color filtering" 
+                        className="w-1/3 select select-xs"
                         data-tip="filter colors"
                         data-for="tooltip"
                         value={data.colorState.filter}
@@ -94,7 +101,8 @@ export function Colors() {
                         <option value="layer">Layer Colors</option>
                     </select>
 
-                    <button data-tip="remove current color"
+                    <button aria-label="remove current color" 
+                        data-tip="remove current color"
                         data-for="tooltip"
                         onClick={data.deleteColor}
                         className="btn btn-xs">

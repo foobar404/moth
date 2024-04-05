@@ -14,32 +14,37 @@ export function Frames() {
         <section className="flex-1 w-1/2">
             <nav className={"row !justify-between"}>
                 <section className="space-x-2 p-app__frame-controls-section bg-accent">
-                    <button data-tip="new frame" data-for="tooltip"
+                    <button aria-label="add new frame" 
+                        data-tip="new frame" data-for="tooltip"
                         onClick={data.addFrame}
                         className="btn btn-xs">
                         <MdAddPhotoAlternate className="text-lg" />
                     </button>
-                    <button data-tip="duplicate frame"
+                    <button aria-label="duplicate current frame" 
+                        data-tip="duplicate frame"
                         data-for="tooltip"
                         onClick={data.duplicateFrame}
                         className="btn btn-xs">
                         <IoCopy className="text-lg" />
                     </button>
 
-                    <button data-tip="move frame left"
+                    <button aria-label="move current frame left" 
+                        data-tip="move frame left"
                         data-for="tooltip"
                         onClick={data.moveFrameLeft}
                         className="btn btn-xs">
                         <BsFillCaretLeftFill className="text-lg" />
                     </button>
-                    <button data-tip="move frame right"
+                    <button aria-label="move current frame right" 
+                        data-tip="move frame right"
                         data-for="tooltip"
                         onClick={data.moveFrameRight}
                         className="btn btn-xs">
                         <BsFillCaretRightFill className="text-lg" />
                     </button>
 
-                    <button data-tip="delete frame"
+                    <button aria-label="delete current frame"
+                        data-tip="delete frame"
                         data-for="tooltip"
                         onClick={data.deleteFrame}
                         className="btn btn-xs">
@@ -48,28 +53,32 @@ export function Frames() {
                 </section>
 
                 <section className="flex items-center space-x-2 p-app__frame-controls-section bg-accent">
-                    <button data-tip={"animation frame left"}
+                    <button aria-label="move animation frame left" 
+                        data-tip={"animation frame left"}
                         data-for="tooltip"
                         onClick={data.previewFrameLeft}
                         className="btn btn-xs">
                         {<IoChevronBack className="text-lg" />}
                     </button>
 
-                    <button data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
+                    <button aria-label="toggle animation play/pause" 
+                        data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
                         data-for="tooltip"
                         onClick={data.togglePlay}
                         className="btn btn-xs">
                         {data.preview.playing ? <IoStop className="text-lg" /> : <IoPlay className="text-lg" />}
                     </button>
 
-                    <button data-tip={"animation frame right"}
+                    <button aria-label="move animation frame right" 
+                        data-tip={"animation frame right"}
                         data-for="tooltip"
                         onClick={data.previewFrameRight}
                         className="btn btn-xs">
                         {<IoChevronForward className="text-lg" />}
                     </button>
 
-                    <input data-tip="fps slider"
+                    <input aria-label="current fps slider" 
+                        data-tip="fps slider"
                         data-for="tooltip"
                         type="range"
                         min="1"
@@ -79,7 +88,8 @@ export function Frames() {
                         className="range range-xs range-secondary max-w-[60px]"
                         onChange={e => data.setFps(Number(e.target.value))} />
 
-                    <input data-tip="fps"
+                    <input aria-label="current fps input" 
+                        data-tip="fps"
                         data-for="tooltip"
                         type="number"
                         min="1"
@@ -90,14 +100,16 @@ export function Frames() {
                 </section>
 
                 <section className="row !flex-nowrap p-app__frame-controls-section bg-accent">
-                    <button data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
+                    <button aria-label="toggle onion skin effect" 
+                        data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
                         data-for="tooltip"
                         className="mr-2 btn btn-xs"
                         onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
                         {data.onionSkin ? <MdLayers className="text-lg" /> : <MdLayersClear className="text-lg" />}
                     </button>
 
-                    <input data-tip="onion skin opacity"
+                    <input aria-label="onion skin opacity slider" 
+                        data-tip="onion skin opacity"
                         data-for="tooltip"
                         type="range"
                         min="0"
@@ -111,6 +123,7 @@ export function Frames() {
             <section className={`overflow-auto p-1 row-left max-h-[400px] ${data.enlargePreview ? "!row flex-wrap" : ""}`}>
                 {data.frames.map((frame, i) => (
                     <img key={i}
+                        alt={`frame #${i + 1}`}
                         draggable
                         onDragStart={(e) => data.handleDragStart(e, frame)}
                         onDragOver={(e) => e.preventDefault()}

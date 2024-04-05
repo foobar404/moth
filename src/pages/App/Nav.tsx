@@ -45,37 +45,43 @@ export function Nav(props: IProps) {
                     <div>
                         <label>
                             <p>Scale: {data.exportSettings.scale} - {data.canvasSize.height * data.exportSettings.scale} x {data.canvasSize.width * data.exportSettings.scale}</p>
-                            <input type="range"
+                            <input aria-label="export image scale"
+                                type="range"
                                 value={data.exportSettings.scale}
                                 className="range range-slider-base-content" min={1} max={20} step={1}
                                 onChange={(e) => data.setExportSettings({ ...data.exportSettings, scale: e.currentTarget.valueAsNumber })} />
                         </label>
                         <label className="label">
                             <p className="mr-2">Include Moth Data:</p>
-                            <input type="checkbox"
+                            <input aria-label="include moth data toggle"
+                                type="checkbox"
                                 className="checkbox"
                                 checked={data.exportSettings.mothData}
                                 onChange={e => data.setExportSettings({ ...data.exportSettings, mothData: e.currentTarget.checked })} />
                         </label>
                     </div>
 
-                    <button className="btn min-w-[250px] text-left"
+                    <button aria-label="export current layer"
+                        className="btn min-w-[250px] text-left"
                         onClick={() => data.exportProject({ layerOnly: true })}>
                         <IoLayers className="text-2xl" />
                         Export Current Layer
                     </button>
-                    <button className="btn min-w-[250px]"
+                    <button aria-label="export current frame"
+                        className="btn min-w-[250px]"
                         onClick={() => data.exportProject({ frameOnly: true })}>
                         <IoImage className="text-2xl" />
                         Export Current Frame
                     </button>
                     <section className="p-4 rounded-lg shadow-inner col bg-base-200">
-                        <button className="btn btn-outline min-w-[250px] mb-2"
+                        <button aria-label="export all frames as a gif"
+                            className="btn btn-outline min-w-[250px] mb-2"
                             onClick={data.createGif}>
                             <PiGifFill className="text-2xl" />
                             Export as GIF
                         </button>
-                        <input data-tip="fps"
+                        <input aria-label="gif fps setting"
+                            data-tip="fps"
                             data-for="tooltip"
                             type="number"
                             className="w-20 input input-sm"
@@ -98,21 +104,24 @@ export function Nav(props: IProps) {
                             onChange={e => data.setExportSettings({ ...data.exportSettings, videoFps: e.currentTarget.valueAsNumber })} />
                     </section> */}
                     <section className="p-4 rounded-lg shadow-inner col bg-base-200">
-                        <button className="btn btn-accent min-w-[250px] mb-2"
+                        <button aria-label="export all frames as a spritesheet"
+                            className="btn btn-accent min-w-[250px] mb-2"
                             onClick={() => data.exportProject()}>
                             <MdMovieFilter className="text-2xl" />
                             Export as Spritesheet
                         </button>
 
                         <section className="space-x-2 row">
-                            <input data-tip="padding x"
+                            <input aria-label="spritesheet x padding value"
+                                data-tip="padding x"
                                 data-for="tooltip"
                                 type="number"
                                 className="w-20 input input-sm"
                                 value={data.exportSettings.paddingX}
                                 onKeyUp={e => e.stopPropagation()}
                                 onChange={e => data.setExportSettings({ ...data.exportSettings, paddingX: e.currentTarget.valueAsNumber })} />
-                            <input data-tip="padding y"
+                            <input aria-label="spritesheet y padding value"
+                                data-tip="padding y"
                                 data-for="tooltip"
                                 type="number"
                                 className="w-20 input input-sm"
@@ -136,7 +145,8 @@ export function Nav(props: IProps) {
             <ReactTooltip id="tooltip" />
             <main className="p-12">
                 <section className="space-y-2 col">
-                    <button className="px-14 btn btn-accent"
+                    <button aria-label="import moth project"
+                        className="px-14 btn btn-accent"
                         onClick={() => {
                             data.importProject();
                             data.modalImport.setIsOpen(false);
@@ -144,7 +154,8 @@ export function Nav(props: IProps) {
                         Import Project
                     </button>
                     <section className="p-4 rounded-lg shadow-inner col bg-base-200">
-                        <button className="px-14 btn btn-outline"
+                        <button aria-label="import png, jpg or gif image"
+                            className="px-14 btn btn-outline"
                             onClick={() => {
                                 data.importImage();
                                 data.modalImport.setIsOpen(false);
@@ -153,7 +164,8 @@ export function Nav(props: IProps) {
                         </button>
 
                         <div className="mt-2 space-x-2 row">
-                            <input data-tip="max size"
+                            <input aria-label="max size of image"
+                                data-tip="max size"
                                 data-for="tooltip"
                                 type="number"
                                 max="512"
@@ -163,7 +175,8 @@ export function Nav(props: IProps) {
                                 onKeyDown={e => e.stopPropagation()}
                                 onClick={e => e.currentTarget.select()}
                                 onChange={e => data.setImageImportSettings(s => ({ ...s, size: Number(e.currentTarget?.value ?? 512) }))} />
-                            <input data-tip="max colors"
+                            <input aria-label="max unique colors of image"
+                                data-tip="max colors"
                                 data-for="tooltip"
                                 type="number"
                                 max="128"
@@ -189,7 +202,8 @@ export function Nav(props: IProps) {
                                     className="flex-1 p-1 text-center rounded-md cursor-pointer hover:bg-slate-400 hover:text-white">
                                     {project}
                                 </li>
-                                <button className="btn btn-xs"
+                                <button aria-label="delete project"
+                                    className="btn btn-xs"
                                     onClick={() => data.deleteProject(project)}>
                                     <ImCross />
                                 </button>
@@ -201,16 +215,19 @@ export function Nav(props: IProps) {
         </Modal>
 
         <nav className="space-x-2 row-left !flex-nowrap p-app__nav p-app__block w-max">
-            <button onClick={() => data.modalImport.setIsOpen(true)}
+            <button aria-label="open import settings"
+                onClick={() => data.modalImport.setIsOpen(true)}
                 className="box-content py-1 btn btn-sm btn-primary">
                 <IoImage className="text-2xl" /> Import
             </button>
-            <button onClick={() => data.modalExport.setIsOpen(true)}
+            <button aria-label="open export settings"
+                onClick={() => data.modalExport.setIsOpen(true)}
                 className="box-content py-1 btn btn-sm btn-secondary">
                 <HiStar className="text-2xl" /> Export
             </button>
 
-            <select className="select select-bordered"
+            <select aria-label="themes list"
+                className="select select-bordered"
                 value={data.theme}
                 onChange={(e) => data.changeTheme(e.currentTarget.value)}>
 
@@ -235,7 +252,8 @@ export function Nav(props: IProps) {
                 <option value="xbox-dark">Xbox Dark</option>
             </select>
 
-            <input data-tip="project name"
+            <input aria-label="project name"
+                data-tip="project name"
                 data-for="tooltip"
                 type="text"
                 placeholder="Enter Name"
@@ -244,7 +262,8 @@ export function Nav(props: IProps) {
                 className="input input-md input-bordered min-w-[250px]"
                 onChange={e => data.saveProjectName(e.target.value)} />
 
-            <a data-tip="report a bug"
+            <a aria-label="report a bug with the moth bug form"
+                data-tip="report a bug"
                 data-for="tooltip"
                 target="_blank"
                 className="btn btn-sm btn-warning"
@@ -666,10 +685,17 @@ function useNav(props: IProps) {
     }
 
     function changeTheme(themeName) {
+        // update web app theme
         let root = document.documentElement;
         root.setAttribute("data-theme", themeName);
         localStorage.setItem("moth-theme", themeName);
         setTheme(themeName);
+
+        // update PWA theme
+        const newColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--p').trim();
+        const metaThemeColor = document.querySelector('meta[name=theme-color]');
+        metaThemeColor!.setAttribute("content", `oklch(${newColor})`);
     }
 
     return {

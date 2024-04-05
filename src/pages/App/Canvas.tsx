@@ -25,7 +25,8 @@ export function Canvas() {
                         className="mr-2 swap swap-rotate"
                         onChange={e => data.setToolSettings({ ...data.toolSettings, eraseAll: !data.toolSettings.eraseAll })}>
 
-                        <input type="checkbox" checked={data.toolSettings.eraseAll} />
+                        <input aria-label="erase all pixel with the same color"
+                            type="checkbox" checked={data.toolSettings.eraseAll} />
 
                         <BsCircleHalf className="text-xl swap-off text-accent-content" />
                         <BsCircleFill className="text-xl swap-on text-accent-content" />
@@ -37,7 +38,8 @@ export function Canvas() {
                         <FaCloud data-tip="continuous fill"
                             data-for="tooltip"
                             className={`text-accent-content`} />
-                        <input type="checkbox"
+                        <input aria-label="continuous / global fill toggle for bucket tool"
+                            type="checkbox"
                             className="toggle toggle-sm toggle-secondary"
                             checked={data.toolSettings.fillAll}
                             onChange={(e) => data.setToolSettings({ ...data.toolSettings, fillAll: e.currentTarget.checked })} />
@@ -52,7 +54,8 @@ export function Canvas() {
                         data-tip="mirror x & y axis"
                         data-for="tooltip">
                         <FaArrowsAlt className="inline mr-1 text-lg text-accent-content" />
-                        <input type="radio"
+                        <input aria-label="mirror x and y axis"
+                            type="radio"
                             className="radio radio-xs radio-secondary"
                             name="mirror-type"
                             checked={data.toolSettings.mirror.x && data.toolSettings.mirror.y}
@@ -62,7 +65,8 @@ export function Canvas() {
                         data-tip="mirror x axis"
                         data-for="tooltip">
                         <FaArrowsAltH className="inline mr-1 text-lg text-accent-content" />
-                        <input type="radio"
+                        <input aria-label="mirror x axis"
+                            type="radio"
                             className="radio radio-xs radio-secondary"
                             name="mirror-type"
                             checked={data.toolSettings.mirror.x && !data.toolSettings.mirror.y}
@@ -72,7 +76,8 @@ export function Canvas() {
                         data-tip="mirror y axis"
                         data-for="tooltip">
                         <FaArrowsAltV className="inline mr-1 text-lg text-accent-content" />
-                        <input type="radio"
+                        <input aria-label="mirror y axis"
+                            type="radio"
                             className="radio radio-xs radio-secondary"
                             name="mirror-type"
                             checked={data.toolSettings.mirror.y && !data.toolSettings.mirror.x}
@@ -85,7 +90,8 @@ export function Canvas() {
                         data-for="tooltip"
                         className="flex mr-2 row">
                         <FaFill className="mr-1 text-lg text-accent-content" />
-                        <input type="checkbox"
+                        <input aria-label="fill shapes in with active color"
+                            type="checkbox"
                             className="checkbox checkbox-xs checkbox-secondary"
                             checked={data.toolSettings.fillShape}
                             onChange={e => data.setToolSettings({ ...data.toolSettings, fillShape: e.currentTarget.checked })} />
@@ -94,7 +100,8 @@ export function Canvas() {
                         data-for="tooltip"
                         className="flex mr-2 row">
                         <TbSquareFilled className="mr-1 text-lg text-accent-content" />
-                        <input type="radio"
+                        <input aria-label="set shape to square"
+                            type="radio"
                             name="shape"
                             className="radio radio-xs radio-secondary"
                             value="square"
@@ -105,7 +112,8 @@ export function Canvas() {
                         data-for="tooltip"
                         className="flex mr-2 row">
                         <TbRectangleFilled className="mr-1 text-lg text-accent-content" />
-                        <input type="radio"
+                        <input aria-label="set shape to rectangle"
+                            type="radio"
                             name="shape"
                             className="radio radio-xs radio-secondary"
                             value="rect"
@@ -117,7 +125,8 @@ export function Canvas() {
                         data-for="tooltip"
                         className="flex mr-2 row">
                         <TbCircleFilled className="mr-1 text-lg text-accent-content" />
-                        <input type="radio"
+                        <input aria-label="set shape to circle"
+                            type="radio"
                             name="shape"
                             className="radio radio-xs radio-secondary"
                             value="circle"
@@ -128,7 +137,8 @@ export function Canvas() {
                         data-for="tooltip"
                         className="flex mr-2 row">
                         <TbOvalFilled className="mr-1 text-lg text-accent-content" />
-                        <input type="radio"
+                        <input aria-label="set shape to oval"
+                            type="radio"
                             name="shape"
                             className="radio radio-xs radio-secondary"
                             value="oval"
@@ -144,12 +154,14 @@ export function Canvas() {
                             data-for="tooltip"
                             onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: data.toolSettings.lightMode == "light" ? "dark" : "light" })}>
 
-                            <input type="checkbox" checked={data.toolSettings.lightMode === "light"} />
+                            <input aria-label="toggle dark/light mode"
+                                type="checkbox" checked={data.toolSettings.lightMode === "light"} />
 
                             <FaSun className="text-xl swap-on text-accent-content" />
                             <FaMoon className="text-xl swap-off text-accent-content" />
                         </div>
-                        <input data-tip="dark/light intensity"
+                        <input aria-label="light intensity value"
+                            data-tip="dark/light intensity"
                             data-for="tooltip"
                             value={data.toolSettings.lightIntensity}
                             onChange={(e) => data.setToolSettings({ ...data.toolSettings, lightIntensity: e.currentTarget.valueAsNumber })}
@@ -159,13 +171,15 @@ export function Canvas() {
 
                 {["brush", "eraser", "light", "line", "mirror"].includes(data.toolSettings.leftTool) && (<>
                     <div className="space-x-1 row">
-                        <input data-tip="brush slider ( [ ) ( ] )"
+                        <input aria-label="active tool size slider"
+                            data-tip="brush slider ( [ ) ( ] )"
                             data-for="tooltip"
                             type="range" min="1" max="10" step="1"
                             className="range range-xs range-secondary w-[60px]"
                             value={data.toolSettings.size}
                             onChange={(e) => data.setToolSettings({ ...data.toolSettings, size: e.currentTarget.valueAsNumber })} />
-                        <input type="number"
+                        <input aria-label="active tool size input"
+                            type="number"
                             data-tip="brush size ( [ ) ( ] )"
                             data-for="tooltip"
                             value={data.toolSettings.size}
@@ -180,7 +194,8 @@ export function Canvas() {
             </nav>
 
             <nav className="absolute h-[40px] z-10 p-2 m-2 space-x-2 rounded-lg shadow-lg bg-accent text-accent-content top-right row">
-                <input type="range" min="1" max="50" step="1"
+                <input aria-label="zoom slider"
+                    type="range" min="1" max="50" step="1"
                     data-tip="grid zoom"
                     data-for="tooltip"
                     className="range range-xs range-secondary"
@@ -189,7 +204,8 @@ export function Canvas() {
                     onChange={(e) => data.setZoom(parseInt(e.target.value))} />
                 <label>
                     <p hidden>height</p>
-                    <input data-tip="grid height"
+                    <input aria-label="set grid height"
+                        data-tip="grid height"
                         data-for="tooltip"
                         type="number"
                         min="1"
@@ -202,7 +218,8 @@ export function Canvas() {
                 </label>
                 <label>
                     <p hidden>width</p>
-                    <input data-tip="grid width"
+                    <input aria-label="set grid width"
+                        data-tip="grid width"
                         data-for="tooltip"
                         type="number"
                         min="1"
@@ -213,13 +230,15 @@ export function Canvas() {
                         onClick={e => e.currentTarget.select()}
                         onChange={e => data.resizeHandler({ width: Math.min(512, e.currentTarget.valueAsNumber) })} />
                 </label>
-                <button data-tip="undo ( ctrl + z )"
+                <button aria-label="undo"
+                    data-tip="undo ( ctrl + z )"
                     data-for="tooltip"
                     onClick={data.undo}
                     className="btn btn-xs">
                     <FaUndoAlt />
                 </button>
-                <button data-tip="redo ( ctrl + shift + z )"
+                <button aria-label="redo"
+                    data-tip="redo ( ctrl + shift + z )"
                     data-for="tooltip"
                     onClick={data.redo}
                     className="btn btn-xs">
@@ -229,7 +248,8 @@ export function Canvas() {
                     data-for="tooltip"
                     className="mr-2 row">
                     <FaMap className="mr-2 text-lg" />
-                    <input type="checkbox"
+                    <input aria-label="toggle tilemode" 
+                        type="checkbox"
                         className="checkbox checkbox-xs"
                         onChange={e => data.tilemode.current = e.currentTarget.checked} />
                 </label>
