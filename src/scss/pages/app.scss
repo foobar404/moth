@@ -20,23 +20,6 @@
         position: relative;
     }
 
-    &__canvas-elm {
-        margin: auto;
-        image-rendering: pixelated;
-        image-rendering: crisp-edges;
-        backface-visibility: hidden;
-        transform: translate3d(0, 0, 0);
-        will-change: contents;
-    }
-
-    &__canvas-container {
-        display: flex;
-        height: 100%;
-        overflow: auto;
-        width: 100%;
-        image-rendering: pixelated;
-    }
-
     &__tools {
         display: flex;
         align-items: center;
@@ -69,12 +52,6 @@
         gap: 4px;
         padding: 4px;
         border-radius: 10px;
-    }
-
-    &__color {
-        &.--active {
-            border: 2px solid #fff;
-        }
     }
 
     &__layer-controls {

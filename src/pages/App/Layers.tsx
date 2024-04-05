@@ -3,7 +3,7 @@ import { MdDelete } from "react-icons/md";
 import ReactTooltip from "react-tooltip";
 import { RiGitMergeFill } from "react-icons/ri";
 import { IoEye, IoCopy } from "react-icons/io5";
-import { useCanvas, useGlobalStore } from "../../utils";
+import { useCanvas, useGlobalStore, useShortcuts } from "../../utils";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
@@ -51,31 +51,35 @@ export function Layers() {
                     className="btn btn-xs">
                     <IoCopy className="text-lg" />
                 </button>
-                <div className="content-center w-full row">
-                    <label data-tip="change non-active layers opacity"
-                        data-for="tooltip"
-                        className="w-full mt-1 mr-2 ">
-                        <p hidden>layers opacity lever</p>
-                        <input min="1"
-                            step="1"
-                            max="255"
-                            type="range"
-                            className="w-full range range-xs"
-                            value={data.allLayersOpacity}
-                            onChange={e => data.setAllLayersOpacity(e.currentTarget.valueAsNumber)} />
-                    </label>
+                <div className="content-center w-full space-x-2 row">
                     <button data-tip={`${data.layersAreVisible ? "hide non-active layers" : "show all layers"}`}
                         data-for="tooltip"
                         onClick={data.toggleAllLayerVisibility}
                         className="btn btn-xs">
                         {data.layersAreVisible ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
                     </button>
+                    <label data-tip="change non-active layers opacity"
+                        data-for="tooltip"
+                        className="w-full mt-1">
+                        <p hidden>layers opacity lever</p>
+                        <input min="1"
+                            step="1"
+                            max="255"
+                            type="range"
+                            className="w-full range range-xs range-secondary"
+                            value={data.allLayersOpacity}
+                            onChange={e => data.setAllLayersOpacity(e.currentTarget.valueAsNumber)} />
+                    </label>
                 </div>
             </nav>
 
-            <section>
+            <section className="space-y-2">
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
-                    <div className="row" key={i}>
+                    <div className="space-x-2 row" key={i}>
+                        <button onClick={() => data.toggleLayerVisibility(layer)}
+                            className="self-stretch h-auto ml-1 btn btn-xs btn-accent">
+                            {layer.opacity === 255 ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
+                        </button>
                         <div className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
                             <img src={data.imageMap[layer.symbol]}
                                 draggable
@@ -102,10 +106,6 @@ export function Layers() {
                                 }}
                             />
                         </div>
-                        <button onClick={() => data.toggleLayerVisibility(layer)}
-                            className="ml-1 btn btn-xs btn-accent">
-                            {layer.opacity === 255 ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
-                        </button>
                     </div>
                 ))}
             </section>
@@ -124,6 +124,11 @@ function useLayers() {
     const layersAreVisible = allLayersOpacity === 255;
     const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
     const previousActiveLayer = useRef<Symbol>(activeLayer.symbol);
+
+    useShortcuts({
+        "arrowup": decreaseCurrentLayer,
+        "arrowdown": increaseCurrentLayer,
+    });
 
     useEffect(() => {
         let map: any = {};
@@ -301,6 +306,28 @@ function useLayers() {
         newFrame.layers.splice(index + 1, 0, newLayer);
         setActiveFrame(newFrame);
         setActiveLayer(newLayer);
+    }
+
+    function increaseCurrentLayer() {
+        let newFrame = { ...activeFrame };
+        let index = newFrame.layers.findIndex(l => l.symbol == activeLayer.symbol) + 1;
+        if (index < newFrame.layers.length) {
+            setActiveLayer(newFrame.layers[index]);
+        }
+        else {
+            setActiveLayer(newFrame.layers[0]);
+        }
+    }
+
+    function decreaseCurrentLayer() {
+        let newFrame = { ...activeFrame };
+        let index = newFrame.layers.findIndex(l => l.symbol == activeLayer.symbol) - 1;
+        if (index >= 0) {
+            setActiveLayer(newFrame.layers[index]);
+        }
+        else {
+            setActiveLayer(newFrame.layers[newFrame.layers.length - 1]);
+        }
     }
 
     return {

@@ -32,5 +32,13 @@ html {
 }
 
 .no-scroll::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0);
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.range::-webkit-slider-runnable-track {
+    background: oklch(var(--b1) / .7);
+}
+
+.range-slider-base-content::-webkit-slider-runnable-track {
+    background: oklch(var(--bc) / .7);
 }

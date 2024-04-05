@@ -44,10 +44,10 @@ export function Nav(props: IProps) {
                 <section className="space-y-2 col">
                     <div>
                         <label>
-                            <p>Scale: {data.exportSettings.scale}</p>
+                            <p>Scale: {data.exportSettings.scale} - {data.canvasSize.height * data.exportSettings.scale} x {data.canvasSize.width * data.exportSettings.scale}</p>
                             <input type="range"
                                 value={data.exportSettings.scale}
-                                className="range" min={1} max={20} step={1}
+                                className="range range-slider-base-content" min={1} max={20} step={1}
                                 onChange={(e) => data.setExportSettings({ ...data.exportSettings, scale: e.currentTarget.valueAsNumber })} />
                         </label>
                         <label className="label">
@@ -241,7 +241,7 @@ export function Nav(props: IProps) {
                 placeholder="Enter Name"
                 value={data.projectName}
                 onKeyDown={e => e.stopPropagation()}
-                className="input input-sm min-w-[250px]"
+                className="input input-md input-bordered min-w-[250px]"
                 onChange={e => data.saveProjectName(e.target.value)} />
 
             <a data-tip="report a bug"
@@ -676,6 +676,7 @@ function useNav(props: IProps) {
         theme,
         saving,
         message,
+        canvasSize,
         modalExport,
         modalImport,
         projectName,

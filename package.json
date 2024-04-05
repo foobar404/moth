@@ -1,6 +1,6 @@
 {
-  "name": "moth-pixel-editor",
-  "version": "0.1.0",
+  "name": "moth-pixel-art-editor",
+  "version": "1.0.1",
   "private": true,
   "homepage": "https://bugpack.io/",
   "dependencies": {
@@ -32,6 +32,7 @@
     "png-chunks-encode": "^1.0.0",
     "png-chunks-extract": "^1.0.0",
     "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",

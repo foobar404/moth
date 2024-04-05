@@ -1,48 +1,108 @@
+# Done
+- 1.0.1 4/4/25
+    - (Easy)(Feature) left right arrow for frames, up down arrow for layers
+    - (Easy)(Bug) fill all tooltip
+        - use cloud for icon 
+        - discontinuous fill / global fill 
+     - (Easy)(Bug) tool / action button color
+     - (Easy)(Feature) fps slider
+     - (Easy)(Feature) show preview of size when scaling export
+     - (Easy)(Feature) eye icon on the left side
+     - (Easy)(Bug) range sliders are hard to see
+
 # Doing
 - Austin
-    - (Medium) The zoom scroll zooms to the center, not the cursor
-    - (Easy) make frames & color/layers section collapsible
-    - (Easy) update shortcut keys
-    - (Hard) Add blur / jumble tool
-    - (Medium) add spray tool
-    - (Easy) make app comply with PWA standards
+    - (Easy)(Feature) mirror from starting point
+        - (Easy)(Feature) mirror ying / yang
+    - (Easy)(Bug) current tool state breaking line tool
+    - (Easy)(Feature) npm i react-beautiful-dnd
+        - (Easy)(Feature) dnd tabs
+      - (Easy)(Bug) obfuscate build code
 - Nate
 
 # TODO
-- (Easy) hide / show frame
-- (Easy) left right arrow for frames, up down arrow for layers
-- (Easy) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
-- (Easy) Use the same icons set across the app
-- (Easy) Join multiple similer tool into one iterface
-- (Easy) Saveable color palettes 
-- (Medium) Layer groups / frame groups
-- (Medium) light tool is to strong and doesint work on black
-- (Medium) insert duplicated frame after the current frame
-- (Medium) saved projects should have a preview img
-- (Medium) add console error watch system
-- (Medium) Multiple sprite tabs
-- (Medium) add pixel perfect mode to line tool
-- (Medium) allow custom brush shapes 
-- (Medium) line tool wasint working (tool state)
-- (Medium) new & duplicated frames go after current frame 
-- (Hard) Add contour tool 
-- (Hard) add font tool
-- (Hard) [ & ] tigger wrong shortcut
-- (Hard) shortcuts stop working after a while
-- (Hard) make selections standout
+- (Easy) FPS is reset when pressing space
+- (Easy)(Feature) make app comply with PWA standards
+    - (Easy)(Feature) install PWA prompt
+- (Easy)(Feature) export format dropdown
+- (Easy)(Feature) icon in the nav to toggle sections
+- (Easy)(Feature) colored circle for eye dropper
+- (Easy)(Bug) thickness for shapes
+- (Easy)(Feature) flatten all layers
+- (Easy)(Feature) play animation backwards?
+- (Easy)(Feature) last frame / first frame
+- (Easy)(Feature) ping / pong animation loop?
+- (Easy)(Feature) import color palette from image or color palette file
+- (Easy)(Feature) export as zip, file for each frame
+- (Easy)(Feature) hide / show frame
+    - (Easy)(Feature) buttons on frames, hide from animation
+- (Easy)(Feature) rainbow color mode
+- (Easy)(Feature) random color mode
+- (Easy)(Feature) save color palette as .csv / load .csv
+- (Easy)(Bug) shape icons are rounded
+- (Easy)(Feature) move tool is like a selection tool
+- (Easy)(Feature) indexed colors
+- (Easy)(Feature) animate main canvas
+- (Easy)(Feature) make clear more accessable
+- (Easy)(Feature) only show popup when new version is available
+- (Easy)(Feature) make frames & color/layers section collapsible
+- (Easy)(Feature) update shortcut keys
+- (Easy)(Bug) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
+- (Easy)(Feature) Use the same icons set across the app
+- (Easy)(Feature) Join multiple similer tool into one iterface
+- (Medium)(Feature) copy / paste selection
+- (Medium)(Feature) export as css
+- (Medium)(Feature) onion skinning for furure frame
+    - onion skinning color effects
+- (Medium)(Feature) select by color
+- (Medium)(Feature) select by drawing
+- (Medium)(Feature) crop tool
+- (Medium)(Feature) refrence images tab
+- (Medium)(Feature) mirror mode
+- (Medium)(Feature) add current mouse position
+- (Medium)(Feature) import gif as frames
+- (Medium)(Feature) fullscreen canvas mode
+- (Medium)(Bug) pressing z is buggy
+- (Medium)(Feature) Sprite packing
+- (Medium)(Feature) Import and slice existing .png spritesheets.
+- (Medium)(Feature) .pyxel and .asesprite / .ase import
+- (Medium)(Feature) load demo button
+- (Medium)(Feature) wrap around move option
+- (Medium)(Feature) add spray tool
+- (Medium)(Feature) The zoom scroll zooms to the center, not the cursor
+- (Medium)(Feature) Layer groups / frame groups
+- (Medium)(Bug) light tool is to strong and doesint work on black
+- (Medium)(Bug) insert duplicated frame after the current frame
+- (Medium)(Feature) add console error watch system
+- (Medium)(Feature) Multiple sprite tabs
+- (Medium)(Feature) add pixel perfect mode to line tool
+- (Medium)(Feature) allow custom brush shapes 
+- (Medium)(Bug) line tool wasint working (tool state)
+- (Medium)(Bug) make new & duplicated frames go after current frame 
+- (Hard)(Feature) Add blur / jumble tool
+- (Hard)(Feature) Add contour tool 
+    - (Medium)(Feature) fill brush tool (close loop)
+- (Hard)(Feature) add font tool
+- (Hard)(Bug) [ & ] tigger wrong shortcut
+- (Hard)(Bug) shortcuts stop working after a while
+- (Hard)(Feature) tools only modify active selection
+- (Hard)(Feature) better selection box
+- (Hard)(Feature) download as svg
+- (Hard)(Feature) export as .tmx
+- (Hard)(Feature) make selections standout
     - rotate
     - scale
     - draw only in selection
     - move to new layer / frame
-- (Hard) Ctrl-z undos brush strokes and last canvas resize
+- (Hard)(Feature) Ctrl-z undos brush strokes and last canvas resize
     - CTRL-Z undos and changes in text (title, color palette name, ect)
     - When you undo layer joins, the number of layers does not change, the layer just disappears.
     - Undo redo wont work with layers
-- (Hard) shortcuts (settings modal)
+- (Hard)(Feature) settings modal
     - custom shortcuts 
         - custom shortcuts override default
     - reset shortcuts to default button 
-- (Hard) get color picker working again
+- (Hard)(Bug) get color picker working again
     - Color pallets that are premade
     - Option to create a color pallet from sprite
     - color pallette recommendations 
@@ -59,12 +119,6 @@
     - lights / darks 
     - add opacity 
 
-# Promotion
-- reddit
-- itch game jam
-- twitch channels
-- build catapiller extension
-
 # Kickstarter Launch
 - setup alpha / beta test branch
 - moth subdomain or /moth
@@ -73,9 +127,13 @@
 - payment page
 - pricing page
 - bugpack home page
+- online gallery 
 
 # Pro Features
-- node based editor
+- tilemap features (https://github.com/praghus/plextus)
+- realtime collaboration
+- 3d pixel editing
+- node based editor (https://github.com/Ttanasart-pt/Pixel-Composer)
 - rig system 
     - mesh deformation tool (points, weights)
     - bones arnt visible in final render
@@ -94,6 +152,7 @@
 - non-destructive "Effects"
     - color filter
     - outline effect
+    - texture fill
     - The "sun" effect is a ball, that is placed somewhere on the canvas, and affects the colors of the sprites with a specific falloff
         - light source tool, creates highlights and shadows for you 
 - themes
@@ -102,11 +161,17 @@
     - custom layout, custom shortcut
     - minimize UI
 
-# Stretch 
-- add data file for export
-- online gallery 
-- selection areas
-    - rotate and scale selection areas
-    - duplicate selection 
-    - move selection to new layer
+# Promotion Ideas
+- reddit
+- itch game jam
+- twitch channels
+- build catapiller extension
 
+# Best editors on the market
+aseprite - https://www.aseprite.org/
+piskel - https://www.piskelapp.com/
+pixelorama - https://orama-interactive.itch.io/pixelorama
+spritepaint - https://spritepaint.com/
+pixelmash - https://nevercenter.com/pixelmash/
+pixel composer - https://makham.itch.io/pixel-composer
+wunderpaint - https://lean8086.github.io/wunderpaint/

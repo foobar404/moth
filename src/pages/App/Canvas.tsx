@@ -1,22 +1,15 @@
 import tinycolor from "tinycolor2";
 import { FaMap } from "react-icons/fa6";
-import { ImMinus } from "react-icons/im";
 import ReactTooltip from 'react-tooltip';
-import { BiPlusMedical } from "react-icons/bi";
-import { BsCircleFill, BsCircleHalf } from "react-icons/bs";
 import React, { useEffect, useRef } from 'react';
+import { BsCircleFill, BsCircleHalf } from "react-icons/bs";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
 import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
-import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV, FaFill } from "react-icons/fa";
+import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV, FaFill, FaCloud } from "react-icons/fa";
 
 
 enum ToolStage {
     PREVIEW, ADJUSTING, MOVING
-}
-
-
-enum MouseEvent {
-    MOUSE_DOWN, MOUSE_UP, MOUSE_MOVE
 }
 
 
@@ -40,17 +33,17 @@ export function Canvas() {
                 </>)}
 
                 {data.toolSettings.leftTool === "bucket" && (<>
-                    <label data-tip="fill all"
-                        data-for="tooltip"
-                        className="p-1 space-x-1 bg-base rounded-xl row">
-                        <BsCircleHalf className={`text-accent-content`} />
-                        <input
-                            type="checkbox"
-                            value="synthwave"
+                    <label className="p-1 space-x-1 bg-base rounded-xl row">
+                        <FaCloud data-tip="continuous fill"
+                            data-for="tooltip"
+                            className={`text-accent-content`} />
+                        <input type="checkbox"
                             className="toggle toggle-sm toggle-secondary"
                             checked={data.toolSettings.fillAll}
                             onChange={(e) => data.setToolSettings({ ...data.toolSettings, fillAll: e.currentTarget.checked })} />
-                        <BsCircleFill className={`text-accent-content`} />
+                        <FaSun data-tip="global fill"
+                            data-for="tooltip"
+                            className={`text-accent-content`} />
                     </label>
                 </>)}
 
@@ -242,7 +235,7 @@ export function Canvas() {
                 </label>
             </nav>
 
-            <section className="p-app__canvas-container" ref={data.mainCanvasContainer}></section>
+            <section className="w-full h-full overflow-hidden row p-app__canvas-container" ref={data.mainCanvasContainer}></section>
         </section>
     )
 }
@@ -1138,7 +1131,6 @@ function useCanvas() {
 
         const canvasContainer = document.querySelector(".p-app__canvas-container");
 
-        // Add passive: false if you need to call preventDefault for these events
         canvasContainer!.addEventListener('mousedown', setMouseState, { passive: true });
         document.addEventListener('mouseup', setMouseState, { passive: true });
         document.addEventListener('mousemove', setMouseState, { passive: true });
@@ -1146,7 +1138,7 @@ function useCanvas() {
         canvasContainer!.addEventListener('wheel', (e: any) => {
             e.preventDefault();
             e.stopPropagation();
-            let delta = e.deltaY > 0 ? -0.3 : 0.3;
+            let delta = e.deltaY > 0 ? -0.1 : 0.1;
             setZoom(mainCanvasZoom.current + delta);
         }, { passive: false });
 
@@ -1299,7 +1291,11 @@ function useCanvas() {
 
     function setZoom(zoom = 1) {
         mainCanvasZoom.current = Math.max(1, zoom);
-        mainCanvas.getElement().style.transform = `scale(${mainCanvasZoom.current})`;
+
+        let translateX = 0;
+        let translateY = 0;
+
+        mainCanvas.getElement().style.transform = `scale(${mainCanvasZoom.current}) translate(${translateX}px, ${translateY}px)`;
     }
 
     function resizeHandler(size: { height?: number, width?: number }) {

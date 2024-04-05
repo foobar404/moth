@@ -12,6 +12,7 @@ export function useCanvas(props?: IProps) {
     let ctx = useRef<CanvasRenderingContext2D>(canvas.current.getContext('2d')!);
 
     canvas.current.style.imageRendering = "pixelated";
+    canvas.current.style.willChange = "contents";
     ctx.current.imageSmoothingEnabled = false;
 
     function makeCanvas() {

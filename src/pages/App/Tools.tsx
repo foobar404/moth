@@ -3,16 +3,14 @@ import ReactTooltip from 'react-tooltip';
 import { IoMdMove } from "react-icons/io";
 import { AiFillFire } from "react-icons/ai";
 import { GiMirrorMirror } from "react-icons/gi";
-import { RxBlendingMode } from "react-icons/rx";
-import { IoBandageSharp } from "react-icons/io5";
 import React, { useEffect, useState } from 'react';
+import { MdOutlineCallReceived } from "react-icons/md";
 import { BsBucketFill, BsEraserFill } from "react-icons/bs";
 import { IoColorWandSharp, IoNuclear } from "react-icons/io5";
 import { useShortcuts, useCanvas, useGlobalStore } from '../../utils';
-import { MdInvertColors, MdOutlineCallReceived } from "react-icons/md";
+import { TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
 import { FaEyeDropper, FaBrush, FaTools, FaBox, FaLightbulb, FaShapes } from "react-icons/fa";
 import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } from "react-icons/bi";
-import { TbArrowsDiagonal2, TbFlipHorizontal, TbFlipVertical, TbArrowLoopRight } from "react-icons/tb";
 
 
 export function Tools() {
@@ -22,11 +20,11 @@ export function Tools() {
         <nav className="flex items-center p-1 mb-1 border-2 rounded-md border-primary">
             <FaTools data-tip="tools (1)"
                 data-for="tooltip"
-                className={`text-lg cursor-pointer ${data.view == "tools" ? "text-primary" : "text-secondary-content"}`}
+                className={`text-lg cursor-pointer ${data.view == "tools" ? "text-primary" : "text-base-content"}`}
                 onClick={() => data.setView("tools")} />
             <AiFillFire data-tip="actions (2)"
                 data-for="tooltip"
-                className={`text-lg cursor-pointer ${data.view == "actions" ? "text-primary" : "text-secondary-content"}`}
+                className={`text-lg cursor-pointer ${data.view == "actions" ? "text-primary" : "text-base-content"}`}
                 onClick={() => data.setView("actions")} />
         </nav>
 

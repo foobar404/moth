@@ -2,8 +2,8 @@ import { Preview } from './Preview';
 import { IFrame, IPreview } from '../../types';
 import React, { useState, useEffect, useRef } from 'react';
 import { useCanvas, useGlobalStore, useShortcuts } from '../../utils';
-import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
+import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
 
 
@@ -47,34 +47,46 @@ export function Frames() {
                     </button>
                 </section>
 
-                <section className="flex items-center p-app__frame-controls-section bg-accent">
-                    <label data-tip="FPS" data-for="tooltip">
-                        <input type="number"
-                            min="1"
-                            value={data.preview.fps}
-                            className="w-16 mr-2 input input-xs"
-                            onKeyUp={e => e.stopPropagation()}
-                            onChange={e => data.setFps(Number(e.target.value))} />
-                    </label>
-
+                <section className="flex items-center space-x-2 p-app__frame-controls-section bg-accent">
                     <button data-tip={"animation frame left"}
                         data-for="tooltip"
                         onClick={data.previewFrameLeft}
                         className="btn btn-xs">
                         {<IoChevronBack className="text-lg" />}
                     </button>
-                    <button data-tip={"animation frame right"}
-                        data-for="tooltip"
-                        onClick={data.previewFrameRight}
-                        className="btn btn-xs">
-                        {<IoChevronForward className="text-lg" />}
-                    </button>
+
                     <button data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
                         data-for="tooltip"
                         onClick={data.togglePlay}
                         className="btn btn-xs">
                         {data.preview.playing ? <IoStop className="text-lg" /> : <IoPlay className="text-lg" />}
                     </button>
+
+                    <button data-tip={"animation frame right"}
+                        data-for="tooltip"
+                        onClick={data.previewFrameRight}
+                        className="btn btn-xs">
+                        {<IoChevronForward className="text-lg" />}
+                    </button>
+
+                    <input data-tip="fps slider"
+                        data-for="tooltip"
+                        type="range"
+                        min="1"
+                        max="24"
+                        step="1"
+                        value={data.preview.fps}
+                        className="range range-xs range-secondary max-w-[60px]"
+                        onChange={e => data.setFps(Number(e.target.value))} />
+
+                    <input data-tip="fps"
+                        data-for="tooltip"
+                        type="number"
+                        min="1"
+                        value={data.preview.fps}
+                        className="w-16 mr-2 input input-xs max-w-[50px]"
+                        onKeyUp={e => e.stopPropagation()}
+                        onChange={e => data.setFps(Number(e.target.value))} />
                 </section>
 
                 <section className="row !flex-nowrap p-app__frame-controls-section bg-accent">
@@ -84,15 +96,15 @@ export function Frames() {
                         onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
                         {data.onionSkin ? <MdLayers className="text-lg" /> : <MdLayersClear className="text-lg" />}
                     </button>
+
                     <input data-tip="onion skin opacity"
                         data-for="tooltip"
                         type="range"
                         min="0"
                         max="255"
                         value={data.onionSkin}
-                        className="range range-xs"
-                        onChange={e => data.setOnionSkin(e.target.valueAsNumber)}
-                    ></input>
+                        className="range range-xs range-secondary"
+                        onChange={e => data.setOnionSkin(e.target.valueAsNumber)} />
                 </section>
             </nav>
 
@@ -114,7 +126,10 @@ export function Frames() {
             </section>
         </section>
 
-        <div onClick={() => data.setEnlargePreview(!data.enlargePreview)} className={`ml-2 cursor-pointer hover:scale-95`}>
+        <div data-tip="enlarge animatin ( space )"
+            data-for="tooltip"
+            onClick={() => data.setEnlargePreview(!data.enlargePreview)}
+            className={`ml-2 cursor-pointer hover:scale-95`}>
             <Preview {...data.preview} className={`${data.enlargePreview ? "h-[300px] min-w-[300px] max-w-[534px]" : "h-[120px] min-w-[120px] max-w-[213px]"}`} />
         </div>
     </section>)
@@ -123,6 +138,7 @@ export function Frames() {
 function useFrames() {
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
+    const frameCount = useRef(0);
     const {
         frames, setFrames, activeFrame, setActiveFrame,
         setActiveLayer, canvasSize, onionSkin, setOnionSkin,
@@ -131,8 +147,13 @@ function useFrames() {
     let [imageMap, setImageMap] = useState<any>({});
     let [enlargePreview, setEnlargePreview] = useState(false);
     let [draggedFrame, setDraggedFrame] = useState<IFrame | null>(null);
-    const frameCount = useRef(0);
     let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false, frameCount });
+
+    useShortcuts({
+        "arrowright": previewFrameRight,
+        "arrowleft": previewFrameLeft,
+        " ": toggleAnimationMode
+    });
 
     useEffect(() => {
         let map: { [s: symbol]: string } = {};
@@ -145,7 +166,6 @@ function useFrames() {
 
     const handleDragStart = (e, frame) => {
         setDraggedFrame(frame);
-        // Optional: Add any drag start effects here
     };
 
     const handleDrop = (e, targetFrame) => {
@@ -156,7 +176,6 @@ function useFrames() {
         const targetIndex = frames.findIndex(f => f.symbol === targetFrame.symbol);
 
         let newFrames = [...frames];
-        // Remove the dragged frame and insert it at the position of the target frame
         newFrames.splice(draggedIndex, 1); // Remove dragged frame
         newFrames.splice(targetIndex, 0, draggedFrame); // Insert at new position
 
@@ -164,7 +183,7 @@ function useFrames() {
     };
 
     const handleDragEnd = () => {
-        setDraggedFrame(null); // Reset the state
+        setDraggedFrame(null);
     };
 
     function getImage(frame?: IFrame) {
@@ -244,6 +263,7 @@ function useFrames() {
     function togglePlay() {
         setPreview({ ...preview, playing: !preview.playing });
     }
+
     function previewFrameLeft() {
         setPreview({ ...preview, playing: false });
         let activeFrameIndex = frames.findIndex(frame => frame.symbol === activeFrame.symbol);
@@ -258,6 +278,7 @@ function useFrames() {
         setActiveFrame(frame);
         setActiveLayer(frame.layers[0]);
     }
+
     function previewFrameRight() {
         setPreview({ ...preview, playing: false });
         let activeFrameIndex = frames.findIndex(frame => frame.symbol === activeFrame.symbol);
@@ -286,12 +307,6 @@ function useFrames() {
             setPreview({ ...preview, playing: false })
         }
     }
-
-    useShortcuts({
-        "arrowright": previewFrameRight,
-        "arrowleft": previewFrameLeft,
-        " ": toggleAnimationMode
-    })
 
     return {
         frames,
