@@ -1,14 +1,4 @@
 # Done
-- 1.0.1 4/4/25
-    - (Easy)(Feature) left right arrow for frames, up down arrow for layers
-    - (Easy)(Bug) fill all tooltip
-        - use cloud for icon 
-        - discontinuous fill / global fill 
-     - (Easy)(Bug) tool / action button color
-     - (Easy)(Feature) fps slider
-     - (Easy)(Feature) show preview of size when scaling export
-     - (Easy)(Feature) eye icon on the left side
-     - (Easy)(Bug) range sliders are hard to see
 
 # Doing
 - Austin
@@ -21,9 +11,8 @@
 - Nate
 
 # TODO
-- (Easy) FPS is reset when pressing space
-- (Easy)(Feature) make app comply with PWA standards
-    - (Easy)(Feature) install PWA prompt
+- (Easy)(Bug) add pwa not supported prompt
+- (Easy)(Bug) FPS is reset when pressing space
 - (Easy)(Feature) export format dropdown
 - (Easy)(Feature) icon in the nav to toggle sections
 - (Easy)(Feature) colored circle for eye dropper

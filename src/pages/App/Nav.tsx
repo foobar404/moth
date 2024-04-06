@@ -73,7 +73,7 @@ export function Nav(props: IProps) {
                         <IoImage className="text-2xl" />
                         Export Current Frame
                     </button>
-                    <section className="p-4 rounded-lg shadow-inner col bg-base-200">
+                    <section className="p-4 rounded-lg col bg-base-200">
                         <button aria-label="export all frames as a gif"
                             className="btn btn-outline min-w-[250px] mb-2"
                             onClick={data.createGif}>
@@ -89,7 +89,7 @@ export function Nav(props: IProps) {
                             onKeyUp={e => e.stopPropagation()}
                             onChange={e => data.setExportSettings({ ...data.exportSettings, gifFps: e.currentTarget.valueAsNumber })} />
                     </section>
-                    {/* <section className="p-4 rounded-lg shadow-inner col bg-base-200">
+                    {/* <section className="p-4 rounded-lg col bg-base-200">
                         <button className="btn btn-outline min-w-[250px] mb-2"
                             onClick={data.createVideo}>
                             <PiGifFill className="text-2xl" />
@@ -103,7 +103,7 @@ export function Nav(props: IProps) {
                             onKeyUp={e => e.stopPropagation()}
                             onChange={e => data.setExportSettings({ ...data.exportSettings, videoFps: e.currentTarget.valueAsNumber })} />
                     </section> */}
-                    <section className="p-4 rounded-lg shadow-inner col bg-base-200">
+                    <section className="p-4 rounded-lg col bg-base-200">
                         <button aria-label="export all frames as a spritesheet"
                             className="btn btn-accent min-w-[250px] mb-2"
                             onClick={() => data.exportProject()}>
@@ -153,7 +153,7 @@ export function Nav(props: IProps) {
                         }}>
                         Import Project
                     </button>
-                    <section className="p-4 rounded-lg shadow-inner col bg-base-200">
+                    <section className="p-4 rounded-lg col bg-base-200">
                         <button aria-label="import png, jpg or gif image"
                             className="px-14 btn btn-outline"
                             onClick={() => {
@@ -268,7 +268,7 @@ export function Nav(props: IProps) {
                 target="_blank"
                 className="btn btn-sm btn-warning"
                 href={"https://forms.gle/pDXePJUoGSFnUBJF7"}>
-                <FaBug />
+                <FaBug/>
             </a>
 
             <section className="fixed z-50 p-2 bottom-right">

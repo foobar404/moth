@@ -18,8 +18,8 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: oklch(var(--p));
-    border-radius: 4px;
+    background-color: oklch(var(--bc) / .5);
+    border-radius: 50px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

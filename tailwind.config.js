@@ -192,7 +192,7 @@ module.exports = {
           "secondary": "#0058A6", // Deep blue, representing the cool tones of the N64 branding
           "accent": "#009E60", // Vibrant green, for lively accents, reflecting the colorful gaming experiences
           "neutral": "#A5A5A5", // Medium grey, for text and neutral elements, ensuring readability and contrast
-          "base-100": "#bfbbbc", // Clean white background, keeping the design light and engaging
+          "base-100": "#e1e1e1", // Clean white background, keeping the design light and engaging
 
           "--rounded-box": "10px",
           "--rounded-btn": "10px",
