@@ -2,32 +2,34 @@
 
 # Doing
 - Austin
-    - (Easy)(Feature) mirror from starting point
-        - (Easy)(Feature) mirror ying / yang
-    - (Easy)(Bug) current tool state breaking line tool
-    - (Easy)(Feature) npm i react-beautiful-dnd
-        - (Easy)(Feature) dnd tabs
-      - (Easy)(Bug) obfuscate build code
+    - (Hard)(Bug) pixels get deleted when changing the canvas size
+    - (Hard)(Bug) When the canvas size is 100+pixels the site slows down, and sometimes shortcuts don't work
+    - (Easy)(Bug) Update import modal
+    - (Hard)(Bug) [ & ] tigger wrong shortcut
+        - (Hard)(Bug) shortcuts stop working after a while
+        - (Medium)(Bug) pressing z is buggy
 - Nate
 
 # TODO
 - (Easy)(Bug) add pwa not supported prompt
+- (Easy)(Feature) mirror from starting point
+    - (Easy)(Feature) mirror ying / yang
+- (Easy)(Feature) npm i react-beautiful-dnd
+    - (Easy)(Feature) dnd tabs
+- (Easy)(Bug) obfuscate build code
 - (Easy)(Bug) FPS is reset when pressing space
 - (Easy)(Feature) export format dropdown
 - (Easy)(Feature) icon in the nav to toggle sections
-- (Easy)(Feature) colored circle for eye dropper
 - (Easy)(Bug) thickness for shapes
 - (Easy)(Feature) flatten all layers
 - (Easy)(Feature) play animation backwards?
 - (Easy)(Feature) last frame / first frame
 - (Easy)(Feature) ping / pong animation loop?
-- (Easy)(Feature) import color palette from image or color palette file
 - (Easy)(Feature) export as zip, file for each frame
 - (Easy)(Feature) hide / show frame
     - (Easy)(Feature) buttons on frames, hide from animation
 - (Easy)(Feature) rainbow color mode
 - (Easy)(Feature) random color mode
-- (Easy)(Feature) save color palette as .csv / load .csv
 - (Easy)(Bug) shape icons are rounded
 - (Easy)(Feature) move tool is like a selection tool
 - (Easy)(Feature) indexed colors
@@ -39,6 +41,8 @@
 - (Easy)(Bug) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
 - (Easy)(Feature) Use the same icons set across the app
 - (Easy)(Feature) Join multiple similer tool into one iterface
+- (Medium)(Bug) make sure all brush combinations work with left and right buttons
+- (Medium)(Feature) mask mode for brush tool
 - (Medium)(Feature) copy / paste selection
 - (Medium)(Feature) export as css
 - (Medium)(Feature) onion skinning for furure frame
@@ -51,7 +55,6 @@
 - (Medium)(Feature) add current mouse position
 - (Medium)(Feature) import gif as frames
 - (Medium)(Feature) fullscreen canvas mode
-- (Medium)(Bug) pressing z is buggy
 - (Medium)(Feature) Sprite packing
 - (Medium)(Feature) Import and slice existing .png spritesheets.
 - (Medium)(Feature) .pyxel and .asesprite / .ase import
@@ -66,14 +69,11 @@
 - (Medium)(Feature) Multiple sprite tabs
 - (Medium)(Feature) add pixel perfect mode to line tool
 - (Medium)(Feature) allow custom brush shapes 
-- (Medium)(Bug) line tool wasint working (tool state)
 - (Medium)(Bug) make new & duplicated frames go after current frame 
 - (Hard)(Feature) Add blur / jumble tool
 - (Hard)(Feature) Add contour tool 
     - (Medium)(Feature) fill brush tool (close loop)
 - (Hard)(Feature) add font tool
-- (Hard)(Bug) [ & ] tigger wrong shortcut
-- (Hard)(Bug) shortcuts stop working after a while
 - (Hard)(Feature) tools only modify active selection
 - (Hard)(Feature) better selection box
 - (Hard)(Feature) download as svg
@@ -139,6 +139,9 @@
     - provide types of progression arcs
 - ai sprite gen
 - non-destructive "Effects"
+    - AA
+    - mirror
+    - scatter
     - color filter
     - outline effect
     - texture fill

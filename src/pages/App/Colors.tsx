@@ -5,13 +5,16 @@ import { MdDelete } from "react-icons/md";
 import { ChromePicker } from "react-color";
 import { BiPlusMedical } from "react-icons/bi";
 import React, { useEffect, useState } from 'react';
-import { useGlobalStore, useSetInterval, useShortcuts } from '../../utils';
+import { ModalColorPalettes } from "./ModalColorPalettes";
+import { useCanvas, useGlobalStore, useModal, useSetInterval, useShortcuts } from '../../utils';
+import { FaFileExport, FaFileImport } from "react-icons/fa";
 
 
 export function Colors() {
     const data = useColors();
 
-    return (
+    return (<>
+        <ModalColorPalettes {...data.modalColorPalettes} />
         <section className="mt-2">
             <div onKeyDown={e => e.stopPropagation()}>
                 <ChromePicker
@@ -32,14 +35,33 @@ export function Colors() {
 
             <nav className="my-2 p-app__color-controls !bg-accent">
                 <div className="w-full space-x-1 row">
-                    <button aria-label="add new color palette" 
+                    <button aria-label="import color palette"
+                        data-tip="import color palette from lospec or file"
+                        data-for="tooltip"
+                        className="w-1/2 btn btn-xs"
+                        onClick={() => data.modalColorPalettes.open()}>
+                        <FaFileImport className="text-lg" />
+                        Import
+                    </button>
+                    <button aria-label="export color palette"
+                        data-tip="export color palette as .png"
+                        data-for="tooltip"
+                        className="w-1/2 btn btn-xs"
+                        onClick={() => data.exportColorPalette()}>
+                        <FaFileExport className="text-lg" />
+                        Export
+                    </button>
+                </div>
+
+                <div className="w-full space-x-1 row">
+                    <button aria-label="add new color palette"
                         data-tip="add new pallete"
                         data-for="tooltip"
                         onClick={data.addNewColorPalette}
                         className="btn btn-xs">
                         <BiPlusMedical className="text-lg" />
                     </button>
-                    <select aria-label="color palettes" 
+                    <select aria-label="color palettes"
                         data-tip="color pallete selection"
                         data-for="tooltip"
                         className="w-1/3 select select-xs"
@@ -51,15 +73,15 @@ export function Colors() {
                         ))}
                     </select>
 
-                    <input aria-label="color palette name" 
+                    <input aria-label="color palette name"
                         type="text"
                         data-for="tooltip"
-                        data-tip="color pallete name"
+                        data-tip={`${data.activeColorPalette.name}`}
                         className="w-1/3 input input-xs"
                         value={data.activeColorPalette.name}
                         onKeyDown={e => e.stopPropagation()}
                         onChange={e => data.updatePaletteName(e.currentTarget.value)} />
-                    <button aria-label="remove current color palette" 
+                    <button aria-label="remove current color palette"
                         data-tip="remove current pallete"
                         data-for="tooltip"
                         className="btn btn-xs"
@@ -69,7 +91,7 @@ export function Colors() {
                 </div>
 
                 <div className="w-full space-x-1 row">
-                    <button aria-label="add current color" 
+                    <button aria-label="add current color"
                         data-tip="add current color"
                         data-for="tooltip"
                         onClick={data.addColor}
@@ -77,7 +99,7 @@ export function Colors() {
                         <BiPlusMedical className="text-lg" />
                     </button>
 
-                    <select aria-label="color sorting" 
+                    <select aria-label="color sorting"
                         data-tip="sort colors"
                         data-for="tooltip"
                         className="w-1/3 select select-xs"
@@ -89,7 +111,7 @@ export function Colors() {
                         <option value="hue">Hue</option>
                     </select>
 
-                    <select aria-label="color filtering" 
+                    <select aria-label="color filtering"
                         className="w-1/3 select select-xs"
                         data-tip="filter colors"
                         data-for="tooltip"
@@ -101,7 +123,7 @@ export function Colors() {
                         <option value="layer">Layer Colors</option>
                     </select>
 
-                    <button aria-label="remove current color" 
+                    <button aria-label="remove current color"
                         data-tip="remove current color"
                         data-for="tooltip"
                         onClick={data.deleteColor}
@@ -126,7 +148,7 @@ export function Colors() {
                 ))}
             </section>
         </section>
-    )
+    </>)
 }
 
 
@@ -134,14 +156,16 @@ function useColors() {
     const {
         colorStats, setColorStats, colorPalettes, setColorPalettes, activeColorPalette,
         setActiveColorPalette, activeColor, frames, activeFrame, activeLayer,
-        setActiveColor, canvasChangeCount
+        setActiveColor, canvasChangeCount,
     } = useGlobalStore();
+    const modalColorPalettes = useModal();
     const recentColors = sortColorsByMostRecent(activeColorPalette.colors);
     let [visibleColors, setVisibleColors] = useState<IColor[]>(activeColorPalette.colors);
     let [colorState, setColorState] = useState<{ filter: "all" | "project" | "frame" | "layer", sort: "default" | "hue" | "recent" | "count" }>({
         filter: "all",
         sort: "default"
     });
+    const canvas1 = useCanvas();
 
     useShortcuts({
         "z": swapColors
@@ -379,6 +403,28 @@ function useColors() {
         });
     }
 
+    function exportColorPalette() {
+        let size = 40;
+        let rowMax = 10;
+        let width = Math.min(rowMax * size, activeColorPalette.colors.length * size);
+        let height = Math.floor(activeColorPalette.colors.length / rowMax) * size + size;
+
+        canvas1.resize(width, height);
+
+        activeColorPalette.colors.forEach((color, i) => {
+            let x = i % 10;
+            let y = Math.floor(i / 10);
+
+            canvas1.drawPixel(x * size, y * size, size, color);
+        });
+
+        let url = canvas1.toDataURL();
+        let a = document.createElement("a");
+        a.href = url;
+        a.download = `${activeColorPalette.name}.png`;
+        a.click();
+    }
+
     return {
         colorStats,
         colorState,
@@ -387,6 +433,7 @@ function useColors() {
         visibleColors,
         colorPalettes,
         activeColorPalette,
+        modalColorPalettes,
         addColor,
         swapColors,
         getTextColor,
@@ -397,6 +444,7 @@ function useColors() {
         sortColorsByHue,
         showColorsInLayer,
         showColorsInFrame,
+        exportColorPalette,
         updatePaletteName,
         addNewColorPalette,
         deleteColorPalette,
