@@ -2,15 +2,16 @@
 
 # Doing
 - Austin
+    - (Medium)(Bug) eraser leaves artifacts at larger sizes
+    - (Easy)(Bug) update toggles 
     - (Hard)(Bug) pixels get deleted when changing the canvas size
-    - (Hard)(Bug) When the canvas size is 100+pixels the site slows down, and sometimes shortcuts don't work
-    - (Easy)(Bug) Update import modal
     - (Hard)(Bug) [ & ] tigger wrong shortcut
         - (Hard)(Bug) shortcuts stop working after a while
         - (Medium)(Bug) pressing z is buggy
 - Nate
 
 # TODO
+- (Easy)(Bug) make light tool use lines
 - (Easy)(Bug) add pwa not supported prompt
 - (Easy)(Feature) mirror from starting point
     - (Easy)(Feature) mirror ying / yang

@@ -98,7 +98,7 @@ export function ModalExport(props) {
                             <input aria-label="export image scale"
                                 type="range"
                                 value={data.exportSettings.scale}
-                                className="range range-slider-base-content" min={1} max={20} step={1}
+                                className="range range-slider-base-content" min={1} max={30} step={1}
                                 onChange={(e) => data.setExportSettings({ ...data.exportSettings, scale: e.currentTarget.valueAsNumber })} />
                         </section>
                     </footer>

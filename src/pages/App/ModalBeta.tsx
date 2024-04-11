@@ -51,6 +51,13 @@ export default function ModalBeta(props: IProps) {
             <footer>
                 <h2 className="p-2 font-bold rounded-t-lg text-base-content w-min bg-base-200">Changelog</h2>
                 <div className="bg-base-200 max-h-[200px] overflow-auto p-2 mockup-code rounded-tl-none rounded-lg">
+                    <pre data-prefix="$" className="text-info"><code>v1.0.4 - 4/10/2024</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>increase app performance by 8x</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>pixelate tilemode</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>update import modal</code></pre>
+
+                    <div className="divider" />
+
                     <pre data-prefix="$" className="text-info"><code>v1.0.3 - 4/9/2024</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>fix tools not working randomly</code></pre>
                     <pre data-prefix=">" className="text-success"><code>add a colored circle for the eye dropper</code></pre>
@@ -64,17 +71,6 @@ export default function ModalBeta(props: IProps) {
                     <pre data-prefix=">" className="text-success"><code>make app comply with PWA standards</code></pre>
                     <pre data-prefix=">" className="text-success"><code>add PWA download button</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>improve SEO performance</code></pre>
-
-                    <div className="divider" />
-
-                    <pre data-prefix="$" className="text-info"><code>v1.0.1 - 4/4/2024</code></pre>
-                    <pre data-prefix=">" className="text-success"><code>add shortcuts for frames and layers, ↑↓˿→</code></pre>
-                    <pre data-prefix=">" className="text-base-content"><code>update bucket global fill tooltip</code></pre>
-                    <pre data-prefix=">" className="text-base-content"><code>add more contrast to tool / action toggle buttons</code></pre>
-                    <pre data-prefix=">" className="text-success"><code>add a slider for fps</code></pre>
-                    <pre data-prefix=">" className="text-success"><code>show preview of height & width when scaling exports</code></pre>
-                    <pre data-prefix=">" className="text-success"><code>update visibility icon for layers</code></pre>
-                    <pre data-prefix=">" className="text-base-content"><code>make range sliders easier to see</code></pre>
                 </div>
             </footer>
         </main>

@@ -72,12 +72,11 @@ export function Nav() {
             </a>
 
             <section className="fixed z-50 p-2 bottom-right">
-                <div className="px-6 py-4 badge badge-info">
-                    {data.message && data.message}
-                    {!data.message && (<>
-                        {data.saving ? "Saving..." : "Saved"}
-                    </>)}
-                </div>
+                {data.message && (
+                    <div className="px-6 py-4 badge badge-info">
+                        {data.message}
+                    </div>
+                )}
             </section>
         </nav>
     </>)
@@ -85,20 +84,19 @@ export function Nav() {
 
 
 function useNav() {
+    const { projectName, frames, canvasSize, colorPalettes, setProjectName } = useGlobalStore();
     const modalExport = useModal();
     const modalImport = useModal();
-    const { projectName, frames, canvasSize, colorPalettes, setProjectName, canvasChangeCount } = useGlobalStore();
 
     let [theme, setTheme] = useState("light");
-    let [saving, setSaving] = useState(false);
     let [message, setMessage] = useState("");
-
-    useEffect(() => {
-        setSaving(true);
-    }, [canvasChangeCount]);
 
     // save project locally
     useSetInterval(() => {
+        if (canvasSize.height >= 512 || canvasSize.width >= 512) {
+            return setMessage("Storage Full");
+        }
+
         try {
             let localProject = getProject();
 
@@ -115,13 +113,12 @@ function useNav() {
             }
 
             localStorage.setItem(localProject.name, JSON.stringify(localProject));
-            setSaving(false);
-            setMessage("");
+            setMessage(`Saved at: ${new Date().toLocaleTimeString()}`);
         }
         catch (e) {
             setMessage("Storage Full");
         }
-    }, 2000, [canvasChangeCount]);
+    }, 20000, [projectName, frames, colorPalettes, canvasSize]);
 
     // load theme
     useEffect(() => {
@@ -168,7 +165,6 @@ function useNav() {
 
     return {
         theme,
-        saving,
         message,
         canvasSize,
         modalExport,

@@ -209,12 +209,12 @@ export function Canvas() {
                         data-for="tooltip"
                         type="number"
                         min="1"
-                        max="512"
+                        max="2048"
                         className="w-16 input input-xs text-base-content"
                         value={data.canvasSize.height}
                         onKeyUp={e => e.stopPropagation()}
                         onClick={e => e.currentTarget.select()}
-                        onChange={e => data.resizeHandler({ height: Math.min(512, e.currentTarget.valueAsNumber) })} />
+                        onChange={e => data.resizeHandler({ height: Math.min(2048, e.currentTarget.valueAsNumber) })} />
                 </label>
                 <label>
                     <p hidden>width</p>
@@ -223,12 +223,12 @@ export function Canvas() {
                         data-for="tooltip"
                         type="number"
                         min="1"
-                        max="512"
+                        max="2048"
                         className="w-16 input input-xs text-base-content"
                         value={data.canvasSize.width}
                         onKeyUp={e => e.stopPropagation()}
                         onClick={e => e.currentTarget.select()}
-                        onChange={e => data.resizeHandler({ width: Math.min(512, e.currentTarget.valueAsNumber) })} />
+                        onChange={e => data.resizeHandler({ width: Math.min(2048, e.currentTarget.valueAsNumber) })} />
                 </label>
                 <button aria-label="undo"
                     data-tip="undo ( ctrl + z )"
@@ -260,24 +260,24 @@ export function Canvas() {
     )
 }
 
+
 function useCanvas() {
     const { toolSettings, setActiveColor, setToolSettings,
         activeColor, activeColorPalette, setActiveColorPalette,
-        colorStats, activeLayer, setActiveLayer, activeFrame,
-        canvasSize, setCanvasSize, onionSkin, frames,
-        canvasChangeCount, setCanvasChangeCount,
+        colorStats, activeLayer, activeFrame, canvasSize,
+        setCanvasSize, onionSkin, frames,
     } = useGlobalStore();
-    const mainCanvasContainer = useRef<HTMLElement>(null);
     const mainCanvas = useCanvasHook();
-    const saveCanvas = useCanvasHook();
-    const previewCanvas = useCanvasHook();
-    const tempCanvas1 = useCanvasHook();
-    const tempCanvas2 = useCanvasHook();
+    const saveCanvas = useCanvasHook({ offscreen: true });
+    const previewCanvas = useCanvasHook({ offscreen: true });
+    const tempCanvas1 = useCanvasHook({ offscreen: true });
+    const tempCanvas2 = useCanvasHook({ offscreen: true });
     const undoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
     const redoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
 
-    let tilemode = useRef(false);
+    let mainCanvasContainer = useRef<HTMLElement>(null);
     let mainCanvasZoom = useRef(15);
+    let tilemode = useRef(false);
     let mouseState = useRef({
         leftDown: false,
         rightDown: false,
@@ -321,7 +321,7 @@ function useCanvas() {
             startPosition: { x: 0, y: 0 },
         }
     });
-    let stateCache = useRef({ activeColorPalette, activeColor, activeFrame, colorStats, toolSettings, activeLayer, canvasSize, onionSkin, frames, canvasChangeCount });
+    let stateCache = useRef({ activeColorPalette, activeColor, activeFrame, colorStats, toolSettings, activeLayer, canvasSize, onionSkin, frames });
     let toolHandlers = {
         "brush": (x, y, toolButtonActive, preview) => {
             // center the mouse cursor in the brush 
@@ -1143,13 +1143,6 @@ function useCanvas() {
         setInterval(saveCanvasState, 1000);
     }, []);
 
-    // update frames and layers preview image
-    useEffect(() => {
-        setInterval(() => {
-            setActiveLayer(stateCache.current.activeLayer);
-        }, 500);
-    }, []);
-
     // mouse event listeners
     useEffect(() => {
         const setMouseState = e => {
@@ -1203,7 +1196,7 @@ function useCanvas() {
         mainCanvas.getCtx().imageSmoothingEnabled = false;
         mainCanvasContainer.current?.appendChild(mainCanvas.getElement());
 
-        mainCanvas.getElement().classList.add("p-app__canvas-elm");
+        mainCanvas.getElement().classList.add(...["p-app__canvas-elm", "p-app__grid2x2"]);
         mainCanvas.resize(canvasSize.width, canvasSize.height);
         saveCanvas.resize(canvasSize.width, canvasSize.height);
         previewCanvas.resize(canvasSize.width, canvasSize.height);
@@ -1238,8 +1231,8 @@ function useCanvas() {
 
     // update state cache
     useEffect(() => {
-        stateCache.current = { activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames, canvasChangeCount };
-    }, [activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames, canvasChangeCount]);
+        stateCache.current = { activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames };
+    }, [activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames]);
 
     // rebuild tooltip
     useEffect(() => { ReactTooltip.rebuild() }, [toolSettings]);
@@ -1363,23 +1356,11 @@ function useCanvas() {
         saveCanvas.clear();
         previewCanvas.clear();
         mainCanvas.clear();
-        mainCanvas.drawGrid();
 
         // position relative to the canvas element
         let rect = mainCanvas.getElement().getBoundingClientRect();
-        let x = Math.floor((mouseState.current.x - rect.x) / mainCanvasZoom.current);
-        let y = Math.floor((mouseState.current.y - rect.y) / mainCanvasZoom.current);
-
-        // tool info
-        const { leftTool, rightTool, middleTool } = stateCache.current.toolSettings;
-        const tool =
-            mouseState.current.leftDown ? leftTool :
-                mouseState.current.rightDown ? rightTool :
-                    mouseState.current.middleDown ? middleTool : leftTool;
-        const toolButtonActive =
-            tool === leftTool ? mouseState.current.leftDown :
-                tool === rightTool ? mouseState.current.rightDown :
-                    tool === middleTool ? mouseState.current.middleDown : false;
+        let x = Math.floor((mouseState.current.x - rect.x) * (mainCanvas.getWidth() / rect.width));
+        let y = Math.floor((mouseState.current.y - rect.y) * (mainCanvas.getHeight() / rect.height));
 
         // set tool color
         let { r, g, b, a } = stateCache.current.activeColor;
@@ -1389,7 +1370,7 @@ function useCanvas() {
         tempCanvas2.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
 
         // run current tool
-        if (middleTool) toolHandlers[middleTool](x, y, mouseState.current.middleDown, false);
+        const { leftTool, rightTool } = stateCache.current.toolSettings;
         if (rightTool) toolHandlers[rightTool](x, y, mouseState.current.rightDown, false);
         if (leftTool) toolHandlers[leftTool](x, y, mouseState.current.leftDown, true);
 
@@ -1398,11 +1379,9 @@ function useCanvas() {
             let savedImg = saveCanvas.getImageData();
             let newChange = new Uint32Array(savedImg.data.buffer).some(value => value !== 0);
             if (newChange) {
-                setCanvasChangeCount(stateCache.current.canvasChangeCount + 1);
-
                 const existingColor = stateCache.current.activeColorPalette.colors
                     .find(c => JSON.stringify(c) === JSON.stringify(stateCache.current.activeColor));
-                if (!existingColor && toolButtonActive) {
+                if (!existingColor && (mouseState.current.leftDown || mouseState.current.rightDown)) {
                     const newColors = [...stateCache.current.activeColorPalette.colors, stateCache.current.activeColor];
                     setActiveColorPalette({ ...stateCache.current.activeColorPalette, colors: newColors });
                 }
@@ -1453,12 +1432,11 @@ function useCanvas() {
         }
 
         // render active frame
-        let reversedLayers = stateCache.current.activeFrame.layers.slice().reverse();
-        reversedLayers.forEach((layer) => {
+        stateCache.current.activeFrame.layers.slice().reverse().forEach((layer) => {
             tempCanvas1.putImageData(layer.image);
-            tempCanvas2.getCtx().globalAlpha = layer.opacity / 255;
+            tempCanvas1.getCtx().globalAlpha = layer.opacity / 255;
 
-            // draw the preview layer ontop of the active layer
+            // draw preview
             if (layer.symbol === stateCache.current.activeLayer.symbol) {
                 let previewData = previewCanvas.getImageData();
                 let activeLayerData = tempCanvas1.getImageData();
@@ -1475,14 +1453,10 @@ function useCanvas() {
                 }
 
                 tempCanvas1.putImageData(activeLayerData);
-                tempCanvas2.putImageData(previewData);
-                tempCanvas1.drawImage(tempCanvas2.getElement());
+                tempCanvas1.drawImage(previewCanvas.getElement());
             }
 
-            tempCanvas2.drawImage(tempCanvas1.getElement());
-            mainCanvas.drawImage(tempCanvas2.getElement());
-
-            tempCanvas2.getCtx().globalAlpha = 1;
+            mainCanvas.drawImage(tempCanvas1.getElement());
         });
 
         if (tilemode.current) {
@@ -1490,6 +1464,7 @@ function useCanvas() {
             let height = Math.ceil(stateCache.current.canvasSize.height * mainCanvasZoom.current);
             mainCanvasContainer.current!.style.background = `url(${mainCanvas.getElement().toDataURL()}) repeat center`;
             mainCanvasContainer.current!.style.backgroundSize = `${width}px ${height}px`;
+            mainCanvasContainer.current!.style.imageRendering = "pixelated";
         } else {
             mainCanvasContainer.current!.style.background = `transparent`;
         }

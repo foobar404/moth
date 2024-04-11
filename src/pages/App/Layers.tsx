@@ -3,7 +3,7 @@ import { MdDelete } from "react-icons/md";
 import ReactTooltip from "react-tooltip";
 import { RiGitMergeFill } from "react-icons/ri";
 import { IoEye, IoCopy } from "react-icons/io5";
-import { useCanvas, useGlobalStore, useShortcuts } from "../../utils";
+import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from "../../utils";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
@@ -90,8 +90,8 @@ export function Layers() {
                             {layer.opacity === 255 ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
                         </button>
                         <div className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
-                            <img src={data.imageMap[layer.symbol]}
-                                alt={`layer #${i + 1}`}
+                            <img src={data.imageMap[layer.symbol] ?? data.emptyImg}
+                                aria-label={`layer #${i + 1}`}
                                 draggable
                                 onDragEnd={data.handleDragEnd}
                                 onDragOver={(e) => e.preventDefault()}
@@ -129,25 +129,27 @@ function useLayers() {
     let [allLayersOpacity, setAllLayersOpacity] = useState(255);
     let [draggedLayer, setDraggedLayer] = useState<ILayer | null>(null);
 
+    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const layersAreVisible = allLayersOpacity === 255;
-    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
     const previousActiveLayer = useRef<Symbol>(activeLayer.symbol);
+    const emptyImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAgEBAJpvAX4AAAAASUVORK5CYII=";
 
     useShortcuts({
         "arrowup": decreaseCurrentLayer,
         "arrowdown": increaseCurrentLayer,
     });
 
-    useEffect(() => {
+    //? use a hash to check for changes
+    useSetInterval(() => {
         let map: any = {};
         activeFrame.layers.forEach(layer => {
             let img = getImage(layer.image);
             map[layer.symbol] = img;
         });
         setImageMap(map);
-    }, [activeFrame]);
+    }, 1000, [activeFrame]);
 
     useEffect(() => {
         ReactTooltip.rebuild();
@@ -341,6 +343,7 @@ function useLayers() {
     }
 
     return {
+        emptyImg,
         imageMap,
         activeFrame,
         activeLayer,

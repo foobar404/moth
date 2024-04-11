@@ -4,6 +4,8 @@ import pngText from "png-chunk-text";
 import { Modal } from "../../components";
 import { ImCross } from "react-icons/im";
 import ReactTooltip from "react-tooltip";
+import { IoImage } from "react-icons/io5";
+import { FaStar } from "react-icons/fa";
 import pngExtract from "png-chunks-extract";
 import React, { useEffect, useState } from 'react';
 import { useCanvas, useGlobalStore } from '../../utils';
@@ -16,60 +18,60 @@ export function ModalImport(props) {
         <Modal {...props}>
             <ReactTooltip id="tooltip" />
             <main className="p-12">
-                <section className="space-y-2 col">
-                    <button aria-label="import moth project"
-                        className="px-14 btn btn-accent"
-                        onClick={() => {
-                            data.importProject();
-                            props.setIsOpen(false);
+                <section className="!items-stretch space-y-2 col">
+
+                    <button aria-label="import png, jpg or gif image"
+                        className="btn btn-secondary row-left"
+                        onClick={async () => {
+                            await data.importImage();
+                            props.close();
                         }}>
+                        <IoImage className="text-2xl" />
+                        Import Image
+
+                        <input aria-label="max size of image"
+                            data-tip="max size"
+                            data-for="tooltip"
+                            type="number"
+                            max="512"
+                            min="8"
+                            className="input bg-secondary-content text-secondary input-sm w-[70px]"
+                            defaultValue={data.imageImportSettings.size}
+                            onKeyDown={e => e.stopPropagation()}
+                            onClick={e => { e.currentTarget.select(); e.stopPropagation(); }}
+                            onChange={e => data.setImageImportSettings(s => ({ ...s, size: Number(e.currentTarget?.value ?? 512) }))} />
+                        <input aria-label="max unique colors of image"
+                            data-tip="max colors"
+                            data-for="tooltip"
+                            type="number"
+                            max="128"
+                            min="2"
+                            className="input input-sm bg-secondary-content text-secondary w-[70px]"
+                            defaultValue={data.imageImportSettings.colors}
+                            onKeyDown={e => e.stopPropagation()}
+                            onClick={e => { e.currentTarget.select(); e.stopPropagation(); }}
+                            onChange={e => data.setImageImportSettings(s => ({ ...s, colors: Number(e.currentTarget?.value ?? 128) }))} />
+                    </button>
+
+                    <button aria-label="import moth project"
+                        className="btn btn-primary row-left"
+                        onClick={async () => {
+                            await data.importProject();
+                            props.close();
+                        }}>
+                        <FaStar className="text-2xl" />
                         Import Project
                     </button>
-                    <section className="p-4 rounded-lg col bg-base-200">
-                        <button aria-label="import png, jpg or gif image"
-                            className="px-14 btn btn-outline"
-                            onClick={() => {
-                                data.importImage();
-                                props.setIsOpen(false);
-                            }}>
-                            Import Image
-                        </button>
 
-                        <div className="mt-2 space-x-2 row">
-                            <input aria-label="max size of image"
-                                data-tip="max size"
-                                data-for="tooltip"
-                                type="number"
-                                max="512"
-                                min="8"
-                                className="input input-sm w-[70px]"
-                                defaultValue={data.imageImportSettings.size}
-                                onKeyDown={e => e.stopPropagation()}
-                                onClick={e => e.currentTarget.select()}
-                                onChange={e => data.setImageImportSettings(s => ({ ...s, size: Number(e.currentTarget?.value ?? 512) }))} />
-                            <input aria-label="max unique colors of image"
-                                data-tip="max colors"
-                                data-for="tooltip"
-                                type="number"
-                                max="128"
-                                min="2"
-                                className="input input-sm w-[70px]"
-                                defaultValue={data.imageImportSettings.colors}
-                                onKeyDown={e => e.stopPropagation()}
-                                onClick={e => e.currentTarget.select()}
-                                onChange={e => data.setImageImportSettings(s => ({ ...s, colors: Number(e.currentTarget?.value ?? 128) }))} />
-                        </div>
-                    </section>
+                    <div className="!mb-2 !mt-4 divider">Local Projects</div>
 
-                    <div className="divider">Local Projects</div>
-
-                    <ul className="w-56 rounded-lg menu bg-base-200">
+                    <ul className="rounded-lg menu bg-base-200">
                         {[...data.projectList].reverse().map((project) => (
                             <div key={project} className="row">
                                 <li key={project}
                                     onClick={() => {
                                         data.loadProjectFromLocalStorage(project);
-                                        props.setIsOpen(false);
+                                        props.close();
                                     }}
                                     className="flex-1 p-1 text-center rounded-md cursor-pointer hover:bg-slate-400 hover:text-white">
                                     {project}
@@ -89,7 +91,7 @@ export function ModalImport(props) {
 }
 
 
-function useModalImport(props) {
+export function useModalImport(props) {
     const canvas1 = useCanvas();
     const { projectName, setProjectName, setCanvasSize,
         setFrames, setActiveFrame, setColorPalettes, setActiveLayer,

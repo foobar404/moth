@@ -4,21 +4,35 @@ import React, { useRef } from 'react';
 interface IProps {
     width?: number;
     height?: number;
+    offscreen?: boolean;
 }
 
 
 export function useCanvas(props?: IProps) {
-    let canvas = useRef<HTMLCanvasElement>(makeCanvas());
-    let ctx = useRef<CanvasRenderingContext2D>(canvas.current.getContext('2d')!);
+    let canvas = useRef<HTMLCanvasElement>(null!);
+    let ctx = useRef<CanvasRenderingContext2D>(null!);
 
-    canvas.current.style.imageRendering = "pixelated";
-    canvas.current.style.willChange = "contents";
-    ctx.current.imageSmoothingEnabled = false;
+    if (!canvas.current) {
+        canvas.current = makeCanvas();
+        ctx.current = canvas.current!.getContext('2d')!;
+        ctx.current.imageSmoothingEnabled = false;
+    }
 
     function makeCanvas() {
-        let canvas = document.createElement('canvas');
-        canvas.width = props?.width ?? 8;
-        canvas.height = props?.height ?? 8;
+        let canvas;
+        let width = props?.width ?? 8;
+        let height = props?.height ?? 8;
+
+        if (props?.offscreen) {
+            //@ts-ignore
+            canvas = new OffscreenCanvas(width, height);
+        } else {
+            canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            canvas.style.imageRendering = "pixelated";
+            canvas.style.willChange = "contents";
+        }
 
         return canvas;
     }
@@ -204,34 +218,36 @@ export function useCanvas(props?: IProps) {
         ctx.current.fillRect(x, y, size, size);
     }
 
-    function floodFill(
-        startX,
-        startY,
-        callback: ((x: number, y: number) => void) | null = null,
-        tolerance = 0
-    ) {
-        startX = Math.round(startX); // Ensure startX is a whole number
-        startY = Math.round(startY); // Ensure startY is a whole number
+    function floodFill(startX, startY, callback: any = null, tolerance = 0) {
+        startX = Math.round(startX);
+        startY = Math.round(startY);
 
-        const startColor = getColorAtPixel(startX, startY);
+        const imageData = ctx.current.getImageData(0, 0, canvas.current.width, canvas.current.height);
+        const data = imageData.data;
+        const width = imageData.width;
+        const height = imageData.height;
+
+        const startIdx = (startY * width + startX) * 4;
+        const startColor = [data[startIdx], data[startIdx + 1], data[startIdx + 2], data[startIdx + 3]];
         let pointsToCheck: { x: number, y: number }[] = [{ x: startX, y: startY }];
         let matchingPoints: { x: number, y: number }[] = [];
-        let checkedPoints = new Set();
+        let checkedPoints = new Uint8ClampedArray(width * height);
 
         while (pointsToCheck.length > 0) {
             let { x, y } = pointsToCheck.pop()!;
-            if (!isValidPoint(x, y) || checkedPoints.has(`${x},${y}`) || !colorMatches(x, y, startColor, tolerance)) {
+            let idx = (y * width + x) * 4;
+
+            if (x < 0 || y < 0 || x >= width || y >= height || checkedPoints[y * width + x] || !colorMatches(data, idx, startColor, tolerance)) {
                 continue;
             }
 
             matchingPoints.push({ x, y });
-            checkedPoints.add(`${x},${y}`);
+            checkedPoints[y * width + x] = 1;  // Mark this point as checked
 
             if (callback) {
                 callback(x, y);
             }
 
-            // Add neighboring points to check
             pointsToCheck.push({ x: x + 1, y: y });
             pointsToCheck.push({ x: x - 1, y: y });
             pointsToCheck.push({ x: x, y: y + 1 });
@@ -240,20 +256,11 @@ export function useCanvas(props?: IProps) {
 
         return matchingPoints;
 
-        function isValidPoint(x, y) {
-            // Assuming canvas and ctx are accessible in the current scope
-            return x >= 0 && y >= 0 && x < canvas.current.width && y < canvas.current.height;
-        }
-
-        function colorMatches(x, y, targetColor, tolerance) {
-            const pixelColor = getColorAtPixel(x, y);
-            return pixelColor.every((value, index) => Math.abs(value - targetColor[index]) <= tolerance);
-        }
-
-        function getColorAtPixel(x, y) {
-            // Assuming ctx is the context of your canvas and is accessible in the current scope
-            const imageData = ctx.current.getImageData(x, y, 1, 1).data;
-            return [imageData[0], imageData[1], imageData[2], imageData[3]]; // RGBA
+        function colorMatches(data, idx, targetColor, tolerance) {
+            return Math.abs(data[idx] - targetColor[0]) <= tolerance &&
+                Math.abs(data[idx + 1] - targetColor[1]) <= tolerance &&
+                Math.abs(data[idx + 2] - targetColor[2]) <= tolerance &&
+                Math.abs(data[idx + 3] - targetColor[3]) <= tolerance;
         }
     }
 

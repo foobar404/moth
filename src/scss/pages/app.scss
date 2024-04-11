@@ -84,7 +84,13 @@
     &__grid {
         image-rendering: pixelated;
         object-fit: contain;
-        background: repeating-conic-gradient(#eee 0% 25%, #ccc 0% 50%) 50% / 10px 10px
+        background: repeating-conic-gradient(#eee 0% 25%, #ccc 0% 50%) 50% / 10px 10px;
+    }
+
+    &__grid2x2 {
+        image-rendering: pixelated;
+        object-fit: contain;
+        background: repeating-conic-gradient(#eee 0% 25%, #ccc 0% 50%) 50% / 2px 2px;
     }
 
     &__block {

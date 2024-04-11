@@ -14,9 +14,7 @@ interface IGlobalStore {
     activeColor: { r: number; g: number; b: number; a: number };
     colorStats: IColorStats;
     toolSettings: IToolSettings;
-    canvasChangeCount: number;
 
-    setCanvasChangeCount: (canvasChangeCount: number) => void;
     setProjectName: (projectName: string) => void;
     setCanvasSize: (canvasSize: { height: number; width: number }) => void;
     setOnionSkin: (onionSkin: number) => void;
@@ -40,21 +38,21 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
     const initialColorPalettes: IColorPalette[] = [{
         name: "Default",
         colors: [
-            { r: 0, g: 0, b: 0, a: 255 }, 
-            { r: 29, g: 43, b: 83, a: 255 }, 
-            { r: 126, g: 37, b: 83, a: 255 }, 
-            { r: 0, g: 135, b: 81, a: 255 }, 
-            { r: 171, g: 82, b: 54, a: 255 }, 
-            { r: 95, g: 87, b: 79, a: 255 }, 
-            { r: 194, g: 195, b: 199, a: 255 }, 
-            { r: 255, g: 241, b: 232, a: 255 }, 
+            { r: 0, g: 0, b: 0, a: 255 },
+            { r: 29, g: 43, b: 83, a: 255 },
+            { r: 126, g: 37, b: 83, a: 255 },
+            { r: 0, g: 135, b: 81, a: 255 },
+            { r: 171, g: 82, b: 54, a: 255 },
+            { r: 95, g: 87, b: 79, a: 255 },
+            { r: 194, g: 195, b: 199, a: 255 },
+            { r: 255, g: 241, b: 232, a: 255 },
             { r: 255, g: 0, b: 77, a: 255 },
             { r: 255, g: 163, b: 0, a: 255 },
-            { r: 255, g: 236, b: 39, a: 255 }, 
+            { r: 255, g: 236, b: 39, a: 255 },
             { r: 0, g: 228, b: 54, a: 255 },
-            { r: 41, g: 173, b: 255, a: 255 }, 
-            { r: 131, g: 118, b: 156, a: 255 }, 
-            { r: 255, g: 119, b: 168, a: 255 }, 
+            { r: 41, g: 173, b: 255, a: 255 },
+            { r: 131, g: 118, b: 156, a: 255 },
+            { r: 255, g: 119, b: 168, a: 255 },
             { r: 255, g: 204, b: 170, a: 255 },
         ],
         symbol: Symbol()
@@ -84,9 +82,6 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
             eraseAll: false,
             fillAll: false,
         },
-        canvasChangeCount: 0,
-        // Action methods...
-        setCanvasChangeCount: (canvasChangeCount: number) => set({ canvasChangeCount }),
         setProjectName: (projectName: string) => set({ projectName }),
         setCanvasSize: (canvasSize: { height: number; width: number }) => set({ canvasSize }),
         setOnionSkin: (onionSkin: number) => set({ onionSkin }),

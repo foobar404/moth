@@ -6,8 +6,8 @@ import { ChromePicker } from "react-color";
 import { BiPlusMedical } from "react-icons/bi";
 import React, { useEffect, useState } from 'react';
 import { ModalColorPalettes } from "./ModalColorPalettes";
-import { useCanvas, useGlobalStore, useModal, useSetInterval, useShortcuts } from '../../utils';
 import { FaFileExport, FaFileImport } from "react-icons/fa";
+import { useCanvas, useGlobalStore, useModal, useSetInterval, useShortcuts } from '../../utils';
 
 
 export function Colors() {
@@ -134,15 +134,15 @@ export function Colors() {
             </nav>
 
             <section className="flex-wrap row">
-                {data.visibleColors.map((color: IColor, i) => (
+                {data.visibleColors.map((c: IColor, i) => (
                     <div key={i}
                         data-for="tooltip"
-                        onClick={() => data.setActiveColor(color)}
-                        data-tip={`${tinycolor(color).toHexString()}`}
-                        style={{ background: `${tinycolor(color).toHexString()}` }}
-                        className={`hover:scale-105 overflow-hidden box-content row cursor-pointer h-7 w-7 rounded shadow-xl mr-1 mb-1 border-4 border-transparent ${JSON.stringify(color) === JSON.stringify(data.activeColor) ? "border-base-content" : ""}`}>
-                        <span className="text-xs" style={{ color: `${data.getTextColor(color)}`, fontSize: "9px" }}>
-                            {data.colorStats[tinycolor(color).toRgbString()]?.count ?? 0}
+                        onClick={() => data.setActiveColor(c)}
+                        data-tip={`${tinycolor(c).toHexString()}`}
+                        style={{ background: `${tinycolor(c).toHexString()}` }}
+                        className={`hover:scale-105 overflow-hidden box-content row cursor-pointer h-7 w-7 rounded shadow-xl mr-1 mb-1 border-4 border-transparent ${JSON.stringify(c) === JSON.stringify(data.activeColor) ? "border-base-content" : ""}`}>
+                        <span className="text-xs" style={{ color: `${data.getTextColor(c)}`, fontSize: "9px" }}>
+                            {data.colorStats[`rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`]?.count ?? 0}
                         </span>
                     </div>
                 ))}
@@ -155,20 +155,20 @@ export function Colors() {
 function useColors() {
     const {
         colorStats, setColorStats, colorPalettes, setColorPalettes, activeColorPalette,
-        setActiveColorPalette, activeColor, frames, activeFrame, activeLayer,
-        setActiveColor, canvasChangeCount,
+        setActiveColorPalette, activeColor, frames, activeFrame, activeLayer, setActiveColor,
     } = useGlobalStore();
     const modalColorPalettes = useModal();
+    const canvas1 = useCanvas({ offscreen: true });
     const recentColors = sortColorsByMostRecent(activeColorPalette.colors);
+
     let [visibleColors, setVisibleColors] = useState<IColor[]>(activeColorPalette.colors);
     let [colorState, setColorState] = useState<{ filter: "all" | "project" | "frame" | "layer", sort: "default" | "hue" | "recent" | "count" }>({
         filter: "all",
         sort: "default"
     });
-    const canvas1 = useCanvas();
 
     useShortcuts({
-        "z": swapColors
+        // "z": swapColors
     });
 
     useEffect(() => {
@@ -192,7 +192,7 @@ function useColors() {
     }, [activeColorPalette, activeColor, colorState, colorStats]);
 
     // update color stats
-    useSetInterval(() => {
+    useEffect(() => {
         let statsCopy = { ...colorStats };
         let colorString = tinycolor(activeColor).toRgbString();
 
@@ -201,29 +201,41 @@ function useColors() {
         else
             statsCopy[colorString] = { count: 0, lastUsed: Date.now() };
 
+        setColorStats(statsCopy);
+    }, [activeColor]);
+
+    // update color stats
+    useSetInterval(() => {
+        let statsCopy = { ...colorStats };
+
         for (let key in statsCopy) {
             statsCopy[key].count = 0;
         }
 
-        frames.forEach(frame => {
-            frame.layers.forEach(layer => {
-                for (let i = 0; i < layer.image.data.length; i += 4) {
-                    let r = layer.image.data[i];
-                    let g = layer.image.data[i + 1];
-                    let b = layer.image.data[i + 2];
-                    let a = layer.image.data[i + 3];
-                    let c = tinycolor({ r, g, b, a }).toRgbString();
+        frames.forEach(({ layers }) => {
+            layers.forEach(({ image }) => {
+                const data = new Uint32Array(image.data.buffer);
+                for (let i = 0; i < data.length; i++) {
+                    const color = data[i];
+                    const r = color & 0xFF;
+                    const g = (color >>> 8) & 0xFF;
+                    const b = (color >>> 16) & 0xFF;
+                    const a = (color >>> 24) & 0xFF;
+                    const colorKey = `rgba(${r}, ${g}, ${b}, ${a})`;
 
-                    if (statsCopy[c])
-                        statsCopy[c].count++;
-                    else
-                        statsCopy[c] = { count: 1, lastUsed: 0 };
+                    if (a === 0) continue;
+
+                    if (!statsCopy[colorKey]) {
+                        statsCopy[colorKey] = { count: 1, lastUsed: 0 };
+                    } else {
+                        statsCopy[colorKey].count++;
+                    }
                 }
             });
         });
 
         setColorStats(statsCopy);
-    }, 500, [canvasChangeCount]);
+    }, 3000, [frames, colorStats]);
 
     function deleteColor() {
         let colors = activeColorPalette.colors.filter(c => JSON.stringify(c) !== JSON.stringify(activeColor));

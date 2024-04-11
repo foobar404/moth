@@ -1,7 +1,7 @@
 import { Preview } from './Preview';
 import { IFrame, IPreview } from '../../types';
 import React, { useState, useEffect, useRef } from 'react';
-import { useCanvas, useGlobalStore, useShortcuts } from '../../utils';
+import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from '../../utils';
 import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
 import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
@@ -14,13 +14,13 @@ export function Frames() {
         <section className="flex-1 w-1/2">
             <nav className={"row !justify-between"}>
                 <section className="space-x-2 p-app__frame-controls-section bg-accent">
-                    <button aria-label="add new frame" 
+                    <button aria-label="add new frame"
                         data-tip="new frame" data-for="tooltip"
                         onClick={data.addFrame}
                         className="btn btn-xs">
                         <MdAddPhotoAlternate className="text-lg" />
                     </button>
-                    <button aria-label="duplicate current frame" 
+                    <button aria-label="duplicate current frame"
                         data-tip="duplicate frame"
                         data-for="tooltip"
                         onClick={data.duplicateFrame}
@@ -28,14 +28,14 @@ export function Frames() {
                         <IoCopy className="text-lg" />
                     </button>
 
-                    <button aria-label="move current frame left" 
+                    <button aria-label="move current frame left"
                         data-tip="move frame left"
                         data-for="tooltip"
                         onClick={data.moveFrameLeft}
                         className="btn btn-xs">
                         <BsFillCaretLeftFill className="text-lg" />
                     </button>
-                    <button aria-label="move current frame right" 
+                    <button aria-label="move current frame right"
                         data-tip="move frame right"
                         data-for="tooltip"
                         onClick={data.moveFrameRight}
@@ -53,7 +53,7 @@ export function Frames() {
                 </section>
 
                 <section className="flex items-center space-x-2 p-app__frame-controls-section bg-accent">
-                    <button aria-label="move animation frame left" 
+                    <button aria-label="move animation frame left"
                         data-tip={"animation frame left"}
                         data-for="tooltip"
                         onClick={data.previewFrameLeft}
@@ -61,7 +61,7 @@ export function Frames() {
                         {<IoChevronBack className="text-lg" />}
                     </button>
 
-                    <button aria-label="toggle animation play/pause" 
+                    <button aria-label="toggle animation play/pause"
                         data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
                         data-for="tooltip"
                         onClick={data.togglePlay}
@@ -69,7 +69,7 @@ export function Frames() {
                         {data.preview.playing ? <IoStop className="text-lg" /> : <IoPlay className="text-lg" />}
                     </button>
 
-                    <button aria-label="move animation frame right" 
+                    <button aria-label="move animation frame right"
                         data-tip={"animation frame right"}
                         data-for="tooltip"
                         onClick={data.previewFrameRight}
@@ -77,7 +77,7 @@ export function Frames() {
                         {<IoChevronForward className="text-lg" />}
                     </button>
 
-                    <input aria-label="current fps slider" 
+                    <input aria-label="current fps slider"
                         data-tip="fps slider"
                         data-for="tooltip"
                         type="range"
@@ -88,7 +88,7 @@ export function Frames() {
                         className="range range-xs range-secondary max-w-[60px]"
                         onChange={e => data.setFps(Number(e.target.value))} />
 
-                    <input aria-label="current fps input" 
+                    <input aria-label="current fps input"
                         data-tip="fps"
                         data-for="tooltip"
                         type="number"
@@ -100,7 +100,7 @@ export function Frames() {
                 </section>
 
                 <section className="row !flex-nowrap p-app__frame-controls-section bg-accent">
-                    <button aria-label="toggle onion skin effect" 
+                    <button aria-label="toggle onion skin effect"
                         data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
                         data-for="tooltip"
                         className="mr-2 btn btn-xs"
@@ -108,7 +108,7 @@ export function Frames() {
                         {data.onionSkin ? <MdLayers className="text-lg" /> : <MdLayersClear className="text-lg" />}
                     </button>
 
-                    <input aria-label="onion skin opacity slider" 
+                    <input aria-label="onion skin opacity slider"
                         data-tip="onion skin opacity"
                         data-for="tooltip"
                         type="range"
@@ -123,14 +123,14 @@ export function Frames() {
             <section className={`overflow-auto p-1 row-left max-h-[400px] ${data.enlargePreview ? "!row flex-wrap" : ""}`}>
                 {data.frames.map((frame, i) => (
                     <img key={i}
-                        alt={`frame #${i + 1}`}
+                        aria-label={`frame #${i + 1}`}
                         draggable
                         onDragStart={(e) => data.handleDragStart(e, frame)}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => data.handleDrop(e, frame)}
                         onDragEnd={data.handleDragEnd}
                         className={`h-[60px] min-w-[60px] max-w-[106px] flex-shrink-0 p-app__grid m-1 hover:scale-105 shadow-md rounded-md cursor-pointer box-content border-4 border-base-100 ${frame.symbol === data.activeFrame.symbol ? "!border-base-content" : ""}`}
-                        src={data.imageMap[frame.symbol]}
+                        src={data.imageMap[frame.symbol] ?? data.emptyImg}
                         onClick={() => {
                             data.setActiveFrame(frame);
                             data.setActiveLayer(frame.layers[0]);
@@ -149,13 +149,14 @@ export function Frames() {
 }
 
 function useFrames() {
-    const canvas1 = useCanvas();
-    const canvas2 = useCanvas();
-    const frameCount = useRef(0);
     const {
         frames, setFrames, activeFrame, setActiveFrame,
         setActiveLayer, canvasSize, onionSkin, setOnionSkin,
     } = useGlobalStore();
+    const canvas1 = useCanvas();
+    const canvas2 = useCanvas();
+    const frameCount = useRef(0);
+    const emptyImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAgEBAJpvAX4AAAAASUVORK5CYII=";
 
     let [imageMap, setImageMap] = useState<any>({});
     let [enlargePreview, setEnlargePreview] = useState(false);
@@ -168,14 +169,20 @@ function useFrames() {
         " ": toggleAnimationMode
     });
 
-    useEffect(() => {
+    //? use a hash to check for changes
+    useSetInterval(() => {
         let map: { [s: symbol]: string } = {};
         frames.forEach(frame => {
             map[frame.symbol] = getImage(frame);
         });
 
         setImageMap(map);
-    }, [activeFrame]);
+    }, 1000, [frames]);
+
+    useEffect(() => {
+        let activeFrameIndex = frames.findIndex(frame => frame.symbol === activeFrame.symbol);
+        frameCount.current = activeFrameIndex;
+    }, [activeFrame, preview.playing]);
 
     const handleDragStart = (e, frame) => {
         setDraggedFrame(frame);
@@ -327,6 +334,7 @@ function useFrames() {
         imageMap,
         onionSkin,
         activeFrame,
+        emptyImg,
         setFps,
         addFrame,
         togglePlay,

@@ -45,12 +45,16 @@ export function ModalColorPalettes(props) {
                 </button>
 
                 <section className="max-h-[400px] overflow-auto p-4 space-y-4">
-                    {data.loadedPalettes.length === 0 && (
-                        <div className="duration-75 cursor-pointer hover:scale-105 ">
-                            <h2 className="px-10 py-4 font-bold rounded-none rounded-t-lg text-base-content w-max skeleton" ></h2>
-                            <div className="p-6 overflow-auto space-x-1 row max-h-[200px] rounded-tl-none rounded-lg skeleton"></div>
+                    {data.loadedPalettes.length === 0 && (<>
+                        <div className="w-[440px] duration-75 cursor-pointer hover:scale-105">
+                            <h2 className="py-4 font-bold rounded-none rounded-t-lg px-14 text-base-content w-max skeleton"></h2>
+                            <div className="p-8 overflow-auto space-x-1 row max-h-[200px] rounded-tl-none rounded-lg skeleton"></div>
                         </div>
-                    )}
+                        <div className="w-[440px] duration-75 cursor-pointer hover:scale-105">
+                            <h2 className="py-4 font-bold rounded-none rounded-t-lg px-14 text-base-content w-max skeleton"></h2>
+                            <div className="p-8 overflow-auto space-x-1 row max-h-[200px] rounded-tl-none rounded-lg skeleton"></div>
+                        </div>
+                    </>)}
 
                     {data.loadedPalettes.map(c => (
                         <div key={c.name} className="duration-75 cursor-pointer hover:scale-105"

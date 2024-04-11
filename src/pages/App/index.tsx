@@ -8,10 +8,10 @@ import ModalBeta from "./ModalBeta";
 import mixpanel from 'mixpanel-browser';
 import ReactTooltip from 'react-tooltip';
 import React, { useEffect } from 'react';
-import { useModal, useShortcuts } from "../../utils";
 import { Drawer } from "../../components";
-import { IoMdColorPalette } from "react-icons/io";
 import { IoLayers } from "react-icons/io5";
+import { IoMdColorPalette } from "react-icons/io";
+import { useModal, useShortcuts } from "../../utils";
 
 
 export function App() {
@@ -59,10 +59,6 @@ export function App() {
 
 function useApp() {
 	const modalBeta = useModal(true);
-	// const keys = useShortcuts({
-	// 	"3": () => setTabIndex(0),
-	// 	"4": () => setTabIndex(1),
-	// });
 
 	useEffect(() => {
 		mixpanel.track('Page: App');
