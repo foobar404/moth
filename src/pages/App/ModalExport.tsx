@@ -31,20 +31,22 @@ export function ModalExport(props) {
     return (
         <Modal {...props}>
             <ReactTooltip id="tooltip" />
-            <main className="p-12">
+            <main className="pt-8 sm:p-12 max-w-[80vw]">
                 <section className="!items-stretch space-y-2 col">
+                    <span className="sm:hidden">Export Current Frame</span>
                     <button aria-label="export current frame"
                         className="btn btn-secondary row-left"
                         onClick={() => data.exportProject({ ...data.exportSettings, frameOnly: true })}>
                         <IoImage className="text-2xl" />
-                        Export Current Frame
+                        <span className="hidden sm:block">Export Current Frame</span>
                     </button>
 
+                    <span className="sm:hidden">Export as GIF</span>
                     <button aria-label="export all frames as a gif"
                         className="btn btn-secondary row-left"
                         onClick={() => data.createGif(data.exportSettings)}>
                         <PiGifFill className="text-2xl" />
-                        Export as GIF
+                        <span className="hidden sm:block">Export as GIF</span>
                         <input aria-label="gif fps setting"
                             data-for="tooltip"
                             data-tip="fps"
@@ -56,11 +58,12 @@ export function ModalExport(props) {
                             onChange={e => data.setExportSettings({ ...data.exportSettings, gifFps: e.currentTarget.valueAsNumber })} />
                     </button>
 
+                    <span className="sm:hidden">Export as Spritesheet</span>
                     <button aria-label="export all frames as a spritesheet"
                         className="btn btn-secondary row-left"
                         onClick={() => data.exportProject(data.exportSettings)}>
                         <MdMovieFilter className="text-2xl" />
-                        Export as Spritesheet
+                        <span className="hidden sm:block">Export as Spritesheet</span>
                         <div className="inline-flex ml-4 space-x-2">
                             <input aria-label="spritesheet x padding value"
                                 data-for="tooltip"
@@ -83,11 +86,12 @@ export function ModalExport(props) {
                         </div>
                     </button>
 
+                    <span className="sm:hidden">Save Project</span>
                     <button aria-label="save project as .moth file"
                         className="btn btn-primary row-left"
                         onClick={() => data.saveProject()}>
                         <FaStar className="text-2xl" />
-                        Save Project
+                        <span className="hidden sm:block">Save Project</span>
                     </button>
 
                     <footer>
@@ -95,11 +99,21 @@ export function ModalExport(props) {
 
                         <section className="bg-base-200 max-h-[200px] overflow-auto p-2 rounded-tl-none rounded-lg text-base-content">
                             <p>Scale: {data.exportSettings.scale} - {data.canvasSize.height * data.exportSettings.scale} x {data.canvasSize.width * data.exportSettings.scale}</p>
-                            <input aria-label="export image scale"
-                                type="range"
-                                value={data.exportSettings.scale}
-                                className="range range-slider-base-content" min={1} max={30} step={1}
-                                onChange={(e) => data.setExportSettings({ ...data.exportSettings, scale: e.currentTarget.valueAsNumber })} />
+                            <div className="row">
+                                <input aria-label="export image scale slider"
+                                    type="range"
+                                    min={1} max={30}
+                                    value={data.exportSettings.scale}
+                                    className="range range-slider-base-content"
+                                    onChange={(e) => data.setExportSettings({ ...data.exportSettings, scale: e.currentTarget.valueAsNumber })} />
+
+                                <input aria-label="export image scale input"
+                                    type="number"
+                                    min={1}
+                                    value={data.exportSettings.scale}
+                                    className="input input-sm w-[70px] ml-2"
+                                    onChange={(e) => data.setExportSettings({ ...data.exportSettings, scale: e.currentTarget.valueAsNumber })} />
+                            </div>
                         </section>
                     </footer>
                 </section>

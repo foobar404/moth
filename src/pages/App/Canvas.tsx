@@ -1146,23 +1146,46 @@ function useCanvas() {
     // mouse event listeners
     useEffect(() => {
         const setMouseState = e => {
-            mouseState.current = {
-                ...mouseState.current,
-                x: e.clientX,
-                y: e.clientY,
-                movementX: e.movementX,
-                movementY: e.movementY,
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+            let movementX = e.movementX;
+            let movementY = e.movementY;
+
+            if (e.touches) {
+                if (e.touches[0]) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                    // Calculating movementX/Y for touch by comparing with last position
+                    movementX = clientX - (mouseState.current.x || clientX);
+                    movementY = clientY - (mouseState.current.y || clientY);
+                }
             }
 
-            if (e.type === "mousedown") {
-                if (e.button === 0) mouseState.current.leftDown = true;
-                if (e.button === 1) mouseState.current.middleDown = true;
-                if (e.button === 2) mouseState.current.rightDown = true;
+            mouseState.current = {
+                ...mouseState.current,
+                x: clientX,
+                y: clientY,
+                movementX: movementX,
+                movementY: movementY,
             }
-            if (e.type === "mouseup") {
-                if (e.button === 0) mouseState.current.leftDown = false;
-                if (e.button === 1) mouseState.current.middleDown = false;
-                if (e.button === 2) mouseState.current.rightDown = false;
+
+            switch (e.type) {
+                case "mousedown":
+                    if (e.button === 0) mouseState.current.leftDown = true;
+                    if (e.button === 1) mouseState.current.middleDown = true;
+                    if (e.button === 2) mouseState.current.rightDown = true;
+                    break;
+                case "mouseup":
+                    if (e.button === 0) mouseState.current.leftDown = false;
+                    if (e.button === 1) mouseState.current.middleDown = false;
+                    if (e.button === 2) mouseState.current.rightDown = false;
+                    break;
+                case "touchstart":
+                    mouseState.current.leftDown = true;  
+                    break;
+                case "touchend":
+                    mouseState.current.leftDown = false; 
+                    break;
             }
         };
 
@@ -1172,10 +1195,18 @@ function useCanvas() {
         document.addEventListener('mouseup', setMouseState, { passive: true });
         document.addEventListener('mousemove', setMouseState, { passive: true });
 
+        canvasContainer!.addEventListener('touchstart', setMouseState, { passive: true });
+        document.addEventListener('touchend', setMouseState, { passive: true });
+        document.addEventListener('touchmove', setMouseState, { passive: true });
+
         canvasContainer!.addEventListener('wheel', (e: any) => {
             e.preventDefault();
             e.stopPropagation();
-            let delta = e.deltaY > 0 ? -0.1 : 0.1;
+
+            let max = Math.max(stateCache.current.canvasSize.width, stateCache.current.canvasSize.height);
+            let baseSpeed = .5;
+            let speed = Math.log(max) / Math.log(max / baseSpeed);
+            let delta = e.deltaY > 0 ? -(speed) : (speed);
             setZoom(mainCanvasZoom.current + delta);
         }, { passive: false });
 
@@ -1196,7 +1227,7 @@ function useCanvas() {
         mainCanvas.getCtx().imageSmoothingEnabled = false;
         mainCanvasContainer.current?.appendChild(mainCanvas.getElement());
 
-        mainCanvas.getElement().classList.add(...["p-app__canvas-elm", "p-app__grid2x2"]);
+        mainCanvas.getElement().classList.add(...["p-app__canvas-elm"]);
         mainCanvas.resize(canvasSize.width, canvasSize.height);
         saveCanvas.resize(canvasSize.width, canvasSize.height);
         previewCanvas.resize(canvasSize.width, canvasSize.height);
@@ -1205,6 +1236,11 @@ function useCanvas() {
 
         setZoom(mainCanvasZoom.current);
     }, []);
+
+    // update state cache
+    useEffect(() => {
+        stateCache.current = { activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames };
+    }, [activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames]);
 
     // resize canvas and layers
     useEffect(() => {
@@ -1227,12 +1263,9 @@ function useCanvas() {
                 layer.image = centerImageData(layer.image, canvasSize.width, canvasSize.height);
             });
         });
-    }, [canvasSize]);
 
-    // update state cache
-    useEffect(() => {
-        stateCache.current = { activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames };
-    }, [activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames]);
+        setZoom(mainCanvasZoom.current);
+    }, [canvasSize]);
 
     // rebuild tooltip
     useEffect(() => { ReactTooltip.rebuild() }, [toolSettings]);
@@ -1332,7 +1365,13 @@ function useCanvas() {
     }
 
     function setZoom(zoom = 1) {
-        mainCanvasZoom.current = Math.max(1, zoom);
+        let min;
+        if (stateCache.current.canvasSize.width > stateCache.current.canvasSize.height)
+            min = (mainCanvasContainer.current!.clientWidth * .6) / stateCache.current.canvasSize.width;
+        else
+            min = (mainCanvasContainer.current!.clientHeight * .6) / stateCache.current.canvasSize.height;
+
+        mainCanvasZoom.current = Math.max(min, zoom);
 
         let translateX = 0;
         let translateY = 0;
@@ -1356,6 +1395,7 @@ function useCanvas() {
         saveCanvas.clear();
         previewCanvas.clear();
         mainCanvas.clear();
+        mainCanvas.drawGrid();
 
         // position relative to the canvas element
         let rect = mainCanvas.getElement().getBoundingClientRect();

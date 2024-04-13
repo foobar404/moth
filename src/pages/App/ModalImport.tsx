@@ -17,7 +17,7 @@ export function ModalImport(props) {
     return (
         <Modal {...props}>
             <ReactTooltip id="tooltip" />
-            <main className="p-12">
+            <main className="pt-8 md:p-12 max-w-[80vw]">
                 <section className="!items-stretch space-y-2 col">
 
                     <button aria-label="import png, jpg or gif image"
@@ -60,7 +60,7 @@ export function ModalImport(props) {
                             props.close();
                         }}>
                         <FaStar className="text-2xl" />
-                        Import Project
+                        Open Project
                     </button>
 
                     <div className="!mb-2 !mt-4 divider">Local Projects</div>

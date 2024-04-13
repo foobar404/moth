@@ -10,6 +10,14 @@
         "left content right"
         "left footer right";
 
+    @media (max-width: 1024px) {
+        grid-template-columns: 60px calc(100% - 60px);
+        grid-template-areas:
+            "header header"
+            "left content"
+            "left footer";
+    }
+
     &__nav {
         grid-area: header;
     }

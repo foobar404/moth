@@ -4,7 +4,7 @@ import { Canvas } from './Canvas';
 import { Colors } from './Colors';
 import { Frames } from './Frames';
 import { Layers } from './Layers';
-import ModalBeta from "./ModalBeta";
+import ModalHero from "./ModalHero";
 import mixpanel from 'mixpanel-browser';
 import ReactTooltip from 'react-tooltip';
 import React, { useEffect } from 'react';
@@ -18,7 +18,7 @@ export function App() {
 	const data = useApp();
 
 	return (<>
-		<ModalBeta {...data.modalBeta} />
+		<ModalHero {...data.modalHero} />
 
 		<main className="p-app">
 			<ReactTooltip id="tooltip" />
@@ -31,7 +31,7 @@ export function App() {
 
 			<Canvas />
 
-			<section className={`p-app__sidebar-right p-app__block --right}`}>
+			<section className={`p-app__sidebar-right p-app__block --right !hidden lg:!block`}>
 				<Drawer isOpen className="p-2 border-4 rounded-lg border-secondary">
 					<h2 className="p-2 duration-100 border-4 cursor-pointer border-base-100 text-secondary-content row bg-secondary rounded-box hover:scale-105">
 						<IoMdColorPalette className="mr-1 text-xl" /> Colors
@@ -58,7 +58,7 @@ export function App() {
 
 
 function useApp() {
-	const modalBeta = useModal(true);
+	const modalHero = useModal(true);
 
 	useEffect(() => {
 		mixpanel.track('Page: App');
@@ -73,7 +73,7 @@ function useApp() {
 	}, []);
 
 	return {
-		modalBeta,
+		modalHero,
 	};
 }
 

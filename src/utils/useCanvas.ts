@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import tinycolor from 'tinycolor2';
 
 
 interface IProps {
@@ -94,22 +95,25 @@ export function useCanvas(props?: IProps) {
     }
 
     function drawGrid(color1 = "#eee", color2 = "#ccc", size = 1) {
-        let rows = Math.floor(canvas.current.height / size);
-        let cols = Math.floor(canvas.current.width / size);
+        const imgData = ctx.current.createImageData(canvas.current.width, canvas.current.height);
+        const data = imgData.data;
+        const width = imgData.width;
+        const height = imgData.height;
+        let color1RGB = tinycolor(color1).toRgb();
+        let color2RGB = tinycolor(color2).toRgb();
 
-        ctx.current.fillStyle = color1;
-        for (let y = 0; y < rows; y++) {
-            for (let x = (y % 2); x < cols; x += 2) { // Adjust starting index based on row number
-                ctx.current.fillRect(x * size, y * size, size, size);
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const color = ((x + y) % 2 === 0) ? color1RGB : color2RGB;
+                const index = (x + y * width) * 4;
+                data[index + 0] = color.r;
+                data[index + 1] = color.g;
+                data[index + 2] = color.b;
+                data[index + 3] = 255;
             }
         }
 
-        ctx.current.fillStyle = color2;
-        for (let y = 0; y < rows; y++) {
-            for (let x = (y % 2 === 0 ? 1 : 0); x < cols; x += 2) { // Adjust starting index based on row number
-                ctx.current.fillRect(x * size, y * size, size, size);
-            }
-        }
+        ctx.current.putImageData(imgData, 0, 0);
     }
 
     function drawLine(start, end, size = 1, color?, prefect = false) {

@@ -33,12 +33,12 @@ export function Colors() {
                 <div className="w-1/2 h-full" style={{ background: `${tinycolor(data.recentColors[1]).toRgbString()}` }}></div>
             </div>
 
-            <nav className="my-2 p-app__color-controls !bg-accent">
-                <div className="w-full space-x-1 row">
+            <nav className="p-1 my-2 space-y-1 rounded-md bg-accent">
+                <div className="space-x-1 row">
                     <button aria-label="import color palette"
                         data-tip="import color palette from lospec or file"
                         data-for="tooltip"
-                        className="w-1/2 btn btn-xs"
+                        className="w-[49%] btn btn-xs"
                         onClick={() => data.modalColorPalettes.open()}>
                         <FaFileImport className="text-lg" />
                         Import
@@ -46,7 +46,7 @@ export function Colors() {
                     <button aria-label="export color palette"
                         data-tip="export color palette as .png"
                         data-for="tooltip"
-                        className="w-1/2 btn btn-xs"
+                        className="w-[49%] btn btn-xs"
                         onClick={() => data.exportColorPalette()}>
                         <FaFileExport className="text-lg" />
                         Export
@@ -259,8 +259,12 @@ function useColors() {
         setActiveColorPalette(palette!);
     }
 
+    //? update this to not use builtin browser ui
     function addNewColorPalette() {
         let name = window.prompt("Enter a name for the new palette.");
+
+        if (!name) return;
+
         let newPalette = {
             name: name ?? "",
             colors: [{ r: 0, g: 0, b: 0, a: 255 }],

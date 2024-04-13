@@ -18,13 +18,23 @@ export function Nav() {
             <button aria-label="open import settings"
                 onClick={() => data.modalImport.setIsOpen(true)}
                 className="box-content py-1 btn btn-sm btn-primary">
-                <IoImage className="text-2xl" /> Import
+                <IoImage className="text-2xl" /> 
+                <span className="hidden sm:block">Open</span>
             </button>
             <button aria-label="open export settings"
                 onClick={() => data.modalExport.setIsOpen(true)}
                 className="box-content py-1 btn btn-sm btn-secondary">
-                <HiStar className="text-2xl" /> Export
+                <HiStar className="text-2xl" /> 
+                <span className="hidden sm:block">Save</span>
             </button>
+            <a aria-label="report a bug with the moth bug form"
+                data-tip="report a bug"
+                data-for="tooltip"
+                target="_blank"
+                className="box-content py-1 btn btn-sm btn-square btn-warning"
+                href={"https://forms.gle/pDXePJUoGSFnUBJF7"}>
+                <FaBug />
+            </a>
 
             <select aria-label="themes list"
                 className="select select-bordered"
@@ -59,19 +69,10 @@ export function Nav() {
                 placeholder="Enter Name"
                 value={data.projectName}
                 onKeyDown={e => e.stopPropagation()}
-                className="input input-md input-bordered min-w-[250px]"
+                className="input input-md input-bordered w-min min-w-[250px] hidden sm:block"
                 onChange={e => data.saveProjectName(e.target.value)} />
 
-            <a aria-label="report a bug with the moth bug form"
-                data-tip="report a bug"
-                data-for="tooltip"
-                target="_blank"
-                className="btn btn-sm btn-warning"
-                href={"https://forms.gle/pDXePJUoGSFnUBJF7"}>
-                <FaBug />
-            </a>
-
-            <section className="fixed z-50 p-2 bottom-right">
+            <section className="fixed z-50 !hidden p-2 bottom-right lg:!block">
                 {data.message && (
                     <div className="px-6 py-4 badge badge-info">
                         {data.message}
