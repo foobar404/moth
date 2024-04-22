@@ -1,7 +1,7 @@
 import tinycolor from "tinycolor2";
 import { FaMap } from "react-icons/fa6";
 import ReactTooltip from 'react-tooltip';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BsCircleFill, BsCircleHalf } from "react-icons/bs";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
 import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
@@ -244,14 +244,15 @@ export function Canvas() {
                     className="btn btn-xs">
                     <FaRedoAlt />
                 </button>
+
                 <label data-tip="toggle tilemode"
                     data-for="tooltip"
-                    className="mr-2 row">
-                    <FaMap className="mr-2 text-lg" />
+                    className={`row rounded-md p-1 cursor-pointer ${data.tilemode ? "bg-secondary text-secondary-content" : ""}`}>
+                    <FaMap className="text-lg" />
                     <input aria-label="toggle tilemode"
                         type="checkbox"
-                        className="checkbox checkbox-xs"
-                        onChange={e => data.tilemode.current = e.currentTarget.checked} />
+                        className="hidden checkbox checkbox-xs"
+                        onChange={e => data.setTilemode(e.currentTarget.checked)} />
                 </label>
             </nav>
 
@@ -262,11 +263,12 @@ export function Canvas() {
 
 
 function useCanvas() {
-    const { toolSettings, setActiveColor, setToolSettings,
+    let { toolSettings, setActiveColor, setToolSettings,
         activeColor, activeColorPalette, setActiveColorPalette,
-        colorStats, activeLayer, activeFrame, canvasSize,
-        setCanvasSize, onionSkin, frames,
+        activeLayer, activeFrame, canvasSize, setCanvasSize, onionSkin, frames,
     } = useGlobalStore();
+    let [tilemode, setTilemode] = useState(false);
+    const stateCache = useRef({ activeColorPalette, activeColor, activeFrame, toolSettings, activeLayer, canvasSize, onionSkin, frames, tilemode });
     const mainCanvas = useCanvasHook();
     const saveCanvas = useCanvasHook({ offscreen: true });
     const previewCanvas = useCanvasHook({ offscreen: true });
@@ -275,10 +277,9 @@ function useCanvas() {
     const undoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
     const redoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
 
-    let mainCanvasContainer = useRef<HTMLElement>(null);
-    let mainCanvasZoom = useRef(15);
-    let tilemode = useRef(false);
-    let mouseState = useRef({
+    const mainCanvasContainer = useRef<HTMLElement>(null);
+    const mainCanvasZoom = useRef(15);
+    const mouseState = useRef({
         leftDown: false,
         rightDown: false,
         middleDown: false,
@@ -287,7 +288,7 @@ function useCanvas() {
         movementX: 0,
         movementY: 0,
     });
-    let toolState = useRef({
+    const toolState = useRef({
         stage: ToolStage.PREVIEW,
         brush: { previousPoint: { x: 0, y: 0 } },
         eraser: { previousPoint: { x: 0, y: 0 } },
@@ -321,8 +322,7 @@ function useCanvas() {
             startPosition: { x: 0, y: 0 },
         }
     });
-    let stateCache = useRef({ activeColorPalette, activeColor, activeFrame, colorStats, toolSettings, activeLayer, canvasSize, onionSkin, frames });
-    let toolHandlers = {
+    const toolHandlers = {
         "brush": (x, y, toolButtonActive, preview) => {
             // center the mouse cursor in the brush 
             let width = stateCache.current.toolSettings.size;
@@ -1181,10 +1181,10 @@ function useCanvas() {
                     if (e.button === 2) mouseState.current.rightDown = false;
                     break;
                 case "touchstart":
-                    mouseState.current.leftDown = true;  
+                    mouseState.current.leftDown = true;
                     break;
                 case "touchend":
-                    mouseState.current.leftDown = false; 
+                    mouseState.current.leftDown = false;
                     break;
             }
         };
@@ -1239,8 +1239,8 @@ function useCanvas() {
 
     // update state cache
     useEffect(() => {
-        stateCache.current = { activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames };
-    }, [activeColorPalette, activeColor, colorStats, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames]);
+        stateCache.current = { activeColorPalette, activeColor, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames, tilemode };
+    }, [activeColorPalette, activeColor, toolSettings, activeLayer, activeFrame, canvasSize, onionSkin, frames, tilemode]);
 
     // resize canvas and layers
     useEffect(() => {
@@ -1473,13 +1473,12 @@ function useCanvas() {
 
         // render active frame
         stateCache.current.activeFrame.layers.slice().reverse().forEach((layer) => {
-            tempCanvas1.putImageData(layer.image);
-            tempCanvas1.getCtx().globalAlpha = layer.opacity / 255;
+            tempCanvas2.getCtx().globalAlpha = layer.opacity / 255;
 
             // draw preview
             if (layer.symbol === stateCache.current.activeLayer.symbol) {
                 let previewData = previewCanvas.getImageData();
-                let activeLayerData = tempCanvas1.getImageData();
+                let activeLayerData = layer.image;
 
                 for (let i = 0; i < previewData.data.length; i += 4) {
                     let a = previewData.data[i + 3];
@@ -1493,13 +1492,17 @@ function useCanvas() {
                 }
 
                 tempCanvas1.putImageData(activeLayerData);
-                tempCanvas1.drawImage(previewCanvas.getElement());
+                tempCanvas2.drawImage(tempCanvas1.getElement());
+                tempCanvas2.drawImage(previewCanvas.getElement());
+            } else {
+                tempCanvas1.putImageData(layer.image);
+                tempCanvas2.drawImage(tempCanvas1.getElement());
             }
 
-            mainCanvas.drawImage(tempCanvas1.getElement());
+            mainCanvas.drawImage(tempCanvas2.getElement());
         });
 
-        if (tilemode.current) {
+        if (stateCache.current.tilemode) {
             let width = Math.ceil(stateCache.current.canvasSize.width * mainCanvasZoom.current);
             let height = Math.ceil(stateCache.current.canvasSize.height * mainCanvasZoom.current);
             mainCanvasContainer.current!.style.background = `url(${mainCanvas.getElement().toDataURL()}) repeat center`;
@@ -1515,6 +1518,7 @@ function useCanvas() {
         redo,
         setZoom,
         tilemode,
+        setTilemode,
         canvasSize,
         toolSettings,
         mainCanvasZoom,

@@ -1,55 +1,37 @@
 import { Preview } from './Preview';
 import { IFrame, IPreview } from '../../types';
+import { TiArrowMove } from "react-icons/ti";
 import React, { useState, useEffect, useRef } from 'react';
 import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from '../../utils';
-import { BsFillCaretLeftFill, BsFillCaretRightFill } from "react-icons/bs";
-import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
+import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { IoMdMove } from 'react-icons/io';
 
 
 export function Frames() {
     const data = useFrames();
 
-    return (<section className="!justify-between row-top p-app__block overflow-hidden">
+    return (<section className={`!justify-between p-app__block overflow-hidden ${data.enlargePreview ? "row-top" : "row"}`}>
         <section className="flex-1 w-1/2">
             <nav className={"row !justify-between"}>
-                <section className="space-x-2 p-app__frame-controls-section bg-accent">
-                    <button aria-label="add new frame"
-                        data-tip="new frame" data-for="tooltip"
-                        onClick={data.addFrame}
-                        className="btn btn-xs">
-                        <MdAddPhotoAlternate className="text-lg" />
-                    </button>
-                    <button aria-label="duplicate current frame"
-                        data-tip="duplicate frame"
+                <section className="row !flex-nowrap p-app__frame-controls-section bg-accent">
+                    <button aria-label="toggle onion skin effect"
+                        data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
                         data-for="tooltip"
-                        onClick={data.duplicateFrame}
-                        className="btn btn-xs">
-                        <IoCopy className="text-lg" />
+                        className="mr-2 btn btn-xs"
+                        onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
+                        {data.onionSkin ? <MdLayers className="text-lg" /> : <MdLayersClear className="text-lg" />}
                     </button>
 
-                    <button aria-label="move current frame left"
-                        data-tip="move frame left"
+                    <input aria-label="onion skin opacity slider"
+                        data-tip="onion skin opacity"
                         data-for="tooltip"
-                        onClick={data.moveFrameLeft}
-                        className="btn btn-xs">
-                        <BsFillCaretLeftFill className="text-lg" />
-                    </button>
-                    <button aria-label="move current frame right"
-                        data-tip="move frame right"
-                        data-for="tooltip"
-                        onClick={data.moveFrameRight}
-                        className="btn btn-xs">
-                        <BsFillCaretRightFill className="text-lg" />
-                    </button>
-
-                    <button aria-label="delete current frame"
-                        data-tip="delete frame"
-                        data-for="tooltip"
-                        onClick={data.deleteFrame}
-                        className="btn btn-xs">
-                        <MdDelete className="text-lg" />
-                    </button>
+                        type="range"
+                        min="0"
+                        max="255"
+                        value={data.onionSkin}
+                        className="range range-xs range-secondary w-[100px]"
+                        onChange={e => data.setOnionSkin(e.target.valueAsNumber)} />
                 </section>
 
                 <section className="flex items-center space-x-2 p-app__frame-controls-section bg-accent">
@@ -98,51 +80,63 @@ export function Frames() {
                         onKeyUp={e => e.stopPropagation()}
                         onChange={e => data.setFps(Number(e.target.value))} />
                 </section>
-
-                <section className="row !flex-nowrap p-app__frame-controls-section bg-accent">
-                    <button aria-label="toggle onion skin effect"
-                        data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
-                        data-for="tooltip"
-                        className="mr-2 btn btn-xs"
-                        onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
-                        {data.onionSkin ? <MdLayers className="text-lg" /> : <MdLayersClear className="text-lg" />}
-                    </button>
-
-                    <input aria-label="onion skin opacity slider"
-                        data-tip="onion skin opacity"
-                        data-for="tooltip"
-                        type="range"
-                        min="0"
-                        max="255"
-                        value={data.onionSkin}
-                        className="range range-xs range-secondary"
-                        onChange={e => data.setOnionSkin(e.target.valueAsNumber)} />
-                </section>
             </nav>
 
             <section className={`overflow-auto p-1 row-left max-h-[400px] ${data.enlargePreview ? "!row flex-wrap" : ""}`}>
                 {data.frames.map((frame, i) => (
-                    <img key={i}
-                        aria-label={`frame #${i + 1}`}
-                        draggable
+                    <div key={i} draggable
                         onDragStart={(e) => data.handleDragStart(e, frame)}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={(e) => data.handleDrop(e, frame)}
                         onDragEnd={data.handleDragEnd}
-                        className={`h-[60px] min-w-[60px] max-w-[106px] flex-shrink-0 p-app__grid m-1 hover:scale-105 shadow-md rounded-md cursor-pointer box-content border-4 border-base-100 ${frame.symbol === data.activeFrame.symbol ? "!border-base-content" : ""}`}
-                        src={data.imageMap[frame.symbol] ?? data.emptyImg}
-                        onClick={() => {
-                            data.setActiveFrame(frame);
-                            data.setActiveLayer(frame.layers[0]);
-                        }} />
+                        onClick={() => data.setFrame(frame)}
+                        className="relative group hover:scale-105">
+
+                        <img aria-label={`frame #${i + 1}`}
+                            className={`h-[70px] min-w-[70px] max-w-[106px] m-1 flex-shrink-0 p-app__grid  shadow-md rounded-md cursor-pointer box-content border-4 border-base-100 ${frame.symbol === data.activeFrame.symbol ? "!border-base-content" : ""}`}
+                            src={data.imageMap[frame.symbol] ?? data.emptyImg} />
+
+                        <div className="absolute top-left !hidden group-hover:!flex row w-full h-full bg-base-100/40 rounded-md cursor-grab">
+                            <TiArrowMove className="text-3xl text-base-content" />
+                        </div>
+
+                        <button aria-label="delete current frame"
+                            data-tip="delete frame"
+                            data-for="tooltip"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                data.deleteFrame(frame);
+                            }}
+                            className="absolute !hidden row w-6 h-6 m-1 rounded-md bottom-right bg-base-100 hover:bg-error group-hover:!flex">
+                            <MdDelete className="text-lg" />
+                        </button>
+
+                        <button aria-label="duplicate current frame"
+                            data-tip="duplicate frame"
+                            data-for="tooltip"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                data.duplicateFrame(frame)
+                            }}
+                            className="absolute !hidden row w-6 h-6 m-1 rounded-md bottom-left bg-base-100 hover:bg-info group-hover:!flex">
+                            <IoCopy className="text-lg" />
+                        </button>
+                    </div>
                 ))}
+
+                <div data-tip="new frame"
+                    data-for="tooltip"
+                    onClick={data.addFrame}
+                    className="min-w-[70px] min-h-[70px] m-1 bg-gray-200 border-4 border-gray-400 border-dashed rounded-md cursor-pointer box-content row hover:scale-105 shadow-md">
+                    <MdAddPhotoAlternate aria-label="add new frame" className="text-3xl text-gray-400" />
+                </div>
             </section>
         </section>
 
-        <div data-tip="enlarge animatin ( space )"
+        <div data-tip="enlarge animation ( space )"
             data-for="tooltip"
             onClick={() => data.setEnlargePreview(!data.enlargePreview)}
-            className={`ml-2 cursor-pointer hover:scale-95`}>
+            className={`ml-2 cursor-pointer hover:animate-tilt`}>
             <Preview {...data.preview} className={`${data.enlargePreview ? "h-[300px] min-w-[300px] max-w-[534px]" : "h-[120px] min-w-[120px] max-w-[213px]"}`} />
         </div>
     </section>)
@@ -152,6 +146,7 @@ function useFrames() {
     const {
         frames, setFrames, activeFrame, setActiveFrame,
         setActiveLayer, canvasSize, onionSkin, setOnionSkin,
+        activeLayer,
     } = useGlobalStore();
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
@@ -169,7 +164,17 @@ function useFrames() {
         " ": toggleAnimationMode
     });
 
-    //? use a hash to check for changes
+    // update preview when frames change
+    useEffect(() => {
+        let map: { [s: symbol]: string } = {};
+        frames.forEach(frame => {
+            map[frame.symbol] = getImage(frame);
+        });
+
+        setImageMap(map);
+    }, [frames]);
+
+    // update preview every x seconds
     useSetInterval(() => {
         let map: { [s: symbol]: string } = {};
         frames.forEach(frame => {
@@ -230,22 +235,30 @@ function useFrames() {
         setActiveFrame(newFrame);
     }
 
-    function deleteFrame() {
-        let newFrames = frames.filter(frame => frame.symbol !== activeFrame.symbol);
+    function deleteFrame(frame) {
+        let frameIndex = frames.findIndex(f => f.symbol === frame.symbol);
+        let newFrameIndex = frames.length - 2 >= frameIndex ? frameIndex : Math.max(frameIndex - 1, 0);
+        let newFrames = frames.filter(f => f.symbol !== frame.symbol);
+
         if (newFrames.length === 0) {
             newFrames.push({
                 layers: [{ image: new ImageData(canvasSize.width, canvasSize.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
                 symbol: Symbol(),
             });
         }
+
         setFrames(newFrames);
-        setActiveFrame(newFrames[0]);
-        setActiveLayer(newFrames[0].layers[0]);
+
+        if (frame.symbol === activeFrame.symbol) {
+            setActiveFrame(newFrames[newFrameIndex]);
+            setActiveLayer(newFrames[newFrameIndex].layers[0]);
+        }
     }
 
-    function duplicateFrame() {
+    function duplicateFrame(frame) {
+        let frameIndex = frames.findIndex(f => f.symbol === frame.symbol);
         let newFrame: IFrame = {
-            layers: activeFrame.layers.map(layer => {
+            layers: frame.layers.map(layer => {
                 return {
                     symbol: Symbol(),
                     name: layer.name,
@@ -256,8 +269,17 @@ function useFrames() {
             symbol: Symbol()
         };
 
-        setActiveFrame(newFrame);
-        setActiveLayer(newFrame.layers[0]);
+        let newFrames = [...frames];
+        newFrames.splice(frameIndex + 1, 0, newFrame);
+        setFrames(newFrames);
+    }
+
+    function setFrame(frame) {
+        let layerIndex = activeFrame.layers.findIndex(layer => layer.symbol === activeLayer.symbol);
+        let newLayerIndex = (frame.layers.length - 1) >= layerIndex ? layerIndex : frame.layers.length - 1;
+
+        setActiveFrame(frame);
+        setActiveLayer(frame.layers[newLayerIndex]);
     }
 
     function moveFrameLeft() {
@@ -336,6 +358,7 @@ function useFrames() {
         activeFrame,
         emptyImg,
         setFps,
+        setFrame,
         addFrame,
         togglePlay,
         deleteFrame,

@@ -71,6 +71,14 @@ export default function ModalHero(props: IProps) {
             <footer className="w-full">
                 <h2 className="p-2 font-bold rounded-t-lg text-base-content w-min bg-base-200">Changelog</h2>
                 <div className="bg-base-200 max-h-[200px] overflow-auto p-2 mockup-code rounded-tl-none rounded-lg">
+                    <pre data-prefix="$" className="text-info"><code>v1.0.6 - 4/22/2024</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>update UI for frames</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>speed up the import color palette modal</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>fix sorting colors</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>fix layer opacity</code></pre>
+
+                    <div className="divider" />
+
                     <pre data-prefix="$" className="text-info"><code>v1.0.5 - 4/12/2024</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>fix canceling new color palette</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>rename import/export to open/save</code></pre>
@@ -86,15 +94,6 @@ export default function ModalHero(props: IProps) {
                     <pre data-prefix=">" className="text-success"><code>increase app performance by 8x</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>pixelate tilemode</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>update import modal</code></pre>
-
-                    <div className="divider" />
-
-                    <pre data-prefix="$" className="text-info"><code>v1.0.3 - 4/9/2024</code></pre>
-                    <pre data-prefix=">" className="text-base-content"><code>fix tools not working randomly</code></pre>
-                    <pre data-prefix=">" className="text-success"><code>add a colored circle for the eye dropper</code></pre>
-                    <pre data-prefix=">" className="text-base-content"><code>simplyfy exporting & saving</code></pre>
-                    <pre data-prefix=">" className="text-base-content"><code>box select works in all directions</code></pre>
-                    <pre data-prefix=">" className="text-success"><code>add ability to import / export color palettes</code></pre>
                 </div>
             </footer>
 

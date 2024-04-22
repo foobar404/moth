@@ -31,9 +31,9 @@ export function Nav() {
                 data-tip="report a bug"
                 data-for="tooltip"
                 target="_blank"
-                className="box-content py-1 btn btn-sm btn-square btn-warning"
+                className="box-content py-1 btn btn-sm btn-warning"
                 href={"https://forms.gle/pDXePJUoGSFnUBJF7"}>
-                <FaBug />
+                <FaBug className="text-lg"/>
             </a>
 
             <select aria-label="themes list"

@@ -3,39 +3,17 @@
 # Doing
 - Austin
     - (Medium)(Bug) eraser leaves artifacts at larger sizes
-    - (Hard)(Bug) [ & ] tigger wrong shortcut
-        - (Easy)(Bug) FPS is reset when pressing space
-        - (Hard)(Bug) shortcuts stop working after a while
-        - (Medium)(Bug) pressing z is buggy
-    - (Easy)(Feature) rainbow color mode
-    - (Easy)(Feature) random color mode
-    - (Medium)(Feature) refrence images tab
-    - (Medium)(Feature) add spray tool
-    - (Medium)(Feature) allow custom brush shapes 
-    - (Hard)(Feature) settings modal
-        - custom shortcuts 
-            - custom shortcuts override default
-        - reset shortcuts to default button 
-        - themes
-            - retro game consoles
-            - grid colors
-            - custom layout, custom shortcut
-            - minimize UI
-    - (Hard)(Feature) Add blur / jumble tool
-    - (Hard)(Feature) Add contour tool 
-        - (Medium)(Feature) fill brush tool (close loop)
-    - (Medium)(Feature) add pixel perfect mode to line tool
-    - (Medium)(Feature) mask mode for brush tool
-    - (Easy)(Feature) mirror from starting point
-        - (Easy)(Feature) mirror ying / yang
-    - (Easy)(Bug) make light tool use lines
-    - (Easy)(Bug) update toggles 
-    - (Hard)(Bug) pixels get deleted when changing the canvas size
-        - (Medium)(Feature) add current mouse position
+    - (Medium)(Bug) work on supporting more browsers`
+    - (Easy)(Feature) hide / show frame
+        - (Easy)(Feature) buttons on frames, hide from animation
+
 - Nate
 
 # TODO
-- (Easy)(Bug) add pwa not supported prompt
+- (Easy)(Bug) make light tool use lines
+- (Easy)(Feature) rainbow color mode
+- (Easy)(Feature) random color mode
+- (Easy)(Bug) light and color picker doesint add color if missing
 - (Easy)(Feature) npm i react-beautiful-dnd
     - (Easy)(Feature) dnd tabs
 - (Easy)(Bug) obfuscate build code
@@ -46,8 +24,6 @@
 - (Easy)(Feature) play animation backwards?
 - (Easy)(Feature) ping / pong animation loop?
 - (Easy)(Feature) export as zip, file for each frame
-- (Easy)(Feature) hide / show frame
-    - (Easy)(Feature) buttons on frames, hide from animation
 - (Easy)(Bug) shape icons are rounded
 - (Easy)(Feature) move tool is like a selection tool
 - (Easy)(Feature) indexed colors
@@ -58,6 +34,14 @@
 - (Easy)(Bug) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
 - (Easy)(Feature) Use the same icons set across the app
 - (Easy)(Feature) Join multiple similer tool into one iterface
+- (Medium)(Feature) mirror mode
+    - (Easy)(Feature) mirror from starting point
+    - (Easy)(Feature) mirror ying / yang
+- (Medium)(Feature) add pixel perfect mode to line tool
+- (Medium)(Feature) mask mode for brush tool
+- (Medium)(Feature) refrence images tab
+- (Medium)(Feature) add spray tool
+- (Medium)(Feature) allow custom brush shapes 
 - (Medium)(Bug) make sure all brush combinations work with left and right buttons
 - (Medium)(Feature) copy / paste selection
 - (Medium)(Feature) export as css
@@ -76,15 +60,31 @@
 - (Medium)(Feature) wrap around move option
 - (Medium)(Feature) The zoom scroll zooms to the center, not the cursor
 - (Medium)(Feature) Layer groups / frame groups
-- (Medium)(Bug) insert duplicated frame after the current frame
 - (Medium)(Feature) add console error watch system
 - (Medium)(Feature) Multiple sprite tabs
-- (Medium)(Bug) make new & duplicated frames go after current frame 
 - (Hard)(Feature) add font tool
 - (Hard)(Feature) tools only modify active selection
 - (Hard)(Feature) better selection box
 - (Hard)(Feature) download as svg
 - (Hard)(Feature) export as .tmx
+- (Hard)(Bug) pixels get deleted when changing the canvas size
+    - (Medium)(Feature) add current mouse position
+- (Hard)(Feature) settings modal
+    - custom shortcuts 
+        - custom shortcuts override default
+    - reset shortcuts to default button 
+    - themes
+        - retro game consoles
+        - grid colors
+        - custom layout, custom shortcut
+        - minimize UI
+- (Hard)(Feature) Add blur / jumble tool
+- (Hard)(Feature) Add contour tool 
+    - (Medium)(Feature) fill brush tool (close loop)
+- (Hard)(Bug) [ & ] tigger wrong shortcut
+    - (Easy)(Bug) FPS is reset when pressing space
+    - (Hard)(Bug) shortcuts stop working after a while
+    - (Medium)(Bug) pressing z is buggy
 - (Hard)(Feature) make selections standout
     - rotate
     - scale
@@ -160,10 +160,10 @@
 - build catapiller extension
 
 # Best editors on the market
-aseprite - https://www.aseprite.org/
-piskel - https://www.piskelapp.com/
-pixelorama - https://orama-interactive.itch.io/pixelorama
-spritepaint - https://spritepaint.com/
-pixelmash - https://nevercenter.com/pixelmash/
-pixel composer - https://makham.itch.io/pixel-composer
-wunderpaint - https://lean8086.github.io/wunderpaint/
+- aseprite - https://www.aseprite.org/
+- piskel - https://www.piskelapp.com/
+- pixelorama - https://orama-interactive.itch.io/pixelorama
+- spritepaint - https://spritepaint.com/
+- pixelmash - https://nevercenter.com/pixelmash/
+- pixel composer - https://makham.itch.io/pixel-composer
+- wunderpaint - https://lean8086.github.io/wunderpaint/

@@ -42,7 +42,3 @@ html {
 .range-slider-base-content::-webkit-slider-runnable-track {
     background: oklch(var(--bc) / .7);
 }
-
-.animate-infinite {
-    animation-iteration-count: infinite;
-}

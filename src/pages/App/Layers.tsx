@@ -89,7 +89,7 @@ export function Layers() {
                             className="self-stretch h-auto ml-1 btn btn-xs btn-accent">
                             {layer.opacity === 255 ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
                         </button>
-                        <div className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-black/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-black" : ""}`}>
+                        <div className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-base-content/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-base-content" : ""}`}>
                             <img src={data.imageMap[layer.symbol] ?? data.emptyImg}
                                 aria-label={`layer #${i + 1}`}
                                 draggable
@@ -141,7 +141,17 @@ function useLayers() {
         "arrowdown": increaseCurrentLayer,
     });
 
-    //? use a hash to check for changes
+    // update preview when frame changes
+    useEffect(() => {
+        let map: any = {};
+        activeFrame.layers.forEach(layer => {
+            let img = getImage(layer.image);
+            map[layer.symbol] = img;
+        });
+        setImageMap(map);
+    }, [activeFrame]);
+
+    // update preview every x seconds
     useSetInterval(() => {
         let map: any = {};
         activeFrame.layers.forEach(layer => {

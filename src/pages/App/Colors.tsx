@@ -142,7 +142,7 @@ export function Colors() {
                         style={{ background: `${tinycolor(c).toHexString()}` }}
                         className={`hover:scale-105 overflow-hidden box-content row cursor-pointer h-7 w-7 rounded shadow-xl mr-1 mb-1 border-4 border-transparent ${JSON.stringify(c) === JSON.stringify(data.activeColor) ? "border-base-content" : ""}`}>
                         <span className="text-xs" style={{ color: `${data.getTextColor(c)}`, fontSize: "9px" }}>
-                            {data.colorStats[`rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`]?.count ?? 0}
+                            {data.colorStats[data.colorToString(c)]?.count ?? 0}
                         </span>
                     </div>
                 ))}
@@ -194,7 +194,7 @@ function useColors() {
     // update color stats
     useEffect(() => {
         let statsCopy = { ...colorStats };
-        let colorString = tinycolor(activeColor).toRgbString();
+        let colorString = colorToString(activeColor);
 
         if (statsCopy[colorString])
             statsCopy[colorString].lastUsed = Date.now();
@@ -360,8 +360,8 @@ function useColors() {
 
     function sortColorsByMostUsed(colors: IColor[]) {
         let newColors = [...colors].sort((a, b) => {
-            let colorString = tinycolor(a).toRgbString();
-            let colorString2 = tinycolor(b).toRgbString();
+            let colorString = colorToString(a);
+            let colorString2 = colorToString(b);
 
             return (colorStats[colorString2]?.count ?? 0) - (colorStats[colorString]?.count ?? 0);
         });
@@ -371,8 +371,8 @@ function useColors() {
 
     function sortColorsByMostRecent(colors: IColor[]) {
         let newColors = [...colors].sort((a, b) => {
-            let colorString = tinycolor(a).toRgbString();
-            let colorString2 = tinycolor(b).toRgbString();
+            let colorString = colorToString(a);
+            let colorString2 = colorToString(b);
 
             if (colorStats[colorString2]?.lastUsed && !colorStats[colorString]?.lastUsed) return 1;
             if (!colorStats[colorString2]?.lastUsed && colorStats[colorString]?.lastUsed) return -1;
@@ -410,10 +410,11 @@ function useColors() {
     function swapColors() {
         let colors = sortColorsByMostRecent(activeColorPalette.colors);
         setActiveColor(colors[1] ?? activeColor);
+
         setColorStats({
             ...colorStats,
-            [tinycolor(colors[1]).toRgbString()]: {
-                count: colorStats[tinycolor(colors[1]).toRgbString()].count,
+            [colorToString(colors[1])]: {
+                count: colorStats[colorToString(colors[1])].count,
                 lastUsed: Date.now()
             }
         });
@@ -441,6 +442,10 @@ function useColors() {
         a.click();
     }
 
+    function colorToString(c: IColor) {
+        return `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`;
+    }
+
     return {
         colorStats,
         colorState,
@@ -448,6 +453,7 @@ function useColors() {
         recentColors,
         visibleColors,
         colorPalettes,
+        colorToString,
         activeColorPalette,
         modalColorPalettes,
         addColor,
