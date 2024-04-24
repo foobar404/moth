@@ -18,7 +18,6 @@ export function Colors() {
         <section className="mt-2">
             <div onKeyDown={e => e.stopPropagation()}>
                 <ChromePicker
-                    disableAlpha
                     className="!w-full !bg-base-100 !rounded-xl !shadow-xl border-4 border-accent overflow-hidden !box-border"
                     color={{ r: data.activeColor.r, g: data.activeColor.g, b: data.activeColor.b, a: Number((data.activeColor.a / 255).toFixed(2)) }}
                     onChange={(color: any) => data.setActiveColor({ r: color.rgb.r, g: color.rgb.g, b: color.rgb.b, a: Math.ceil(color.rgb.a * 255) })} />
@@ -158,7 +157,7 @@ function useColors() {
         setActiveColorPalette, activeColor, frames, activeFrame, activeLayer, setActiveColor,
     } = useGlobalStore();
     const modalColorPalettes = useModal();
-    const canvas1 = useCanvas({ offscreen: true });
+    const canvas1 = useCanvas();
     const recentColors = sortColorsByMostRecent(activeColorPalette.colors);
 
     let [visibleColors, setVisibleColors] = useState<IColor[]>(activeColorPalette.colors);

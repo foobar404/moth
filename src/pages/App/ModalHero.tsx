@@ -15,7 +15,7 @@ export default function ModalHero(props: IProps) {
     const data = useModalHero(props);
 
     return (<Modal {...props} blur>
-        <main className="space-y-4 rounded-lg max-w-[80vw] max-h-[80vh] w-[600px] col overflow-auto">
+        <main className="space-y-4 rounded-lg max-w-[80vw] max-h-[82vh] w-[600px] col overflow-auto">
             <h1 className="text-3xl font-bold text-base-content row">
                 <img src="/assets/logo.png" className="w-8 h-8 mr-2" alt="rosy maple moth" />
                 <span className="md:hidden">Moth</span>
@@ -71,6 +71,15 @@ export default function ModalHero(props: IProps) {
             <footer className="w-full">
                 <h2 className="p-2 font-bold rounded-t-lg text-base-content w-min bg-base-200">Changelog</h2>
                 <div className="bg-base-200 max-h-[200px] overflow-auto p-2 mockup-code rounded-tl-none rounded-lg">
+                    <pre data-prefix="$" className="text-info"><code>v1.0.7 - 4/23/2024</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>fix opacity issue with eraser</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>layer opacity works after switching frames</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>allow hiding frames from current animation</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>improve browser support (Brave, Opera, Firefox)</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>add opacity slider for colors</code></pre>
+
+                    <div className="divider" />
+
                     <pre data-prefix="$" className="text-info"><code>v1.0.6 - 4/22/2024</code></pre>
                     <pre data-prefix=">" className="text-success"><code>update UI for frames</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>speed up the import color palette modal</code></pre>
@@ -87,13 +96,6 @@ export default function ModalHero(props: IProps) {
                     <pre data-prefix=">" className="text-base-content"><code>add PWA not supported message</code></pre>
                     <pre data-prefix=">" className="text-success"><code>add project presets</code></pre>
                     <pre data-prefix=">" className="text-success"><code>add mobile support phase 1</code></pre>
-
-                    <div className="divider" />
-
-                    <pre data-prefix="$" className="text-info"><code>v1.0.4 - 4/10/2024</code></pre>
-                    <pre data-prefix=">" className="text-success"><code>increase app performance by 8x</code></pre>
-                    <pre data-prefix=">" className="text-base-content"><code>pixelate tilemode</code></pre>
-                    <pre data-prefix=">" className="text-base-content"><code>update import modal</code></pre>
                 </div>
             </footer>
 

@@ -36,6 +36,7 @@ export interface ILayer {
 
 export interface IFrame {
 	symbol: symbol;
+	visible: boolean;
 	layers: ILayer[];
 }
 

@@ -32,6 +32,7 @@ interface IGlobalStore {
 export const useGlobalStore = create<IGlobalStore>((set, get) => {
     const initialFrames: IFrame[] = [{
         layers: [{ image: new ImageData(32, 32), opacity: 255, symbol: Symbol(), name: "New Layer" }],
+        visible: true,
         symbol: Symbol()
     }];
 

@@ -270,10 +270,10 @@ function useCanvas() {
     let [tilemode, setTilemode] = useState(false);
     const stateCache = useRef({ activeColorPalette, activeColor, activeFrame, toolSettings, activeLayer, canvasSize, onionSkin, frames, tilemode });
     const mainCanvas = useCanvasHook();
-    const saveCanvas = useCanvasHook({ offscreen: true });
-    const previewCanvas = useCanvasHook({ offscreen: true });
-    const tempCanvas1 = useCanvasHook({ offscreen: true });
-    const tempCanvas2 = useCanvasHook({ offscreen: true });
+    const saveCanvas = useCanvasHook();
+    const previewCanvas = useCanvasHook();
+    const tempCanvas1 = useCanvasHook();
+    const tempCanvas2 = useCanvasHook();
     const undoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
     const redoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
 
@@ -296,7 +296,7 @@ function useCanvas() {
         mirror: { previousPoint: { x: 0, y: 0 } },
         smudge: { previousPoint: { x: 0, y: 0 }, previousColor: { r: 0, g: 0, b: 0, a: 0 } },
         shape: { activePoints: [] as { x: number; y: number; }[] },
-        light: { modifiedPoints: new Set() },
+        light: { modifiedPoints: new Set(), previousPoint: { x: 0, y: 0 } },
         move: {
             imgData: null as ImageData | null,
             startPosition: { x: 0, y: 0 },
@@ -339,14 +339,14 @@ function useCanvas() {
                 let start = toolState.current.brush.previousPoint;
                 let end = { x: newX, y: newY };
 
-                saveCanvas.drawLine(start, end, stateCache.current.toolSettings.size, false);
+                saveCanvas.drawLine(start, end, stateCache.current.toolSettings.size, stateCache.current.activeColor);
 
                 toolState.current.brush.previousPoint.x = newX;
                 toolState.current.brush.previousPoint.y = newY;
             } else {
                 toolState.current.brush.previousPoint.x = 0;
                 toolState.current.brush.previousPoint.y = 0;
-                if (preview) previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size);
+                if (preview) previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size, stateCache.current.activeColor);
             }
         },
         "eraser": (x, y, toolButtonActive, preview) => {
@@ -371,7 +371,7 @@ function useCanvas() {
                     let start = toolState.current.eraser.previousPoint;
                     let end = { x: newX, y: newY };
 
-                    saveCanvas.drawLine(start, end, size, "rgba(0, 0, 0, .004)");
+                    saveCanvas.drawLine(start, end, size, { r: 0, g: 0, b: 0, a: 1 });
 
                     toolState.current.eraser.previousPoint.x = newX;
                     toolState.current.eraser.previousPoint.y = newY;
@@ -408,11 +408,11 @@ function useCanvas() {
                     let points = tempCanvas1.floodFill(x, y);
 
                     points.forEach(point => {
-                        saveCanvas.drawPixel(point.x, point.y);
+                        saveCanvas.drawPixel(point.x, point.y, 1, stateCache.current.activeColor);
                     });
                 }
             } else {
-                if (preview) previewCanvas.drawPixel(x, y, 1);
+                if (preview) previewCanvas.drawPixel(x, y, 1, stateCache.current.activeColor);
             }
         },
         "line": (x, y, toolButtonActive, preview) => {
@@ -421,7 +421,7 @@ function useCanvas() {
                 let height = stateCache.current.toolSettings.size;
                 let newX = x - Math.floor(width / 2);
                 let newY = y - Math.floor(height / 2);
-                if (preview) previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size);
+                if (preview) previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size, stateCache.current.activeColor);
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.line.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
@@ -443,10 +443,10 @@ function useCanvas() {
                     endPoint.x -= Math.floor(width / 2);
                     endPoint.y -= Math.floor(height / 2);
 
-                    if (preview) previewCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size, false);
+                    if (preview) previewCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size, stateCache.current.activeColor);
 
                     if (!toolButtonActive) {
-                        saveCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size, false);
+                        saveCanvas.drawLine(startPoint, endPoint, stateCache.current.toolSettings.size, stateCache.current.activeColor);
                         toolState.current.stage = ToolStage.PREVIEW;
                         toolState.current.line.activePoints = [];
                     }
@@ -467,23 +467,23 @@ function useCanvas() {
             let end = { x: newX, y: newY };
 
             // Draw line for initial point
-            tempCanvas1.drawLine(start, end, size, false);
+            tempCanvas1.drawLine(start, end, size, stateCache.current.activeColor);
 
             // Calculate mirrored positions and draw lines for X and Y axis mirroring
             if (mirror.x) {
                 let mirroredStartX = mainCanvas.getWidth() - start.x - size;
                 let mirroredEndX = mainCanvas.getWidth() - end.x - size;
-                tempCanvas1.drawLine({ x: mirroredStartX, y: start.y }, { x: mirroredEndX, y: end.y }, size, false);
+                tempCanvas1.drawLine({ x: mirroredStartX, y: start.y }, { x: mirroredEndX, y: end.y }, size, stateCache.current.activeColor);
             }
             if (mirror.y) {
                 let mirroredStartY = mainCanvas.getHeight() - start.y - size;
                 let mirroredEndY = mainCanvas.getHeight() - end.y - size;
-                tempCanvas1.drawLine({ x: start.x, y: mirroredStartY }, { x: end.x, y: mirroredEndY }, size, false);
+                tempCanvas1.drawLine({ x: start.x, y: mirroredStartY }, { x: end.x, y: mirroredEndY }, size, stateCache.current.activeColor);
             }
             if (mirror.x && mirror.y) {
                 let mirroredStartXY = { x: mainCanvas.getWidth() - start.x - size, y: mainCanvas.getHeight() - start.y - size };
                 let mirroredEndXY = { x: mainCanvas.getWidth() - end.x - size, y: mainCanvas.getHeight() - end.y - size };
-                tempCanvas1.drawLine(mirroredStartXY, mirroredEndXY, size, false);
+                tempCanvas1.drawLine(mirroredStartXY, mirroredEndXY, size, stateCache.current.activeColor);
             }
 
             toolState.current.mirror.previousPoint.x = newX;
@@ -514,7 +514,7 @@ function useCanvas() {
                     let blendedColor = tinycolor.mix(toolState.current.smudge.previousColor, currentColor, 50);
 
                     // Apply the blended color to the canvas
-                    tempCanvas1.drawPixel(newX, newY, brushSize, blendedColor.toRgbString());
+                    // tempCanvas1.drawPixel(newX, newY, brushSize, );
 
                     toolState.current.smudge.previousColor = blendedColor.toRgb();
                     toolState.current.smudge.previousPoint.x = newX;
@@ -616,7 +616,7 @@ function useCanvas() {
         },
         "shape": (x, y, toolButtonActive, preview) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                if (preview) previewCanvas.drawPixel(x, y);
+                if (preview) previewCanvas.drawPixel(x, y, 1, stateCache.current.activeColor);
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 toolState.current.shape.activePoints = [{ x: Math.floor(x), y: Math.floor(y) }];
@@ -771,7 +771,7 @@ function useCanvas() {
         },
         "box": (x, y, toolButtonActive, preview) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                if (preview) previewCanvas.drawPixel(x, y);
+                if (preview) previewCanvas.drawPixel(x, y, 1, { r: 0, g: 0, b: 0, a: 255 });
                 return;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
@@ -786,7 +786,7 @@ function useCanvas() {
                 const width = endX - startX;
                 const height = endY - startY;
 
-                if (preview) previewCanvas.drawRect(startX, startY, width, height, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.drawRect(startX, startY, width, height, { r: 0, g: 0, b: 0, a: 255 });
             }
             if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
                 const startX = Math.min(toolState.current.box.startPoint.x, x);
@@ -874,7 +874,7 @@ function useCanvas() {
 
                 if (preview) previewCanvas.putImageData(eraseImageData);
                 if (preview) previewCanvas.drawImage(tempCanvas2.getElement());
-                if (preview) previewCanvas.drawRect(newStartX, newStartY, selectionWidth, selectionheight, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.drawRect(newStartX, newStartY, selectionWidth, selectionheight, { r: 0, g: 0, b: 0, a: 255 });
 
                 //preview
                 if (pointIsInsideBoundery && toolButtonActive) {
@@ -900,7 +900,7 @@ function useCanvas() {
         },
         "wand": (x, y, toolButtonActive, preview) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                if (preview) previewCanvas.drawPixel(x, y);
+                if (preview) previewCanvas.drawPixel(x, y, 1, { r: 0, g: 0, b: 0, a: 255 });
                 return;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
@@ -977,7 +977,7 @@ function useCanvas() {
 
                 if (preview) previewCanvas.putImageData(eraseImageData);
                 if (preview) previewCanvas.drawImage(tempCanvas2.getElement());
-                if (preview) previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, { r: 0, g: 0, b: 0, a: 255 });
 
                 if (pointIsInsideBoundery && toolButtonActive) {
                     toolState.current.wand.currentPosition.x = x - toolState.current.wand.startPosition.x;
@@ -1001,7 +1001,7 @@ function useCanvas() {
         },
         "lasso": (x, y, toolButtonActive, preview) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
-                if (preview) previewCanvas.drawPixel(x, y);
+                if (preview) previewCanvas.drawPixel(x, y, 1, { r: 0, g: 0, b: 0, a: 255 });
                 return;
             }
             if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
@@ -1014,7 +1014,7 @@ function useCanvas() {
                     toolState.current.lasso.points.push({ x, y });
 
                 let points = toolState.current.lasso.points;
-                if (preview) previewCanvas.drawPolygon(points, true, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.drawPolygon(points, true, { r: 0, g: 0, b: 0, a: 255 });
             }
             if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
                 let points = toolState.current.lasso.points;
@@ -1097,7 +1097,7 @@ function useCanvas() {
 
                 if (preview) previewCanvas.putImageData(eraseImageData);
                 if (preview) previewCanvas.drawImage(tempCanvas2.getElement());
-                if (preview) previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, "rgba(0,0,0,1)");
+                if (preview) previewCanvas.drawPolygon(tempCanvas1.getBoundary(newPoints), true, { r: 0, g: 0, b: 0, a: 255 });
 
                 if (pointIsInsideBoundery && toolButtonActive) {
                     toolState.current.lasso.currentPosition.x = x - toolState.current.lasso.startPosition.x;
@@ -1402,13 +1402,6 @@ function useCanvas() {
         let x = Math.floor((mouseState.current.x - rect.x) * (mainCanvas.getWidth() / rect.width));
         let y = Math.floor((mouseState.current.y - rect.y) * (mainCanvas.getHeight() / rect.height));
 
-        // set tool color
-        let { r, g, b, a } = stateCache.current.activeColor;
-        saveCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-        previewCanvas.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-        tempCanvas1.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-        tempCanvas2.getCtx().fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
-
         // run current tool
         const { leftTool, rightTool } = stateCache.current.toolSettings;
         if (rightTool) toolHandlers[rightTool](x, y, mouseState.current.rightDown, false);
@@ -1462,12 +1455,14 @@ function useCanvas() {
                 tempCanvas2.getCtx().globalAlpha = stateCache.current.onionSkin / 255;
 
                 reversedLayers.forEach((layer) => {
+                    tempCanvas2.getCtx().globalAlpha *= layer.opacity / 255;
+
                     tempCanvas1.putImageData(layer.image);
                     tempCanvas2.drawImage(tempCanvas1.getElement());
                     mainCanvas.drawImage(tempCanvas2.getElement());
-                });
 
-                tempCanvas2.getCtx().globalAlpha = 1;
+                    tempCanvas2.getCtx().globalAlpha = stateCache.current.onionSkin / 255;
+                });
             }
         }
 
@@ -1478,7 +1473,7 @@ function useCanvas() {
             // draw preview
             if (layer.symbol === stateCache.current.activeLayer.symbol) {
                 let previewData = previewCanvas.getImageData();
-                let activeLayerData = layer.image;
+                let activeLayerData = new ImageData(layer.image.data.slice(0), layer.image.width, layer.image.height);
 
                 for (let i = 0; i < previewData.data.length; i += 4) {
                     let a = previewData.data[i + 3];

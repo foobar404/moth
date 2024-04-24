@@ -6,6 +6,7 @@ import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from '../../u
 import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
 import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { IoMdMove } from 'react-icons/io';
+import { RiEye2Line, RiEyeCloseFill } from 'react-icons/ri';
 
 
 export function Frames() {
@@ -90,7 +91,7 @@ export function Frames() {
                         onDrop={(e) => data.handleDrop(e, frame)}
                         onDragEnd={data.handleDragEnd}
                         onClick={() => data.setFrame(frame)}
-                        className="relative group hover:scale-105">
+                        className={`relative group hover:scale-105 ${frame.visible ? "" : "opacity-50"}`}>
 
                         <img aria-label={`frame #${i + 1}`}
                             className={`h-[70px] min-w-[70px] max-w-[106px] m-1 flex-shrink-0 p-app__grid  shadow-md rounded-md cursor-pointer box-content border-4 border-base-100 ${frame.symbol === data.activeFrame.symbol ? "!border-base-content" : ""}`}
@@ -99,6 +100,17 @@ export function Frames() {
                         <div className="absolute top-left !hidden group-hover:!flex row w-full h-full bg-base-100/40 rounded-md cursor-grab">
                             <TiArrowMove className="text-3xl text-base-content" />
                         </div>
+
+                        <button aria-label="toggle frame visibility"
+                            data-tip="animation visibility"
+                            data-for="tooltip"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                data.toggleVisibility(frame)
+                            }}
+                            className={`absolute !hidden row w-6 h-6 m-1 rounded-md top-right bg-base-100 hover:bg-info group-hover:!flex`}>
+                            {frame.visible ? <RiEye2Line className="text-lg" /> : <RiEyeCloseFill className="text-lg" />}
+                        </button>
 
                         <button aria-label="delete current frame"
                             data-tip="delete frame"
@@ -229,6 +241,7 @@ function useFrames() {
     function addFrame() {
         let newFrame: IFrame = {
             layers: [{ image: new ImageData(canvasSize.width, canvasSize.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
+            visible: true,
             symbol: Symbol()
         };
 
@@ -243,6 +256,7 @@ function useFrames() {
         if (newFrames.length === 0) {
             newFrames.push({
                 layers: [{ image: new ImageData(canvasSize.width, canvasSize.height), opacity: 255, symbol: Symbol(), name: "New Layer" }],
+                visible: true,
                 symbol: Symbol(),
             });
         }
@@ -266,6 +280,7 @@ function useFrames() {
                     image: new ImageData(layer.image.data.slice(0), layer.image.width, layer.image.height),
                 }
             }),
+            visible: true,
             symbol: Symbol()
         };
 
@@ -280,6 +295,13 @@ function useFrames() {
 
         setActiveFrame(frame);
         setActiveLayer(frame.layers[newLayerIndex]);
+    }
+
+    function toggleVisibility(frame) {
+        let newFrames = [...frames];
+        let index = newFrames.findIndex(f => f.symbol === frame.symbol);
+        newFrames[index].visible = !newFrames[index].visible;
+        setFrames(newFrames);
     }
 
     function moveFrameLeft() {
@@ -365,6 +387,7 @@ function useFrames() {
         setOnionSkin,
         moveFrameLeft,
         moveFrameRight,
+        toggleVisibility,
         previewFrameLeft,
         previewFrameRight,
         handleDrop,

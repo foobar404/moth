@@ -94,7 +94,7 @@ export function useCanvas(props?: IProps) {
         };
     }
 
-    function drawGrid(color1 = "#eee", color2 = "#ccc", size = 1) {
+    function drawGrid(color1 = "#eee", color2 = "#ccc") {
         const imgData = ctx.current.createImageData(canvas.current.width, canvas.current.height);
         const data = imgData.data;
         const width = imgData.width;
@@ -116,7 +116,7 @@ export function useCanvas(props?: IProps) {
         ctx.current.putImageData(imgData, 0, 0);
     }
 
-    function drawLine(start, end, size = 1, color?, prefect = false) {
+    function drawLine(start, end, size = 1, color) {
         let points: { x: number, y: number }[] = [];
         let x0 = start.x;
         let y0 = start.y;
@@ -131,8 +131,11 @@ export function useCanvas(props?: IProps) {
 
         while (true) {
             points.push({ x: x0, y: y0 });
+
             if (x0 === x1 && y0 === y1) break;
+
             let e2 = 2 * err;
+
             if (e2 >= dy) {
                 err += dy; // Update the error term
                 x0 += sx; // Move in the x direction
@@ -146,6 +149,8 @@ export function useCanvas(props?: IProps) {
         points.forEach((point: { x: any, y: any }) => {
             drawPixel(point.x, point.y, size, color);
         });
+
+        return points;
     };
 
     function drawRect(x, y, width, height, color, fill = false) {
@@ -169,11 +174,11 @@ export function useCanvas(props?: IProps) {
         }
     }
 
-    function drawSquare(x, y, sideLength, color?, fill = false) {
+    function drawSquare(x, y, sideLength, color, fill = false) {
         drawRect(x, y, sideLength, sideLength, color, fill);
     };
 
-    function drawCircle(centerX, centerY, radius, color?, fill = false) {
+    function drawCircle(centerX, centerY, radius, color, fill = false) {
         drawOval(centerX, centerY, radius, radius, color, fill);
     }
 
@@ -201,25 +206,30 @@ export function useCanvas(props?: IProps) {
         }
     }
 
-    function drawPolygon(points, close = false, color?) {
+    function drawPolygon(points, close = false, color) {
         for (let i = 1; i < points.length; i++) {
             drawLine(points[i - 1], points[i], 1, color);
         }
         if (close) drawLine(points[points.length - 1], points[0], 1, color);
     }
 
-    function drawPixel(x, y, size = 1, color?) {
-        if (color) {
-            if (typeof color === 'string') ctx.current.fillStyle = color;
-            else ctx.current.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`;
+    function drawPixel(x, y, size = 1, color) {
+        if (isNaN(x) || isNaN(y)) return;
+
+        const imageData = new ImageData(size, size);
+
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            imageData.data[i] = color.r;
+            imageData.data[i + 1] = color.g;
+            imageData.data[i + 2] = color.b;
+            imageData.data[i + 3] = color.a;
         }
 
-        ctx.current.fillRect(x, y, size, size);
+        putImageData(imageData, x, y);
     }
 
     function erasePixel(x, y, size = 1) {
-        ctx.current.fillStyle = "rgba(0, 0, 0, .004)";
-        ctx.current.fillRect(x, y, size, size);
+        drawPixel(x, y, size, { r: 0, g: 0, b: 0, a: 1 });
     }
 
     function floodFill(startX, startY, callback: any = null, tolerance = 0) {

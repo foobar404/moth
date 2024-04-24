@@ -9,6 +9,7 @@ import { FaStar } from "react-icons/fa";
 import pngExtract from "png-chunks-extract";
 import React, { useEffect, useState } from 'react';
 import { useCanvas, useGlobalStore } from '../../utils';
+import { IFrame } from "../../types";
 
 
 export function ModalImport(props) {
@@ -113,11 +114,7 @@ export function useModalImport(props) {
     }, []);
 
     async function importProject() {
-        let [fileHandle] = await (window as any).showOpenFilePicker({
-            types: [{ accept: { 'image/*': [".png"] } }],
-        });
-
-        let file = await fileHandle.getFile();
+        let file: any = await openFilePicker();
         let fileReader = new FileReader();
         fileReader.readAsArrayBuffer(file);
         fileReader.onload = async () => {
@@ -139,13 +136,56 @@ export function useModalImport(props) {
         }
     }
 
+    function openFilePicker(options: any = {}) {
+        return new Promise((resolve, reject) => {
+            // Create an input element
+            const input: any = document.createElement('input');
+            input.type = 'file';
+            input.style.display = 'none'; // Hide the input element
+
+            // Apply options such as allowing multiple file selections
+            if (options.multiple) input.multiple = true;
+
+            // Handle file type restrictions if provided
+            if (options.types && Array.isArray(options.types)) {
+                let accept = options.types.map(type => type.accept.join(', ')).join(', ');
+                input.accept = accept;
+            }
+
+            // Append to the body temporarily
+            document.body.appendChild(input);
+
+            // Listen for file selection
+            input.onchange = () => {
+                if (input.files.length > 0) {
+                    if (input.multiple) {
+                        resolve(Array.from(input.files)); // Return all selected files
+                    } else {
+                        resolve(input.files[0]); // Return the single selected file
+                    }
+                } else {
+                    reject(new DOMException("The user aborted a request.", "AbortError"));
+                }
+                document.body.removeChild(input); // Clean up
+            };
+
+            input.onerror = () => {
+                reject(new Error('Error in file input.'));
+                document.body.removeChild(input); // Clean up
+            };
+
+            // Trigger file selection dialog
+            input.click();
+        });
+    }
+
     function loadProjectFromLocalStorage(projectName) {
         let project = JSON.parse(localStorage.getItem(projectName) ?? "{}");
         loadProject(project);
     }
 
     function loadProject(project) {
-        project.frames.forEach((frame) => {
+        project.frames.forEach((frame: IFrame) => {
             frame.symbol = Symbol();
             frame.layers.forEach((layer) => {
                 layer.image = new ImageData(new Uint8ClampedArray(Object.values(layer.image.data)), project.canvas.width, project.canvas.height);
@@ -167,11 +207,7 @@ export function useModalImport(props) {
 
     async function importImage() {
         try {
-            let [fileHandle] = await (window as any).showOpenFilePicker({
-                types: [{ accept: { 'image/*': [".png", ".jpg", ".jpeg", ".gif"] } }],
-            });
-
-            let file = await fileHandle.getFile();
+            let file: any = await openFilePicker();
             // Convert the file reading process to use async/await syntax
             let arrayBuffer = await file.arrayBuffer();
             let data = new Uint8Array(arrayBuffer);
@@ -218,12 +254,12 @@ export function useModalImport(props) {
     function deleteProject(project: string) {
         if (!window.confirm("Are you sure you want to delete this project?")) return;
 
-        let currentProjectList = JSON.parse(localStorage.getItem("moth-projects") ?? "[]");
-        currentProjectList = currentProjectList.filter((p: string) => p !== project);
-        let projectListWithoutCurrent = currentProjectList.filter((p: string) => p !== projectName);
+        let projectListWithoutCurrent = projectList.filter((p: string) => p !== project);
 
-        localStorage.setItem("moth-projects", JSON.stringify(currentProjectList));
+        localStorage.setItem("moth-projects", JSON.stringify(projectListWithoutCurrent));
         localStorage.removeItem(project);
+
+        setProjectList(projectListWithoutCurrent);
     }
 
     return {

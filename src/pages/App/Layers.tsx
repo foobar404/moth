@@ -129,11 +129,12 @@ function useLayers() {
     let [allLayersOpacity, setAllLayersOpacity] = useState(255);
     let [draggedLayer, setDraggedLayer] = useState<ILayer | null>(null);
 
-    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize } = useGlobalStore();
+    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize, frames } = useGlobalStore();
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const layersAreVisible = allLayersOpacity === 255;
     const previousActiveLayer = useRef<Symbol>(activeLayer.symbol);
+    const previousActiveFrame = useRef<Symbol>(activeFrame.symbol);
     const emptyImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAgEBAJpvAX4AAAAASUVORK5CYII=";
 
     useShortcuts({
@@ -163,6 +164,11 @@ function useLayers() {
 
     useEffect(() => {
         ReactTooltip.rebuild();
+
+        if (previousActiveFrame.current !== activeFrame.symbol) {
+            previousActiveFrame.current = activeFrame.symbol;
+            return;
+        }
 
         if (previousActiveLayer.current !== activeLayer.symbol) {
             previousActiveLayer.current = activeLayer.symbol;
@@ -275,10 +281,6 @@ function useLayers() {
         setActiveLayer(newFrame.layers[0]);
     }
 
-    function updateLayer(layer: ILayer) {
-        setActiveLayer(layer);
-    }
-
     function addNewLayer() {
         let newLayer: ILayer = {
             opacity: 255,
@@ -361,7 +363,6 @@ function useLayers() {
         layersAreVisible,
         handleDrop,
         mergeLayer,
-        updateLayer,
         addNewLayer,
         deleteLayer,
         moveLayerUp,

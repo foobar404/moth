@@ -27,6 +27,8 @@ function usePreview(props: IPreview) {
     }, [canvasSize]);
 
     useSetInterval(() => {
+        if (frames.every(frame => !frame.visible)) return;
+
         if (props.frameCount.current >= frames.length)
             props.frameCount.current = 0;
         if (props.frameCount.current < 0)
@@ -35,15 +37,23 @@ function usePreview(props: IPreview) {
         canvas1.clear();
 
         let frame = frames[props.frameCount.current];
+        while (!frame.visible) {
+            props.frameCount.current += 1;
+            if (props.frameCount.current >= frames.length)
+                props.frameCount.current = 0;
+            frame = frames[props.frameCount.current];
+        }
+
         let reversedLayers = frame.layers.slice().reverse();
         reversedLayers.forEach(layer => {
             canvas2.putImageData(layer.image);
             canvas1.drawImage(canvas2.getElement());
-        })
+        });
+        setPreviewImg(canvas1.toDataURL());
+
         if (props.playing) {
             props.frameCount.current += 1;
         }
-        setPreviewImg(canvas1.toDataURL());
     }, 1000 / props.fps, [props.fps, props.playing, frames]);
 
     return {

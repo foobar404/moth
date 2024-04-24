@@ -2,15 +2,22 @@
 
 # Doing
 - Austin
-    - (Medium)(Bug) eraser leaves artifacts at larger sizes
-    - (Medium)(Bug) work on supporting more browsers`
-    - (Easy)(Feature) hide / show frame
-        - (Easy)(Feature) buttons on frames, hide from animation
-
+    - (Hard)(Bug) [ & ] tigger wrong shortcut
+        - (Easy)(Bug) FPS is reset when pressing space
+        - (Hard)(Bug) shortcuts stop working after a while
+        - (Medium)(Bug) pressing z is buggy
+    - (Hard)(Feature) settings modal
+        - custom shortcuts 
+            - custom shortcuts override default
+        - reset shortcuts to default button 
+        - themes
+            - retro game consoles
+            - grid colors
+            - custom layout, custom shortcut
+            - minimize UI
 - Nate
 
 # TODO
-- (Easy)(Bug) make light tool use lines
 - (Easy)(Feature) rainbow color mode
 - (Easy)(Feature) random color mode
 - (Easy)(Bug) light and color picker doesint add color if missing
@@ -18,7 +25,8 @@
     - (Easy)(Feature) dnd tabs
 - (Easy)(Bug) obfuscate build code
 - (Easy)(Feature) export format dropdown
-- (Easy)(Feature) icon in the nav to toggle sections
+- (Easy)(Feature) make frames & color/layers section collapsible
+    - (Easy)(Feature) icon in the nav to toggle sections
 - (Easy)(Bug) thickness for shapes
 - (Easy)(Feature) flatten all layers
 - (Easy)(Feature) play animation backwards?
@@ -29,11 +37,10 @@
 - (Easy)(Feature) indexed colors
 - (Easy)(Feature) animate main canvas
 - (Easy)(Feature) make clear more accessable
-- (Easy)(Feature) make frames & color/layers section collapsible
 - (Easy)(Feature) update shortcut keys
-- (Easy)(Bug) Switching frames turns on any layers that were switched to be hidden (only a problem for onion skin)
 - (Easy)(Feature) Use the same icons set across the app
 - (Easy)(Feature) Join multiple similer tool into one iterface
+- (Medium)(Bug) make light tool use lines
 - (Medium)(Feature) mirror mode
     - (Easy)(Feature) mirror from starting point
     - (Easy)(Feature) mirror ying / yang
@@ -50,7 +57,6 @@
 - (Medium)(Feature) select by color
 - (Medium)(Feature) select by drawing
 - (Medium)(Feature) crop tool
-- (Medium)(Feature) mirror mode
 - (Medium)(Feature) import gif as frames
 - (Medium)(Feature) fullscreen canvas mode
 - (Medium)(Feature) Sprite packing
@@ -59,7 +65,7 @@
 - (Medium)(Feature) load demo button
 - (Medium)(Feature) wrap around move option
 - (Medium)(Feature) The zoom scroll zooms to the center, not the cursor
-- (Medium)(Feature) Layer groups / frame groups
+- (Medium)(Feature) Layer groups / frame groups, animations
 - (Medium)(Feature) add console error watch system
 - (Medium)(Feature) Multiple sprite tabs
 - (Hard)(Feature) add font tool
@@ -69,22 +75,9 @@
 - (Hard)(Feature) export as .tmx
 - (Hard)(Bug) pixels get deleted when changing the canvas size
     - (Medium)(Feature) add current mouse position
-- (Hard)(Feature) settings modal
-    - custom shortcuts 
-        - custom shortcuts override default
-    - reset shortcuts to default button 
-    - themes
-        - retro game consoles
-        - grid colors
-        - custom layout, custom shortcut
-        - minimize UI
 - (Hard)(Feature) Add blur / jumble tool
 - (Hard)(Feature) Add contour tool 
     - (Medium)(Feature) fill brush tool (close loop)
-- (Hard)(Bug) [ & ] tigger wrong shortcut
-    - (Easy)(Bug) FPS is reset when pressing space
-    - (Hard)(Bug) shortcuts stop working after a while
-    - (Medium)(Bug) pressing z is buggy
 - (Hard)(Feature) make selections standout
     - rotate
     - scale
