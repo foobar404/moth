@@ -17,14 +17,14 @@ export function Tools() {
     const data = useTools();
 
     return (<>
-        <nav className="flex items-center p-1 mb-1 border-2 rounded-md border-primary">
+        <nav className="flex items-center mb-1 border-2 rounded-md border-primary">
             <FaTools data-tip="tools (1)"
                 data-for="tooltip"
-                className={`text-lg cursor-pointer ${data.view == "tools" ? "text-primary" : "text-base-content"}`}
+                className={`cursor-pointer p-1 box-content focus:outline-none ${data.view == "tools" ? "bg-primary text-primary-content" : "text-base-content"}`}
                 onClick={() => data.setView("tools")} />
             <AiFillFire data-tip="actions (2)"
                 data-for="tooltip"
-                className={`text-lg cursor-pointer ${data.view == "actions" ? "text-primary" : "text-base-content"}`}
+                className={`cursor-pointer p-1 box-content focus:outline-none ${data.view == "actions" ? "bg-primary text-primary-content" : "text-base-content"}`}
                 onClick={() => data.setView("actions")} />
         </nav>
 
@@ -33,151 +33,139 @@ export function Tools() {
                 <button aria-label="select brush tool"
                     data-tip={`brush tool ( b​ ) ${data.getButtonTooltip("brush")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("brush")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("brush")}`}
                     onMouseDown={(e) => data.updateTool(e, "brush")}>
                     <FaBrush className="text-xl" />
                 </button>
                 <button aria-label="select eraser tool"
                     data-tip={`eraser tool ( e​ ) ${data.getButtonTooltip("eraser")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("eraser")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("eraser")}`}
                     onMouseDown={(e) => data.updateTool(e, "eraser")}>
                     <BsEraserFill className="text-xl" />
                 </button>
                 <button aria-label="select bucket tool"
                     data-tip={`bucket tool ( g​ ) ${data.getButtonTooltip("bucket")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("bucket")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("bucket")}`}
                     onMouseDown={(e) => data.updateTool(e, "bucket")}>
                     <BsBucketFill className="text-xl" />
                 </button>
                 <button aria-label="select shape tool"
                     data-tip={`shape tool ( s​ ) ${data.getButtonTooltip("shape")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("shape")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("shape")}`}
                     onMouseDown={(e) => data.updateTool(e, "shape")}>
                     <FaShapes className="text-xl" />
                 </button>
                 <button aria-label="select light tool"
                     data-tip={`light tool ( t​ ) ${data.getButtonTooltip("light")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("light")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("light")}`}
                     onMouseDown={(e) => data.updateTool(e, "light")}>
                     <FaLightbulb className="text-xl" />
                 </button>
                 <button aria-label="select line tool"
                     data-tip={`line tool ( l​ ) ${data.getButtonTooltip("line")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("line")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("line")}`}
                     onMouseDown={(e) => data.updateTool(e, "line")}>
                     <MdOutlineCallReceived className="text-xl" />
                 </button>
                 <button aria-label="select mirror tool"
                     data-tip={`mirror tool ( m​ ) ${data.getButtonTooltip("mirror")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("mirror")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("mirror")}`}
                     onMouseDown={(e) => data.updateTool(e, "mirror")}>
                     <GiMirrorMirror className="text-xl" />
                 </button>
-                {/* <button data-tip={`smudge tool ( d​ ) ${data.getButtonTooltip("smudge")}`}
-                    data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("smudge")}`}
-                    onMouseDown={(e) => data.updateTool(e, "smudge")}>
-                    <RxBlendingMode className="text-xl" />
-                </button> */}
                 <button aria-label="select eyedropper tool"
                     data-tip={`eyedropper tool ( i​ ) ${data.getButtonTooltip("eyedropper")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("eyedropper")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("eyedropper")}`}
                     onMouseDown={(e) => data.updateTool(e, "eyedropper")}>
                     <FaEyeDropper className="text-xl" />
                 </button>
                 <button aria-label="select move tool"
                     data-tip={`move tool ( v​ ) ${data.getButtonTooltip("move")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("move")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("move")}`}
                     onMouseDown={(e) => data.updateTool(e, "move")}>
                     <IoMdMove className="text-xl" />
                 </button>
                 <button aria-label="select box selection tool"
                     data-tip={`box selection tool ( x​ ) ${data.getButtonTooltip("box")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("box")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("box")}`}
                     onMouseDown={(e) => data.updateTool(e, "box")}>
                     <FaBox className="text-xl" />
                 </button>
                 <button aria-label="select wand selection tool"
                     data-tip={`wand selection tool ( w​ ) ${data.getButtonTooltip("wand")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("wand")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("wand")}`}
                     onMouseDown={(e) => data.updateTool(e, "wand")}>
                     <IoColorWandSharp className="text-xl" />
                 </button>
                 <button aria-label="select lasso selection tool"
                     data-tip={`lasso selection tool ( o​ ) ${data.getButtonTooltip("lasso")}`}
                     data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("lasso")}`}
+                    className={`btn btn-primary btn-sm box-content py-1 hover:animate-squeeze ${data.getButtonStyles("lasso")}`}
                     onMouseDown={(e) => data.updateTool(e, "lasso")}>
                     <TbArrowLoopRight className="text-xl" />
                 </button>
-                {/* <button data-tip={`bone tool ( n​ ) ${data.getButtonTooltip("bone")}`}
-                    data-for="tooltip"
-                    className={`btn btn-primary btn-sm box-content py-1 ${data.getButtonStyles("bone")}`}
-                    onMouseDown={(e) => data.updateTool(e, "bone")}>
-                    <FaBone />
-                </button> */}
             </section>
         )}
 
         {data.view === "actions" && (
-            <section className="space-y-2 p-app__tools">
+            <section className="space-y-1">
                 <button aria-label="flip layer horizontally"
                     data-tip="flip layer horizontally ( shift + h )"
                     data-for="tooltip"
                     onClick={() => data.actions["flipHorizontal"]()}
-                    className="box-content py-1 btn btn-secondary btn-sm">
+                    className="box-content py-1 btn btn-secondary btn-sm hover:animate-squeeze">
                     <TbFlipHorizontal className="text-xl" />
                 </button>
                 <button aria-label="flip layer vertically"
                     data-tip="flip layer vertically ( shift + v ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["flipVertical"]()}
-                    className="box-content py-1 btn btn-secondary btn-sm">
+                    className="box-content py-1 btn btn-secondary btn-sm hover:animate-squeeze">
                     <TbFlipVertical className="text-xl" />
                 </button>
                 <button aria-label="center layer horizontally"
                     data-tip="center layer horizontally ( shift + ~ )"
                     data-for="tooltip"
                     onClick={() => data.actions["centerHorizontal"]()}
-                    className="box-content py-1 btn btn-secondary btn-sm">
+                    className="box-content py-1 btn btn-secondary btn-sm hover:animate-squeeze">
                     <BiHorizontalCenter className="text-xl" />
                 </button>
                 <button aria-label="center layer vertically"
                     data-tip="center layer vertically ( shift + | ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["centerVertical"]()}
-                    className="box-content py-1 btn btn-secondary btn-sm">
+                    className="box-content py-1 btn btn-secondary btn-sm hover:animate-squeeze">
                     <BiVerticalCenter className="text-xl" />
                 </button>
                 <button aria-label="rotate layer 90° right"
                     data-tip="rotate layer 90° right ( shift + r ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["rotateRight"]()}
-                    className="box-content py-1 btn btn-secondary btn-sm">
+                    className="box-content py-1 btn btn-secondary btn-sm hover:animate-squeeze">
                     <BiRotateRight className="text-xl" />
                 </button>
                 <button aria-label="rotate layer 90° left"
                     data-tip="rotate layer 90° left ( shift + l ​)"
                     data-for="tooltip"
                     onClick={() => data.actions["rotateLeft"]()}
-                    className="box-content py-1 btn btn-secondary btn-sm">
+                    className="box-content py-1 btn btn-secondary btn-sm hover:animate-squeeze">
                     <BiRotateLeft className="text-xl" />
                 </button>
                 <button aria-label="clear current layer"
                     data-tip="clear current layer ( shift + c​ )"
                     data-for="tooltip"
                     onClick={() => data.actions["clear"]()}
-                    className="box-content py-1 btn btn-secondary btn-sm">
+                    className="box-content py-1 btn btn-secondary btn-sm hover:animate-squeeze">
                     <IoNuclear className="text-xl" />
                 </button>
             </section>

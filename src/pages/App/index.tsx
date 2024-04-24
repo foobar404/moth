@@ -21,7 +21,7 @@ export function App() {
 		<ModalHero {...data.modalHero} />
 
 		<main className="p-app">
-			<ReactTooltip id="tooltip" />
+			<ReactTooltip id="tooltip" effect="solid" className="tooltip"/>
 
 			<Nav />
 

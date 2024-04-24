@@ -1,3 +1,4 @@
+import { BiSolidDonateHeart } from 'react-icons/bi';
 import { Modal } from '../../components'
 import { useGlobalStore } from '../../utils';
 import React, { useEffect, useState } from 'react'
@@ -31,8 +32,17 @@ export default function ModalHero(props: IProps) {
                     className="sm:w-[400px] text-lg btn btn-accent row-left mb-4 mr-4"
                     onClick={() => data.downloadPWA()}>
                     <FaCloud className="text-xl" />
-                    <span className="hidden sm:block">Download Offline App</span>
+                    <span className="hidden sm:block">Download App</span>
                 </button>
+
+                <a className="sm:w-[400px] text-lg btn btn-primary row-left mb-4 mr-4"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    href="https://coindrop.to/austin">
+                    <BiSolidDonateHeart className="text-xl" />
+                    <span className="hidden sm:block">Support Moth</span>
+                </a>
 
                 <a aria-label="support moth by following us on kickstarter"
                     className="sm:w-[400px] text-lg btn btn-secondary row-left mb-4 mr-4"
@@ -42,15 +52,6 @@ export default function ModalHero(props: IProps) {
                     href="https://www.kickstarter.com/projects/foobar404/moth-pixel-art-editor?ref=6psfuy">
                     <FaKickstarterK className="text-xl" />
                     <span className="hidden sm:block">Follow Moth on Kickstarter</span>
-                </a>
-
-                <a className="sm:w-[400px] text-lg btn btn-primary row-left mb-4 mr-4"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    href="https://www.producthunt.com/products/moth-pixel-art-editor">
-                    <FaProductHunt className="text-xl" />
-                    <span className="hidden sm:block">Follow Moth on Product Hunt</span>
                 </a>
             </section>
 
@@ -71,6 +72,12 @@ export default function ModalHero(props: IProps) {
             <footer className="w-full">
                 <h2 className="p-2 font-bold rounded-t-lg text-base-content w-min bg-base-200">Changelog</h2>
                 <div className="bg-base-200 max-h-[200px] overflow-auto p-2 mockup-code rounded-tl-none rounded-lg">
+                    <pre data-prefix="$" className="text-info"><code>v1.0.8 - 4/24/2024</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>improve app UI</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>add support button</code></pre>
+
+                    <div className="divider" />
+
                     <pre data-prefix="$" className="text-info"><code>v1.0.7 - 4/23/2024</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>fix opacity issue with eraser</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>layer opacity works after switching frames</code></pre>

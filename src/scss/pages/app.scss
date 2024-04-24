@@ -4,7 +4,7 @@
     width: 100vw;
     overflow: hidden;
     grid-template-rows: 60px 1fr max-content;
-    grid-template-columns: 60px minmax(720px, calc(100% - (310px + 60px))) 310px;
+    grid-template-columns: 65px minmax(720px, calc(100% - (310px + 60px))) 310px;
     grid-template-areas:
         "left header right"
         "left content right"
@@ -28,12 +28,6 @@
         position: relative;
     }
 
-    &__tools {
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-    }
-
     &__sidebar-left {
         display: flex;
         flex-direction: column;
@@ -53,52 +47,10 @@
         overflow-x: hidden;
     }
 
-    &__color-controls {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 4px;
-        padding: 4px;
-        border-radius: 10px;
-    }
-
-    &__layer-controls {
-        align-items: center;
-        border-radius: 10px;
-        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-        padding: 4px;
-    }
-
-    &__preview {
-        object-fit: contain;
-        backface-visibility: hidden;
-        image-rendering: pixelated;
-        image-rendering: crisp-edges;
-        transform: translate3d(0, 0, 0);
-        will-change: contents;
-    }
-
-    &__frame-controls-section {
-        border-radius: 10px;
-        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-        display: flex;
-        padding: 4px;
-        width: fit-content;
-    }
-
     &__grid {
         image-rendering: pixelated;
         object-fit: contain;
         background: repeating-conic-gradient(#eee 0% 25%, #ccc 0% 50%) 50% / 10px 10px;
-    }
-
-    &__grid2x2 {
-        image-rendering: pixelated;
-        object-fit: contain;
-        background: repeating-conic-gradient(#eee 0% 25%, #ccc 0% 50%) 50% / 2px 2px;
     }
 
     &__block {

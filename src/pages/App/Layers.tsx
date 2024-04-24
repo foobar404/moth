@@ -3,10 +3,11 @@ import { MdDelete } from "react-icons/md";
 import ReactTooltip from "react-tooltip";
 import { RiGitMergeFill } from "react-icons/ri";
 import { IoEye, IoCopy } from "react-icons/io5";
-import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from "../../utils";
 import { HiEyeOff, HiDocumentAdd } from "react-icons/hi";
 import React, { useEffect, useRef, useState } from 'react';
+import { RiEye2Line, RiEyeCloseFill } from 'react-icons/ri';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
+import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from "../../utils";
 
 
 export function Layers() {
@@ -14,7 +15,7 @@ export function Layers() {
 
     return (
         <section className="mt-2">
-            <nav className="mb-2 p-app__layer-controls !bg-accent">
+            <nav className="flex-wrap gap-1 p-2 mb-2 rounded-md bg-accent row-between">
                 <button aria-label="add new layer"
                     data-tip="add new layer"
                     data-for="tooltip"
@@ -63,7 +64,7 @@ export function Layers() {
                         data-for="tooltip"
                         onClick={data.toggleAllLayerVisibility}
                         className="btn btn-xs">
-                        {data.layersAreVisible ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
+                        {data.layersAreVisible ? <RiEye2Line className="text-lg" /> : <RiEyeCloseFill className="text-lg" />}
                     </button>
                     <label data-tip="change non-active layers opacity"
                         data-for="tooltip"
@@ -85,9 +86,11 @@ export function Layers() {
                 {data.activeFrame.layers.map((layer: ILayer, i) => (
                     <div className="space-x-2 row" key={i}>
                         <button aria-label={`toggle visibility of layer ${layer.name}`}
+                            data-tip="toggle visibility"
+                            data-for="tooltip"
                             onClick={() => data.toggleLayerVisibility(layer)}
                             className="self-stretch h-auto ml-1 btn btn-xs btn-accent">
-                            {layer.opacity === 255 ? <IoEye className="text-lg" /> : <HiEyeOff className="text-lg" />}
+                            {layer.opacity === 255 ? <RiEye2Line className="text-lg" /> : <RiEyeCloseFill className="text-lg" />}
                         </button>
                         <div className={`overflow-hidden row-left flex-1 rounded-md border-4 border-transparent hover:border-base-content/25 ${layer.symbol === data.activeLayer.symbol ? "!border-4 !border-base-content" : ""}`}>
                             <img src={data.imageMap[layer.symbol] ?? data.emptyImg}

@@ -32,7 +32,7 @@ export function Colors() {
                 <div className="w-1/2 h-full" style={{ background: `${tinycolor(data.recentColors[1]).toRgbString()}` }}></div>
             </div>
 
-            <nav className="p-1 my-2 space-y-1 rounded-md bg-accent">
+            <nav className="p-2 my-2 space-y-1 rounded-md bg-accent">
                 <div className="space-x-1 row">
                     <button aria-label="import color palette"
                         data-tip="import color palette from lospec or file"

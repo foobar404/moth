@@ -1,89 +1,33 @@
 import { Preview } from './Preview';
-import { IFrame, IPreview } from '../../types';
 import { TiArrowMove } from "react-icons/ti";
+import { IFrame, IPreview } from '../../types';
+import { HiOutlineArrowsExpand } from 'react-icons/hi';
 import React, { useState, useEffect, useRef } from 'react';
-import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from '../../utils';
-import { MdAddPhotoAlternate, MdDelete, MdLayers, MdLayersClear } from "react-icons/md";
-import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { IoMdMove } from 'react-icons/io';
 import { RiEye2Line, RiEyeCloseFill } from 'react-icons/ri';
+import { MdAddPhotoAlternate, MdDelete } from "react-icons/md";
+import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from '../../utils';
+import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
+import ReactTooltip from 'react-tooltip';
 
 
 export function Frames() {
     const data = useFrames();
 
     return (<section className={`!justify-between p-app__block overflow-hidden ${data.enlargePreview ? "row-top" : "row"}`}>
-        <section className="flex-1 w-1/2">
-            <nav className={"row !justify-between"}>
-                <section className="row !flex-nowrap p-app__frame-controls-section bg-accent">
-                    <button aria-label="toggle onion skin effect"
-                        data-tip={`${data.onionSkin ? "disable" : "enable"} onion skin`}
-                        data-for="tooltip"
-                        className="mr-2 btn btn-xs"
-                        onClick={() => data.setOnionSkin(data.onionSkin == 255 ? 0 : 255)}>
-                        {data.onionSkin ? <MdLayers className="text-lg" /> : <MdLayersClear className="text-lg" />}
-                    </button>
+        <section className="flex-1 w-1/2 space-x-2 row-left">
+            <section className="rounded-lg shadow-lg h-[135px] col bg-accent p-4 py-3 relative">
+                <input aria-label="onion skin opacity slider"
+                    data-tip="onion skin opacity"
+                    data-for="tooltip"
+                    type="range"
+                    min="0"
+                    max="255"
+                    value={data.onionSkin}
+                    className="range range-xs range-secondary w-[120px] -rotate-90 mt-12 absolute"
+                    onChange={e => data.setOnionSkin(e.target.valueAsNumber)} />
+            </section>
 
-                    <input aria-label="onion skin opacity slider"
-                        data-tip="onion skin opacity"
-                        data-for="tooltip"
-                        type="range"
-                        min="0"
-                        max="255"
-                        value={data.onionSkin}
-                        className="range range-xs range-secondary w-[100px]"
-                        onChange={e => data.setOnionSkin(e.target.valueAsNumber)} />
-                </section>
-
-                <section className="flex items-center space-x-2 p-app__frame-controls-section bg-accent">
-                    <button aria-label="move animation frame left"
-                        data-tip={"animation frame left"}
-                        data-for="tooltip"
-                        onClick={data.previewFrameLeft}
-                        className="btn btn-xs">
-                        {<IoChevronBack className="text-lg" />}
-                    </button>
-
-                    <button aria-label="toggle animation play/pause"
-                        data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
-                        data-for="tooltip"
-                        onClick={data.togglePlay}
-                        className="btn btn-xs">
-                        {data.preview.playing ? <IoStop className="text-lg" /> : <IoPlay className="text-lg" />}
-                    </button>
-
-                    <button aria-label="move animation frame right"
-                        data-tip={"animation frame right"}
-                        data-for="tooltip"
-                        onClick={data.previewFrameRight}
-                        className="btn btn-xs">
-                        {<IoChevronForward className="text-lg" />}
-                    </button>
-
-                    <input aria-label="current fps slider"
-                        data-tip="fps slider"
-                        data-for="tooltip"
-                        type="range"
-                        min="1"
-                        max="24"
-                        step="1"
-                        value={data.preview.fps}
-                        className="range range-xs range-secondary max-w-[60px]"
-                        onChange={e => data.setFps(Number(e.target.value))} />
-
-                    <input aria-label="current fps input"
-                        data-tip="fps"
-                        data-for="tooltip"
-                        type="number"
-                        min="1"
-                        value={data.preview.fps}
-                        className="w-16 mr-2 input input-xs max-w-[50px]"
-                        onKeyUp={e => e.stopPropagation()}
-                        onChange={e => data.setFps(Number(e.target.value))} />
-                </section>
-            </nav>
-
-            <section className={`overflow-auto p-1 row-left max-h-[400px] ${data.enlargePreview ? "!row flex-wrap" : ""}`}>
+            <section className={`overflow-auto p-1 row-left max-h-[300px] ${data.enlargePreview ? "!row flex-wrap" : ""}`}>
                 {data.frames.map((frame, i) => (
                     <div key={i} draggable
                         onDragStart={(e) => data.handleDragStart(e, frame)}
@@ -108,7 +52,7 @@ export function Frames() {
                                 e.stopPropagation();
                                 data.toggleVisibility(frame)
                             }}
-                            className={`absolute !hidden row w-6 h-6 m-1 rounded-md top-right bg-base-100 hover:bg-info group-hover:!flex`}>
+                            className={`absolute !hidden row w-6 h-6 m-1 rounded-md top-right bg-base-100 hover:bg-base-200 group-hover:!flex`}>
                             {frame.visible ? <RiEye2Line className="text-lg" /> : <RiEyeCloseFill className="text-lg" />}
                         </button>
 
@@ -119,7 +63,7 @@ export function Frames() {
                                 e.stopPropagation();
                                 data.deleteFrame(frame);
                             }}
-                            className="absolute !hidden row w-6 h-6 m-1 rounded-md bottom-right bg-base-100 hover:bg-error group-hover:!flex">
+                            className="absolute !hidden row w-6 h-6 m-1 rounded-md bottom-right bg-base-100 hover:bg-base-200 group-hover:!flex">
                             <MdDelete className="text-lg" />
                         </button>
 
@@ -130,7 +74,7 @@ export function Frames() {
                                 e.stopPropagation();
                                 data.duplicateFrame(frame)
                             }}
-                            className="absolute !hidden row w-6 h-6 m-1 rounded-md bottom-left bg-base-100 hover:bg-info group-hover:!flex">
+                            className="absolute !hidden row w-6 h-6 m-1 rounded-md bottom-left bg-base-100 hover:bg-base-200 group-hover:!flex">
                             <IoCopy className="text-lg" />
                         </button>
                     </div>
@@ -145,11 +89,59 @@ export function Frames() {
             </section>
         </section>
 
-        <div data-tip="enlarge animation ( space )"
-            data-for="tooltip"
-            onClick={() => data.setEnlargePreview(!data.enlargePreview)}
-            className={`ml-2 cursor-pointer hover:animate-tilt`}>
+        <div onClick={() => data.setEnlargePreview(!data.enlargePreview)}
+            className={`relative group ml-2 cursor-pointer hover:animate-tilt`}>
             <Preview {...data.preview} className={`${data.enlargePreview ? "h-[300px] min-w-[300px] max-w-[534px]" : "h-[120px] min-w-[120px] max-w-[213px]"}`} />
+
+            <div className="absolute top-left !hidden group-hover:!flex row w-full h-full bg-base-100/40 rounded-md cursor-pointer">
+                <HiOutlineArrowsExpand className="text-3xl text-base-content" />
+            </div>
+
+            <button aria-label="move animation frame left"
+                data-tip={"animation frame left"}
+                data-for="tooltip"
+                onClick={e => {
+                    e.stopPropagation();
+                    data.previewFrameLeft();
+                }}
+                className="hover:bg-base-200 absolute w-7 h-7 rounded-md top-left bg-base-100 text-accent-content row !hidden group-hover:!flex">
+                {<IoChevronBack className="text-lg" />}
+            </button>
+
+            <button aria-label="toggle animation play/pause"
+                data-tip={`${data.preview.playing ? "stop" : "play"} animation`}
+                data-for="tooltip"
+                onClick={e => {
+                    e.stopPropagation();
+                    data.togglePlay();
+                }}
+                className="hover:bg-base-200 absolute w-7 h-7 rounded-md top bg-base-100 text-accent-content row !hidden group-hover:!flex">
+                {data.preview.playing ? <IoStop className="text-lg" /> : <IoPlay className="text-lg" />}
+            </button>
+
+            <button aria-label="move animation frame right"
+                data-tip={"animation frame right"}
+                data-for="tooltip"
+                onClick={e => {
+                    e.stopPropagation();
+                    data.previewFrameRight();
+                }}
+                className="hover:bg-base-200 absolute w-7 h-7 rounded-md top-right bg-base-100 text-accent-content row !hidden group-hover:!flex">
+                {<IoChevronForward className="text-lg" />}
+            </button>
+
+            <input aria-label="current fps slider"
+                data-tip
+                data-for="fpsTooltip"
+                type="range"
+                min="1"
+                max="30"
+                step="1"
+                value={data.preview.fps}
+                onClick={e => e.stopPropagation()}
+                className="range range-xs range-secondary w-full absolute rounded-md bottom-left bg-base-100 text-accent-content row !hidden group-hover:!flex"
+                onChange={e => data.setFps(Number(e.target.value))} />
+            <ReactTooltip id='fpsTooltip' effect="solid" className="tooltip" getContent={() => `fps slider (${data.preview.fps})`} />
         </div>
     </section>)
 }

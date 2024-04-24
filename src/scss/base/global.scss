@@ -42,3 +42,10 @@ html {
 .range-slider-base-content::-webkit-slider-runnable-track {
     background: oklch(var(--bc) / .7);
 }
+
+.tooltip {
+    background-color: oklch(var(--p)) !important;
+    opacity: 1 !important;
+    color: oklch(var(--pc)) !important;
+    font-weight: bolder;
+}

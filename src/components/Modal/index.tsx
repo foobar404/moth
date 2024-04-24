@@ -17,7 +17,7 @@ export function Modal(props: IProps) {
         <Portal>
             <main className={`c-modal ${props.blur ? "!bg-gradient-to-r !backdrop-blur-sm" : ""}`}
                 onClick={() => props.setIsOpen(false)}>
-                <section className="c-modal__body !bg-base-100"
+                <section className="c-modal__body !bg-base-100 animate-squeeze animate-duration-400"
                     onClick={e => { e.preventDefault(); e.stopPropagation(); }}>
                     <button aria-label="exit"
                         onClick={() => props.setIsOpen(false)}
