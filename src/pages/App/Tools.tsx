@@ -16,7 +16,7 @@ import { BiRotateRight, BiRotateLeft, BiHorizontalCenter, BiVerticalCenter } fro
 export function Tools() {
     const data = useTools();
 
-    return (<>
+    return (<section className="p-app__area-left p-app__block">
         <nav className="flex items-center mb-1 border-2 rounded-md border-primary">
             <FaTools data-tip="tools (1)"
                 data-for="tooltip"
@@ -28,8 +28,8 @@ export function Tools() {
                 onClick={() => data.setView("actions")} />
         </nav>
 
-        {data.view === "tools" && (
-            <section className="space-y-1">
+        <section className="space-y-1 col">
+            {data.view === "tools" && (<>
                 <button aria-label="select brush tool"
                     data-tip={`brush tool ( b​ ) ${data.getButtonTooltip("brush")}`}
                     data-for="tooltip"
@@ -114,11 +114,9 @@ export function Tools() {
                     onMouseDown={(e) => data.updateTool(e, "lasso")}>
                     <TbArrowLoopRight className="text-xl" />
                 </button>
-            </section>
-        )}
+            </>)}
 
-        {data.view === "actions" && (
-            <section className="space-y-1">
+            {data.view === "actions" && (<>
                 <button aria-label="flip layer horizontally"
                     data-tip="flip layer horizontally ( shift + h )"
                     data-for="tooltip"
@@ -168,9 +166,9 @@ export function Tools() {
                     className="box-content py-1 btn btn-secondary btn-sm hover:animate-squeeze">
                     <IoNuclear className="text-xl" />
                 </button>
-            </section>
-        )}
-    </>)
+            </>)}
+        </section>
+    </section >)
 }
 
 

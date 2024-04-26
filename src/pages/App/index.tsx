@@ -10,6 +10,7 @@ import ReactTooltip from 'react-tooltip';
 import React, { useEffect } from 'react';
 import { Drawer } from "../../components";
 import { IoLayers } from "react-icons/io5";
+import { ResizableBox } from 'react-resizable';
 import { IoMdColorPalette } from "react-icons/io";
 import { useModal, useShortcuts } from "../../utils";
 
@@ -21,38 +22,56 @@ export function App() {
 		<ModalHero {...data.modalHero} />
 
 		<main className="p-app">
-			<ReactTooltip id="tooltip" effect="solid" className="tooltip"/>
+			<ReactTooltip id="tooltip" effect="solid" className="tooltip" />
 
 			<Nav />
 
-			<section className="p-app__sidebar-left p-app__block">
-				<Tools />
-			</section>
+			<Tools />
 
 			<Canvas />
 
-			<section className={`p-app__sidebar-right p-app__block --right !hidden lg:!block`}>
-				<Drawer isOpen className="p-2 border-4 rounded-lg border-secondary">
-					<h2 className="p-2 duration-100 border-4 cursor-pointer border-base-100 text-secondary-content row bg-secondary rounded-box hover:scale-105">
-						<IoMdColorPalette className="mr-1 text-xl" /> Colors
-					</h2>
+			<ResizableBox
+				className="relative space-y-1 p-app__area-right p-app__block"
+				height={Infinity}
+				width={330}
+				axis="x"
+				resizeHandles={["w"]}
+				minConstraints={[0, 0]}
+				maxConstraints={[400, Infinity]}
+				handle={<div tabIndex={-1} onClick={e => e.currentTarget.focus()} className="absolute w-4 -ml-2 rounded-md h-5/6 left cursor-grab hover:bg-primary focus:bg-primary"></div>}>
+				<div className="overflow-hidden">
+					<Drawer isOpen className="p-2 border-4 rounded-lg border-secondary">
+						<h2 className="p-2 duration-100 border-4 cursor-pointer border-base-100 text-secondary-content row bg-secondary rounded-box hover:scale-105">
+							<IoMdColorPalette className="mr-1 text-xl" /> Colors
+						</h2>
 
-					<Colors />
-				</Drawer>
+						<Colors />
+					</Drawer>
 
-				<div className="my-1"></div>
+					<Drawer className="p-2 border-4 rounded-lg border-secondary">
+						<h2 className="p-2 duration-100 border-4 cursor-pointer border-base-100 text-secondary-content row bg-secondary rounded-box hover:scale-105">
+							<IoLayers className="mr-1 text-xl" /> Layers
+						</h2>
 
-				<Drawer className="p-2 border-4 rounded-lg border-secondary">
-					<h2 className="p-2 duration-100 border-4 cursor-pointer border-base-100 text-secondary-content row bg-secondary rounded-box hover:scale-105">
-						<IoLayers className="mr-1 text-xl" /> Layers
-					</h2>
+						<Layers />
+					</Drawer>
+				</div>
+			</ResizableBox>
 
-					<Layers />
-				</Drawer>
-			</section>
+			<ResizableBox
+				className="relative rounded-md p-app__area-footer p-app__block"
+				height={150}
+				width={Infinity}
+				axis="y"
+				resizeHandles={["n"]}
+				minConstraints={[0, 0]}
+				maxConstraints={[Infinity, 340]}
+				handle={<div tabIndex={-1} onClick={e => e.currentTarget.focus()} className="absolute w-11/12 h-4 -mt-2 rounded-md top cursor-grab hover:bg-primary focus:bg-primary"></div>}>
 
-			<Frames />
-		</main>
+				<Frames />
+
+			</ResizableBox>
+		</main >
 	</>)
 }
 

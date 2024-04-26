@@ -2,19 +2,18 @@
 
 # Doing
 - Austin
-    - (Hard)(Bug) [ & ] tigger wrong shortcut
-        - (Easy)(Bug) FPS is reset when pressing space
-        - (Hard)(Bug) shortcuts stop working after a while
-        - (Medium)(Bug) pressing z is buggy
-    - (Hard)(Feature) settings modal
-        - custom shortcuts 
-            - custom shortcuts override default
-        - reset shortcuts to default button 
-        - themes
-            - retro game consoles
-            - grid colors
-            - custom layout, custom shortcut
-            - minimize UI
+    - (Medium)(Feature) allow custom brush shapes 
+    - (Medium)(Feature) copy / paste selection
+    - (Medium)(Feature) mirror mode
+        - (Easy)(Feature) mirror from starting point
+        - (Easy)(Feature) mirror ying / yang
+    - (Medium)(Feature) add pixel perfect mode to line tool
+    - (Medium)(Feature) mask mode for brush tool
+    - (Medium)(Feature) add drag handles to resize the canvas
+        - (Hard)(Bug) pixels get deleted when changing the canvas size
+        - (Medium)(Feature) add current mouse position & canvas size at bottom left
+    - (Medium)(Feature) left click in canvas area for center/tool/clear wheel, right click to pan
+        - (Easy)(Feature) make clear more accessable
 - Nate
 
 # TODO
@@ -25,37 +24,24 @@
     - (Easy)(Feature) dnd tabs
 - (Easy)(Bug) obfuscate build code
 - (Easy)(Feature) export format dropdown
-- (Easy)(Feature) make frames & color/layers section collapsible
-    - (Easy)(Feature) icon in the nav to toggle sections
 - (Easy)(Bug) thickness for shapes
 - (Easy)(Feature) flatten all layers
 - (Easy)(Feature) play animation backwards?
 - (Easy)(Feature) ping / pong animation loop?
 - (Easy)(Feature) export as zip, file for each frame
-- (Easy)(Bug) shape icons are rounded
 - (Easy)(Feature) move tool is like a selection tool
 - (Easy)(Feature) indexed colors
 - (Easy)(Feature) animate main canvas
-- (Easy)(Feature) make clear more accessable
-- (Easy)(Feature) update shortcut keys
 - (Easy)(Feature) Use the same icons set across the app
 - (Easy)(Feature) Join multiple similer tool into one iterface
+- (Medium)(Bug) make local projects use indexDB instead
 - (Medium)(Bug) make light tool use lines
-- (Medium)(Feature) mirror mode
-    - (Easy)(Feature) mirror from starting point
-    - (Easy)(Feature) mirror ying / yang
-- (Medium)(Feature) add pixel perfect mode to line tool
-- (Medium)(Feature) mask mode for brush tool
 - (Medium)(Feature) refrence images tab
 - (Medium)(Feature) add spray tool
-- (Medium)(Feature) allow custom brush shapes 
 - (Medium)(Bug) make sure all brush combinations work with left and right buttons
-- (Medium)(Feature) copy / paste selection
 - (Medium)(Feature) export as css
 - (Medium)(Feature) onion skinning for furure frame
     - onion skinning color effects
-- (Medium)(Feature) select by color
-- (Medium)(Feature) select by drawing
 - (Medium)(Feature) crop tool
 - (Medium)(Feature) import gif as frames
 - (Medium)(Feature) fullscreen canvas mode
@@ -64,8 +50,8 @@
 - (Medium)(Feature) .pyxel and .asesprite / .ase import
 - (Medium)(Feature) load demo button
 - (Medium)(Feature) wrap around move option
-- (Medium)(Feature) The zoom scroll zooms to the center, not the cursor
-- (Medium)(Feature) Layer groups / frame groups, animations
+- (Medium)(Feature) scroll zooms to the mouse position
+- (Medium)(Feature) allow creating multiple animations
 - (Medium)(Feature) add console error watch system
 - (Medium)(Feature) Multiple sprite tabs
 - (Hard)(Feature) add font tool
@@ -73,8 +59,16 @@
 - (Hard)(Feature) better selection box
 - (Hard)(Feature) download as svg
 - (Hard)(Feature) export as .tmx
-- (Hard)(Bug) pixels get deleted when changing the canvas size
-    - (Medium)(Feature) add current mouse position
+- (Hard)(Feature) settings modal
+    - (Easy)(Feature) update shortcut keys
+    - custom shortcuts 
+        - custom shortcuts override default
+    - reset shortcuts to default button 
+    - themes
+        - retro game consoles
+        - grid colors
+        - custom layout, custom shortcut
+        - minimize UI
 - (Hard)(Feature) Add blur / jumble tool
 - (Hard)(Feature) Add contour tool 
     - (Medium)(Feature) fill brush tool (close loop)

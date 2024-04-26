@@ -3,48 +3,38 @@
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    grid-template-rows: 60px 1fr max-content;
-    grid-template-columns: 65px minmax(720px, calc(100% - (310px + 60px))) 310px;
+    grid-template-rows: 65px 1fr max-content;
+    grid-template-columns: 65px 1fr max-content;
     grid-template-areas:
         "left header right"
         "left content right"
         "left footer right";
 
     @media (max-width: 1024px) {
-        grid-template-columns: 60px calc(100% - 60px);
         grid-template-areas:
-            "header header"
-            "left content"
-            "left footer";
+            "header header header"
+            "left content right"
+            "left footer footer";
     }
 
-    &__nav {
+    &__area-header {
         grid-area: header;
     }
 
-    &__canvas {
+    &__area-footer {
+        grid-area: footer;
+    }
+
+    &__area-content {
         grid-area: content;
-        overflow: auto;
-        position: relative;
     }
 
-    &__sidebar-left {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+    &__area-left {
         grid-area: left;
-        max-height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
     }
 
-    &__sidebar-right {
-        display: flex;
-        flex-direction: column;
+    &__area-right {
         grid-area: right;
-        max-height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
     }
 
     &__grid {
@@ -56,7 +46,7 @@
     &__block {
         border-radius: 10px;
         margin: 4px;
-        padding: 8px;
+        padding: 4px;
         background: oklch(var(--b1) / .2);
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     }

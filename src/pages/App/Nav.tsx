@@ -14,7 +14,7 @@ export function Nav() {
     return (<>
         <ModalExport {...data.modalExport} />
         <ModalImport {...data.modalImport} />
-        <nav className="space-x-2 row-left !flex-nowrap p-app__nav p-app__block w-max">
+        <nav className="space-x-2 row-left !flex-nowrap p-app__area-header p-app__block w-max">
             <button aria-label="open import settings"
                 onClick={() => data.modalImport.setIsOpen(true)}
                 className="box-content py-1 btn btn-sm btn-primary">

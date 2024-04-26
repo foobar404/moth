@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
-import tinycolor from 'tinycolor2';
 
 
 interface IProps {
     width?: number;
     height?: number;
     offscreen?: boolean;
+    willReadFrequently?: boolean;
 }
 
 
@@ -15,7 +15,9 @@ export function useCanvas(props?: IProps) {
 
     if (!canvas.current) {
         canvas.current = makeCanvas();
-        ctx.current = canvas.current!.getContext('2d')!;
+        ctx.current = canvas.current.getContext('2d', {
+            willReadFrequently: props?.willReadFrequently ?? false
+        })!;
         ctx.current.imageSmoothingEnabled = false;
     }
 
@@ -24,8 +26,9 @@ export function useCanvas(props?: IProps) {
         let width = props?.width ?? 8;
         let height = props?.height ?? 8;
 
-        if (props?.offscreen) {
-            //@ts-ignore
+        // @ts-ignore
+        if (props?.offscreen && OffscreenCanvas) {
+            // @ts-ignore
             canvas = new OffscreenCanvas(width, height);
         } else {
             canvas = document.createElement('canvas');
@@ -94,22 +97,20 @@ export function useCanvas(props?: IProps) {
         };
     }
 
-    function drawGrid(color1 = "#eee", color2 = "#ccc") {
+    function drawGrid(color1 = { r: 238, g: 238, b: 238, a: 255 }, color2 = { r: 204, g: 204, b: 204, a: 255 }) {
         const imgData = ctx.current.createImageData(canvas.current.width, canvas.current.height);
         const data = imgData.data;
         const width = imgData.width;
         const height = imgData.height;
-        let color1RGB = tinycolor(color1).toRgb();
-        let color2RGB = tinycolor(color2).toRgb();
 
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
-                const color = ((x + y) % 2 === 0) ? color1RGB : color2RGB;
+                const color = ((x + y) % 2 === 0) ? color1 : color2;
                 const index = (x + y * width) * 4;
                 data[index + 0] = color.r;
                 data[index + 1] = color.g;
                 data[index + 2] = color.b;
-                data[index + 3] = 255;
+                data[index + 3] = color.a;
             }
         }
 

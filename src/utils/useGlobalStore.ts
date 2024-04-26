@@ -82,6 +82,7 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
             lightIntensity: 10,
             eraseAll: false,
             fillAll: false,
+            wandSelectAll: false,
         },
         setProjectName: (projectName: string) => set({ projectName }),
         setCanvasSize: (canvasSize: { height: number; width: number }) => set({ canvasSize }),

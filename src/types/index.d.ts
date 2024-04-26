@@ -77,6 +77,7 @@ export interface IToolSettings {
 	lightIntensity: number;
 	eraseAll: boolean;
 	fillAll: boolean;
+	wandSelectAll: boolean;
 }
 
 

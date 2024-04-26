@@ -167,7 +167,7 @@ function useColors() {
     });
 
     useShortcuts({
-        // "z": swapColors
+        "z": swapColors
     });
 
     useEffect(() => {
@@ -413,7 +413,7 @@ function useColors() {
         setColorStats({
             ...colorStats,
             [colorToString(colors[1])]: {
-                count: colorStats[colorToString(colors[1])].count,
+                count: colorStats[colorToString(colors[1])]?.count ?? 0,
                 lastUsed: Date.now()
             }
         });

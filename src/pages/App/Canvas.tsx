@@ -6,6 +6,7 @@ import { BsCircleFill, BsCircleHalf } from "react-icons/bs";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
 import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
 import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV, FaFill, FaCloud } from "react-icons/fa";
+import { IoColorFill } from "react-icons/io5";
 
 
 enum ToolStage {
@@ -17,8 +18,8 @@ export function Canvas() {
     const data = useCanvas();
 
     return (
-        <section className="p-app__canvas p-app__block">
-            <nav className={`absolute h-[40px] z-10 m-2 rounded-lg shadow-lg bg-accent text-accent-content top-left row ${["shape", "brush", "bucket", "eraser", "light", "line", "mirror"].includes(data.toolSettings.leftTool) ? "p-2" : ""}`}>
+        <section className="relative overflow-auto p-app__area-content p-app__block">
+            <nav className={`absolute h-[40px] z-10 m-2 rounded-lg shadow-lg bg-accent text-accent-content top-left row ${["shape", "brush", "bucket", "eraser", "light", "line", "mirror", "wand"].includes(data.toolSettings.leftTool) ? "p-2" : ""}`}>
                 {data.toolSettings.leftTool === "eraser" && (<>
                     <label data-tip="erase all"
                         data-for="tooltip"
@@ -169,6 +170,15 @@ export function Canvas() {
                     </div>
                 </>)}
 
+                {data.toolSettings.leftTool === "wand" && (<>
+                    <div data-tip="select by color"
+                        data-for="tooltip"
+                        onClick={() => data.setToolSettings({ ...data.toolSettings, wandSelectAll: !data.toolSettings.wandSelectAll })}
+                        className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.toolSettings.wandSelectAll ? "bg-primary" : ""}`}>
+                        <IoColorFill className={` ${data.toolSettings.wandSelectAll ? "text-primary-content" : "text-base-content"}`} />
+                    </div>
+                </>)}
+
                 {["brush", "eraser", "light", "line", "mirror"].includes(data.toolSettings.leftTool) && (<>
                     <div className="space-x-1 row">
                         <input aria-label="active tool size slider"
@@ -270,10 +280,10 @@ function useCanvas() {
     let [tilemode, setTilemode] = useState(false);
     const stateCache = useRef({ activeColorPalette, activeColor, activeFrame, toolSettings, activeLayer, canvasSize, onionSkin, frames, tilemode });
     const mainCanvas = useCanvasHook();
-    const saveCanvas = useCanvasHook();
-    const previewCanvas = useCanvasHook();
-    const tempCanvas1 = useCanvasHook();
-    const tempCanvas2 = useCanvasHook();
+    const saveCanvas = useCanvasHook({ willReadFrequently: true });
+    const previewCanvas = useCanvasHook({ willReadFrequently: true });
+    const tempCanvas1 = useCanvasHook({ willReadFrequently: true });
+    const tempCanvas2 = useCanvasHook({ willReadFrequently: true });
     const undoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
     const redoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
 
@@ -907,6 +917,18 @@ function useCanvas() {
                 tempCanvas1.putImageData(stateCache.current.activeLayer.image);
                 let points = tempCanvas1.floodFill(x, y);
                 let color = tempCanvas1.getColor(x, y);
+
+                if (stateCache.current.toolSettings.wandSelectAll) {
+                    const imgData = stateCache.current.activeLayer.image;
+                    const data = imgData.data;
+                    points = [];
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        if (data[i] === color.r && data[i + 1] === color.g && data[i + 2] === color.b && data[i + 3] === color.a) {
+                            points.push({ x: i / 4 % imgData.width, y: Math.floor(i / 4 / imgData.width) });
+                        }
+                    }
+                }
 
                 if (color.a === 0) return;
 

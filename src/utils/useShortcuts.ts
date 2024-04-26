@@ -17,6 +17,17 @@ export function useShortcuts(props: IProps) {
             document.body.removeEventListener("keydown", handleKeyDown);
             document.body.removeEventListener("keyup", handleKeyUp);
         };
+    }, [props]);
+
+    useEffect(() => {
+        let permutations = generatePermutations(Array.from(keys) as string[]);
+        for (let perm of permutations) {
+            const key = perm.join("+");
+            if (props[key]) {
+                props[key]();
+                break;
+            }
+        }
     }, [keys]);
 
     function handleKeyDown(e) {
@@ -27,15 +38,13 @@ export function useShortcuts(props: IProps) {
             newKeys.add(e.key.toLowerCase());
 
             let permutations = generatePermutations(Array.from(newKeys) as string[]);
-            permutations.forEach(permutation => {
-                if (permutation.join("+") in props) {
-                    e.preventDefault();
-                    props[permutation.join("+")]();
-                }
-            });
+            for (let perm of permutations) {
+                const key = perm.join("+");
+                if (props[key]) e.preventDefault();
+            }
 
             return newKeys;
-        })
+        });
     };
 
     function handleKeyUp(e) {

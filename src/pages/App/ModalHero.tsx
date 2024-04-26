@@ -72,6 +72,13 @@ export default function ModalHero(props: IProps) {
             <footer className="w-full">
                 <h2 className="p-2 font-bold rounded-t-lg text-base-content w-min bg-base-200">Changelog</h2>
                 <div className="bg-base-200 max-h-[200px] overflow-auto p-2 mockup-code rounded-tl-none rounded-lg">
+                    <pre data-prefix="$" className="text-info"><code>v1.0.9 - 4/25/2024</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>make sections collapsible</code></pre>
+                    <pre data-prefix=">" className="text-base-content"><code>fix inconsistent shortcuts</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add select by color to wand tool</code></pre>
+
+                    <div className="divider" />
+
                     <pre data-prefix="$" className="text-info"><code>v1.0.8 - 4/24/2024</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>improve app UI</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>add support button</code></pre>
@@ -137,7 +144,7 @@ function useModalHero(props: IProps) {
     }, [installPromptEvent]);
 
     function downloadPWA() {
-        setMessage("The offline app works with browsers that support PWA, such as Chrome, Edge, Safari and Opera.");
+        setMessage("The offline app works with browsers that support PWA, such as Chrome, Edge, Safari, Brave, and Opera.");
 
         if (installPromptEvent) {
             installPromptEvent.prompt();
