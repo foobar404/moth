@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RiEye2Line, RiEyeCloseFill } from 'react-icons/ri';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from "../../utils";
+import { FaCopy, FaPaste } from "react-icons/fa";
 
 
 export function Layers() {
@@ -16,6 +17,19 @@ export function Layers() {
     return (
         <section className="mt-2">
             <nav className="flex-wrap gap-1 p-2 mb-2 rounded-md bg-accent row-between">
+                <div className="content-center w-full space-x-2 row">
+                    <button onClick={() => data.setCopyLayer(data.activeLayer)}
+                        className="w-1/2 btn btn-xs">
+                        <FaCopy className="text-lg" />
+                        Copy
+                    </button>
+                    <button onClick={data.pasteLayer}
+                        className="w-1/2 btn btn-xs">
+                        <FaPaste className="text-lg" />
+                        Paste
+                    </button>
+                </div>
+
                 <button aria-label="add new layer"
                     data-tip="add new layer"
                     data-for="tooltip"
@@ -58,6 +72,7 @@ export function Layers() {
                     className="btn btn-xs">
                     <IoCopy className="text-lg" />
                 </button>
+
                 <div className="content-center w-full space-x-2 row">
                     <button aria-label="toggle all layers visibility"
                         data-tip={`${data.layersAreVisible ? "hide non-active layers" : "show all layers"}`}
@@ -132,7 +147,7 @@ function useLayers() {
     let [allLayersOpacity, setAllLayersOpacity] = useState(255);
     let [draggedLayer, setDraggedLayer] = useState<ILayer | null>(null);
 
-    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize, frames } = useGlobalStore();
+    const { activeFrame, setActiveFrame, activeLayer, setActiveLayer, canvasSize, copyLayer, setCopyLayer } = useGlobalStore();
     const canvas1 = useCanvas();
     const canvas2 = useCanvas();
     const layersAreVisible = allLayersOpacity === 255;
@@ -357,6 +372,20 @@ function useLayers() {
         }
     }
 
+    function pasteLayer() {
+        let newFrame = { ...activeFrame };
+        let index = newFrame.layers.findIndex(l => l.symbol === activeLayer.symbol);
+
+        let layer = {
+            symbol: Symbol(),
+            name: activeLayer.name,
+            opacity: activeLayer.opacity,
+            image: new ImageData(copyLayer.image.data, copyLayer.image.width, copyLayer.image.height)
+        }
+
+        newFrame.layers.splice(index + 1, 0, layer);
+    }
+
     return {
         emptyImg,
         imageMap,
@@ -364,6 +393,8 @@ function useLayers() {
         activeLayer,
         allLayersOpacity,
         layersAreVisible,
+        setCopyLayer,
+        pasteLayer,
         handleDrop,
         mergeLayer,
         addNewLayer,

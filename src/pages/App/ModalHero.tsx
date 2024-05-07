@@ -72,6 +72,20 @@ export default function ModalHero(props: IProps) {
             <footer className="w-full">
                 <h2 className="p-2 font-bold rounded-t-lg text-base-content w-min bg-base-200">Changelog</h2>
                 <div className="bg-base-200 max-h-[200px] overflow-auto p-2 mockup-code rounded-tl-none rounded-lg">
+                    <pre data-prefix="$" className="text-info"><code>v1.1.0 - 5/7/2024</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add a panel for reference images</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add AI image gen panel</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add a spray tool</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add crop tool</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add contour/fill mode to brush tool</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add mask mode for brush tool</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add layer effects/filters</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add custom brush shapes with selection tools</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add copy/paste for layers</code></pre>
+                    <pre data-prefix=">" className="text-success"><code>add pixel perfect mode for brush tool (WIP)</code></pre>
+
+                    <div className="divider" />
+
                     <pre data-prefix="$" className="text-info"><code>v1.0.9 - 4/25/2024</code></pre>
                     <pre data-prefix=">" className="text-success"><code>make sections collapsible</code></pre>
                     <pre data-prefix=">" className="text-base-content"><code>fix inconsistent shortcuts</code></pre>

@@ -13,7 +13,7 @@ export function Drawer(props) {
     return (<div className={`${props.className ?? ""}`}>
         <div onClick={data.toggle}>{props.children[0]}</div>
 
-        <div className={`duration-75 no-scroll ${data.isOpen ? "max-h-[500px] overflow-auto" : "max-h-0 overflow-hidden"}`}>
+        <div className={`duration-75 no-scroll ${data.isOpen ? "max-h-[400px] overflow-auto" : "max-h-0 overflow-hidden"}`}>
             {props.children.slice(1)}
         </div>
     </div>)

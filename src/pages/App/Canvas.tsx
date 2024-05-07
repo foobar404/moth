@@ -1,12 +1,13 @@
 import tinycolor from "tinycolor2";
-import { FaMap } from "react-icons/fa6";
+import { FaDroplet, FaMap } from "react-icons/fa6";
 import ReactTooltip from 'react-tooltip';
 import React, { useEffect, useRef, useState } from 'react';
-import { BsCircleFill, BsCircleHalf } from "react-icons/bs";
+import { BsBucketFill, BsCircleFill, BsCircleHalf, BsStars } from "react-icons/bs";
 import { useCanvas as useCanvasHook, useGlobalStore, useShortcuts } from "../../utils";
 import { TbCircleFilled, TbOvalFilled, TbSquareFilled, TbRectangleFilled } from "react-icons/tb";
-import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV, FaFill, FaCloud } from "react-icons/fa";
+import { FaUndoAlt, FaRedoAlt, FaMoon, FaSun, FaArrowsAlt, FaArrowsAltH, FaArrowsAltV, FaFill, FaCloud, FaBrush } from "react-icons/fa";
 import { IoColorFill } from "react-icons/io5";
+import { PiMaskHappyFill } from "react-icons/pi";
 
 
 enum ToolStage {
@@ -19,39 +20,44 @@ export function Canvas() {
 
     return (
         <section className="relative overflow-auto p-app__area-content p-app__block">
-            <nav className={`absolute h-[40px] z-10 m-2 rounded-lg shadow-lg bg-accent text-accent-content top-left row ${["shape", "brush", "bucket", "eraser", "light", "line", "mirror", "wand"].includes(data.toolSettings.leftTool) ? "p-2" : ""}`}>
+            <nav className={`absolute h-[40px] z-10 m-2 rounded-lg shadow-lg bg-accent text-accent-content top-left row space-x-2 p-2`}>
                 {data.toolSettings.leftTool === "eraser" && (<>
-                    <label data-tip="erase all"
+                    <div aria-label="erase all pixel with the same color"
+                        data-tip="toggle erase area"
                         data-for="tooltip"
-                        className="mr-2 swap swap-rotate"
-                        onChange={e => data.setToolSettings({ ...data.toolSettings, eraseAll: !data.toolSettings.eraseAll })}>
-
-                        <input aria-label="erase all pixel with the same color"
-                            type="checkbox" checked={data.toolSettings.eraseAll} />
-
-                        <BsCircleHalf className="text-xl swap-off text-accent-content" />
-                        <BsCircleFill className="text-xl swap-on text-accent-content" />
-                    </label>
+                        onClick={() => data.setToolSettings({ ...data.toolSettings, eraseAll: !data.toolSettings.eraseAll })}
+                        className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.toolSettings.eraseAll ? "bg-primary" : ""}`}>
+                        <FaDroplet className={` ${data.toolSettings.eraseAll ? "text-primary-content" : "text-base-content"}`} />
+                    </div>
                 </>)}
 
                 {data.toolSettings.leftTool === "bucket" && (<>
-                    <label className="p-1 space-x-1 bg-base rounded-xl row">
-                        <FaCloud data-tip="continuous fill"
+                    <div aria-label="continuous / global fill toggle for bucket tool"
+                        data-tip="toggle global fill"
+                        data-for="tooltip"
+                        onClick={(e) => data.setToolSettings({ ...data.toolSettings, fillAll: !data.toolSettings.fillAll })}
+                        className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.toolSettings.fillAll ? "bg-primary" : ""}`}>
+                        <FaCloud className={` ${data.toolSettings.fillAll ? "text-primary-content" : "text-base-content"}`} />
+                    </div>
+                </>)}
+
+                {data.toolSettings.leftTool === "spray" && (<>
+                    <label className="row">
+                        <input data-tip="density"
                             data-for="tooltip"
-                            className={`text-accent-content`} />
-                        <input aria-label="continuous / global fill toggle for bucket tool"
-                            type="checkbox"
-                            className="toggle toggle-sm toggle-secondary"
-                            checked={data.toolSettings.fillAll}
-                            onChange={(e) => data.setToolSettings({ ...data.toolSettings, fillAll: e.currentTarget.checked })} />
-                        <FaSun data-tip="global fill"
-                            data-for="tooltip"
-                            className={`text-accent-content`} />
+                            aria-label="spray density"
+                            type="number"
+                            min="1"
+                            max="10"
+                            step="1"
+                            className="input input-xs"
+                            value={data.toolSettings.spray.density}
+                            onChange={(e) => data.setToolSettings({ ...data.toolSettings, spray: { density: e.currentTarget.valueAsNumber } })} />
                     </label>
                 </>)}
 
                 {data.toolSettings.leftTool === "mirror" && (<>
-                    <label className="mr-2 row"
+                    <label className="row"
                         data-tip="mirror x & y axis"
                         data-for="tooltip">
                         <FaArrowsAlt className="inline mr-1 text-lg text-accent-content" />
@@ -62,7 +68,7 @@ export function Canvas() {
                             checked={data.toolSettings.mirror.x && data.toolSettings.mirror.y}
                             onClick={() => data.setToolSettings({ ...data.toolSettings, mirror: { x: true, y: true } })} />
                     </label>
-                    <label className="mr-2 row"
+                    <label className="row"
                         data-tip="mirror x axis"
                         data-for="tooltip">
                         <FaArrowsAltH className="inline mr-1 text-lg text-accent-content" />
@@ -73,7 +79,7 @@ export function Canvas() {
                             checked={data.toolSettings.mirror.x && !data.toolSettings.mirror.y}
                             onClick={() => data.setToolSettings({ ...data.toolSettings, mirror: { x: true, y: false } })} />
                     </label>
-                    <label className="mr-2 row"
+                    <label className="row"
                         data-tip="mirror y axis"
                         data-for="tooltip">
                         <FaArrowsAltV className="inline mr-1 text-lg text-accent-content" />
@@ -87,19 +93,17 @@ export function Canvas() {
                 </>)}
 
                 {data.toolSettings.leftTool === "shape" && (<>
-                    <label data-tip="fill shape"
+                    <div aria-label="fill shapes in with active color"
+                        data-tip="fill shape"
                         data-for="tooltip"
-                        className="flex mr-2 row">
-                        <FaFill className="mr-1 text-lg text-accent-content" />
-                        <input aria-label="fill shapes in with active color"
-                            type="checkbox"
-                            className="checkbox checkbox-xs checkbox-secondary"
-                            checked={data.toolSettings.fillShape}
-                            onChange={e => data.setToolSettings({ ...data.toolSettings, fillShape: e.currentTarget.checked })} />
-                    </label>
+                        onClick={e => data.setToolSettings({ ...data.toolSettings, fillShape: !data.toolSettings.fillShape })}
+                        className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.toolSettings.fillShape ? "bg-primary" : ""}`}>
+                        <FaFill className={` ${data.toolSettings.fillShape ? "text-primary-content" : "text-base-content"}`} />
+                    </div>
+
                     <label data-tip="square"
                         data-for="tooltip"
-                        className="flex mr-2 row">
+                        className="flex row">
                         <TbSquareFilled className="mr-1 text-lg text-accent-content" />
                         <input aria-label="set shape to square"
                             type="radio"
@@ -111,7 +115,7 @@ export function Canvas() {
                     </label>
                     <label data-tip="rectangle"
                         data-for="tooltip"
-                        className="flex mr-2 row">
+                        className="flex row">
                         <TbRectangleFilled className="mr-1 text-lg text-accent-content" />
                         <input aria-label="set shape to rectangle"
                             type="radio"
@@ -124,7 +128,7 @@ export function Canvas() {
                     </label>
                     <label data-tip="circle"
                         data-for="tooltip"
-                        className="flex mr-2 row">
+                        className="flex row">
                         <TbCircleFilled className="mr-1 text-lg text-accent-content" />
                         <input aria-label="set shape to circle"
                             type="radio"
@@ -136,7 +140,7 @@ export function Canvas() {
                     </label>
                     <label data-tip="oval"
                         data-for="tooltip"
-                        className="flex mr-2 row">
+                        className="flex row">
                         <TbOvalFilled className="mr-1 text-lg text-accent-content" />
                         <input aria-label="set shape to oval"
                             type="radio"
@@ -149,25 +153,23 @@ export function Canvas() {
                 </>)}
 
                 {data.toolSettings.leftTool === "light" && (<>
-                    <div className="row !flex-nowrap">
-                        <div className="mr-2 swap swap-rotate"
-                            data-tip="dark/light mode"
-                            data-for="tooltip"
-                            onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: data.toolSettings.lightMode == "light" ? "dark" : "light" })}>
+                    <div aria-label="toggle dark mode"
+                        data-tip="toggle dark mode"
+                        data-for="tooltip"
+                        onClick={(e) => data.setToolSettings({ ...data.toolSettings, lightMode: data.toolSettings.lightMode == "light" ? "dark" : "light" })}
+                        className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.toolSettings.lightMode == "light" ? "" : "bg-primary"}`}>
 
-                            <input aria-label="toggle dark/light mode"
-                                type="checkbox" checked={data.toolSettings.lightMode === "light"} />
-
-                            <FaSun className="text-xl swap-on text-accent-content" />
-                            <FaMoon className="text-xl swap-off text-accent-content" />
-                        </div>
-                        <input aria-label="light intensity value"
-                            data-tip="dark/light intensity"
-                            data-for="tooltip"
-                            value={data.toolSettings.lightIntensity}
-                            onChange={(e) => data.setToolSettings({ ...data.toolSettings, lightIntensity: e.currentTarget.valueAsNumber })}
-                            type="range" min="1" max="20" className="mr-2 range range-xs range-secondary" step=".5" />
+                        {data.toolSettings.lightMode == "light" ?
+                            <FaSun className="text-base-content" /> :
+                            <FaMoon className="text-primary-content" />}
                     </div>
+
+                    <input aria-label="light intensity value"
+                        data-tip="dark/light intensity"
+                        data-for="tooltip"
+                        value={data.toolSettings.lightIntensity}
+                        onChange={(e) => data.setToolSettings({ ...data.toolSettings, lightIntensity: e.currentTarget.valueAsNumber })}
+                        type="range" min="1" max="20" className="mr-2 range range-xs range-secondary" step=".5" />
                 </>)}
 
                 {data.toolSettings.leftTool === "wand" && (<>
@@ -179,7 +181,38 @@ export function Canvas() {
                     </div>
                 </>)}
 
-                {["brush", "eraser", "light", "line", "mirror"].includes(data.toolSettings.leftTool) && (<>
+                {["box", "wand", "lasso"].includes(data.toolSettings.leftTool) && (<>
+                    <button onClick={data.saveAsBrush}
+                        className="btn btn-sm">
+                        <FaBrush className="text-lg" />
+                        save as brush
+                    </button>
+                </>)}
+
+                {data.toolSettings.leftTool === "brush" && (<>
+                    <div className="space-x-1 row">
+                        <div data-tip="toggle fill mode"
+                            data-for="tooltip"
+                            onClick={() => data.setToolSettings({ ...data.toolSettings, brush: { ...data.toolSettings.brush, fill: !data.toolSettings.brush.fill } })}
+                            className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.toolSettings.brush.fill ? "bg-primary" : ""}`}>
+                            <BsBucketFill className={` ${data.toolSettings.brush.fill ? "text-primary-content" : "text-base-content"}`} />
+                        </div>
+                        <div data-tip="toggle pixel perfect"
+                            data-for="tooltip"
+                            onClick={() => data.setToolSettings({ ...data.toolSettings, brush: { ...data.toolSettings.brush, pixelPerfect: !data.toolSettings.brush.pixelPerfect } })}
+                            className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.toolSettings.brush.pixelPerfect ? "bg-primary" : ""}`}>
+                            <BsStars className={` ${data.toolSettings.brush.pixelPerfect ? "text-primary-content" : "text-base-content"}`} />
+                        </div>
+                        <div data-tip="toggle mask mode"
+                            data-for="tooltip"
+                            onClick={() => data.setToolSettings({ ...data.toolSettings, brush: { ...data.toolSettings.brush, maskMode: !data.toolSettings.brush.maskMode } })}
+                            className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.toolSettings.brush.maskMode ? "bg-primary" : ""}`}>
+                            <PiMaskHappyFill className={` ${data.toolSettings.brush.maskMode ? "text-primary-content" : "text-base-content"}`} />
+                        </div>
+                    </div>
+                </>)}
+
+                {["brush", "eraser", "light", "line", "mirror", "spray", "smudge"].includes(data.toolSettings.leftTool) && (<>
                     <div className="space-x-1 row">
                         <input aria-label="active tool size slider"
                             data-tip="brush slider ( [ ) ( ] )"
@@ -201,6 +234,27 @@ export function Canvas() {
                             }} />
                     </div>
                 </>)}
+
+                {["brush", "eraser", "mirror"].includes(data.toolSettings.leftTool) && <>
+                    <div data-tip="select brush"
+                        data-for="tooltip"
+                        className="dropdown dropdown-end">
+
+                        <button tabIndex={0} className="btn btn-xs">
+                            <img src={data.getActiveBrushPreview()} className="h-[12px] object-contain" style={{ imageRendering: "pixelated" }} />
+                        </button>
+                        <div className="w-12 rounded-md dropdown-content menu bg-base-200">
+                            {data.toolSettings.brushes.map((brush, index) => (
+                                <a href="#" key={index}>
+                                    <img className="object-cover w-10 p-1 cursor-pointer hover:bg-primary"
+                                        onClick={() => data.setToolSettings({ ...data.toolSettings, activeBrush: brush })}
+                                        style={{ imageRendering: "pixelated" }}
+                                        src={data.brushPreviews[index]} />
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                </>}
             </nav>
 
             <nav className="absolute h-[40px] z-10 p-2 m-2 space-x-2 rounded-lg shadow-lg bg-accent text-accent-content top-right row">
@@ -212,6 +266,7 @@ export function Canvas() {
                     style={{ width: "100px" }}
                     defaultValue={10}
                     onChange={(e) => data.setZoom(parseInt(e.target.value))} />
+
                 <label>
                     <p hidden>height</p>
                     <input aria-label="set grid height"
@@ -226,6 +281,7 @@ export function Canvas() {
                         onClick={e => e.currentTarget.select()}
                         onChange={e => data.resizeHandler({ height: Math.min(2048, e.currentTarget.valueAsNumber) })} />
                 </label>
+
                 <label>
                     <p hidden>width</p>
                     <input aria-label="set grid width"
@@ -240,6 +296,7 @@ export function Canvas() {
                         onClick={e => e.currentTarget.select()}
                         onChange={e => data.resizeHandler({ width: Math.min(2048, e.currentTarget.valueAsNumber) })} />
                 </label>
+
                 <button aria-label="undo"
                     data-tip="undo ( ctrl + z )"
                     data-for="tooltip"
@@ -247,6 +304,7 @@ export function Canvas() {
                     className="btn btn-xs">
                     <FaUndoAlt />
                 </button>
+
                 <button aria-label="redo"
                     data-tip="redo ( ctrl + shift + z )"
                     data-for="tooltip"
@@ -255,19 +313,16 @@ export function Canvas() {
                     <FaRedoAlt />
                 </button>
 
-                <label data-tip="toggle tilemode"
+                <div data-tip="toggle tile mode"
                     data-for="tooltip"
-                    className={`row rounded-md p-1 cursor-pointer ${data.tilemode ? "bg-secondary text-secondary-content" : ""}`}>
-                    <FaMap className="text-lg" />
-                    <input aria-label="toggle tilemode"
-                        type="checkbox"
-                        className="hidden checkbox checkbox-xs"
-                        onChange={e => data.setTilemode(e.currentTarget.checked)} />
-                </label>
+                    onClick={() => data.setTilemode(!data.tilemode)}
+                    className={`bg-base-100 p-1 rounded-md cursor-pointer ${data.tilemode ? "bg-primary" : ""}`}>
+                    <FaMap className={` ${data.tilemode ? "text-primary-content" : "text-base-content"}`} />
+                </div>
             </nav>
 
             <section className="w-full h-full overflow-hidden row p-app__canvas-container" ref={data.mainCanvasContainer}></section>
-        </section>
+        </section >
     )
 }
 
@@ -286,6 +341,7 @@ function useCanvas() {
     const tempCanvas2 = useCanvasHook({ willReadFrequently: true });
     const undoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
     const redoStack = useRef<{ layerID: any; image: any; hash: any; frameID: any }[]>([]);
+    let [brushPreviews, setBrushPreviews] = useState<string[]>([]);
 
     const mainCanvasContainer = useRef<HTMLElement>(null);
     const mainCanvasZoom = useRef(15);
@@ -300,9 +356,10 @@ function useCanvas() {
     });
     const toolState = useRef({
         stage: ToolStage.PREVIEW,
-        brush: { previousPoint: { x: 0, y: 0 } },
+        brush: { firstPoint: { x: 0, y: 0 }, previousPoint: { x: 0, y: 0 }, points: [{ x: 0, y: 0 }] },
         eraser: { previousPoint: { x: 0, y: 0 } },
         line: { activePoints: [] as { x: number; y: number; }[] },
+        crop: { startPoint: { x: 0, y: 0 } },
         mirror: { previousPoint: { x: 0, y: 0 } },
         smudge: { previousPoint: { x: 0, y: 0 }, previousColor: { r: 0, g: 0, b: 0, a: 0 } },
         shape: { activePoints: [] as { x: number; y: number; }[] },
@@ -337,26 +394,49 @@ function useCanvas() {
             // center the mouse cursor in the brush 
             let width = stateCache.current.toolSettings.size;
             let height = stateCache.current.toolSettings.size;
-            let newX = x - Math.floor(width / 2);
-            let newY = y - Math.floor(height / 2);
+            let centerX = x - Math.floor(width / 2);
+            let centerY = y - Math.floor(height / 2);
+
+            let { toolSettings, activeColor, activeLayer } = stateCache.current;
 
             if (toolButtonActive) {
                 if (toolState.current.brush.previousPoint.x === 0 && toolState.current.brush.previousPoint.y === 0) {
-                    toolState.current.brush.previousPoint.x = newX;
-                    toolState.current.brush.previousPoint.y = newY;
+                    toolState.current.brush.previousPoint.x = centerX;
+                    toolState.current.brush.previousPoint.y = centerY;
+                }
+                if (toolState.current.brush.firstPoint.x === 0 && toolState.current.brush.firstPoint.y === 0) {
+                    toolState.current.brush.firstPoint.x = centerX;
+                    toolState.current.brush.firstPoint.y = centerY;
                 }
 
                 let start = toolState.current.brush.previousPoint;
-                let end = { x: newX, y: newY };
+                let end = { x: centerX, y: centerY };
 
-                saveCanvas.drawLine(start, end, stateCache.current.toolSettings.size, stateCache.current.activeColor);
+                toolState.current.brush.previousPoint = { x: centerX, y: centerY };
 
-                toolState.current.brush.previousPoint.x = newX;
-                toolState.current.brush.previousPoint.y = newY;
+                if (toolSettings.brush.fill) {
+                    toolState.current.brush.points.push({ x: centerX, y: centerY });
+                }
+
+                saveCanvas.drawLine(start, end, toolSettings.size, activeColor, toolSettings.activeBrush, toolSettings.brush.pixelPerfect);
+
+                if (toolSettings.brush.maskMode) {
+                    tempCanvas1.putImageData(activeLayer.image);
+                    tempCanvas1.getCtx().globalCompositeOperation = 'source-in';
+                    tempCanvas1.drawImage(saveCanvas.getElement());
+                    saveCanvas.putImageData(tempCanvas1.getImageData());
+
+                    tempCanvas1.getCtx().globalCompositeOperation = 'source-over';
+                }
             } else {
-                toolState.current.brush.previousPoint.x = 0;
-                toolState.current.brush.previousPoint.y = 0;
-                if (preview) previewCanvas.drawPixel(newX, newY, stateCache.current.toolSettings.size, stateCache.current.activeColor);
+                if (toolSettings.brush.fill && toolState.current.brush.points.length > 2)
+                    saveCanvas.drawPolygon(toolState.current.brush.points, true, activeColor, true);
+
+                toolState.current.brush.previousPoint = { x: 0, y: 0 };
+                toolState.current.brush.firstPoint = { x: 0, y: 0 };
+                toolState.current.brush.points = [];
+
+                if (preview) previewCanvas.drawPixel(centerX, centerY, toolSettings.size, activeColor, toolSettings.activeBrush);
             }
         },
         "eraser": (x, y, toolButtonActive, preview) => {
@@ -381,7 +461,7 @@ function useCanvas() {
                     let start = toolState.current.eraser.previousPoint;
                     let end = { x: newX, y: newY };
 
-                    saveCanvas.drawLine(start, end, size, { r: 0, g: 0, b: 0, a: 1 });
+                    saveCanvas.drawLine(start, end, size, { r: 0, g: 0, b: 0, a: 1 }, stateCache.current.toolSettings.activeBrush);
 
                     toolState.current.eraser.previousPoint.x = newX;
                     toolState.current.eraser.previousPoint.y = newY;
@@ -425,6 +505,28 @@ function useCanvas() {
                 if (preview) previewCanvas.drawPixel(x, y, 1, stateCache.current.activeColor);
             }
         },
+        "spray": (x, y, toolButtonActive, preview) => {
+            let size = stateCache.current.toolSettings.size;
+            let radius = size / 2;
+            let density = stateCache.current.toolSettings.spray.density;
+            let color = stateCache.current.activeColor;
+
+            if (toolButtonActive) {
+                for (let i = 0; i < density; i++) {
+                    let angle = Math.random() * 2 * Math.PI; // Random angle
+                    let randRadius = Math.random() * radius; // Random radius
+                    let sprayX = Math.round(x + randRadius * Math.cos(angle));
+                    let sprayY = Math.round(y + randRadius * Math.sin(angle));
+
+                    saveCanvas.drawPixel(sprayX, sprayY, 1, color); // Draw a small dot at the calculated position
+                }
+            }
+            else {
+                let centerX = x - Math.floor(size / 2); // Centering the x coordinate
+                let centerY = y - Math.floor(size / 2); // Centering the y coordinate
+                if (preview) previewCanvas.drawPixel(centerX, centerY, stateCache.current.toolSettings.size, stateCache.current.activeColor);
+            }
+        },
         "line": (x, y, toolButtonActive, preview) => {
             if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
                 let width = stateCache.current.toolSettings.size;
@@ -463,6 +565,52 @@ function useCanvas() {
                 }
             }
         },
+        "crop": (x, y, toolButtonActive, preview) => {
+            if (!toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                if (preview) previewCanvas.drawPixel(x, y, 1, stateCache.current.activeColor);
+                return;
+            }
+            if (toolButtonActive && toolState.current.stage === ToolStage.PREVIEW) {
+                toolState.current.crop.startPoint = { x, y };
+                toolState.current.stage = ToolStage.ADJUSTING;
+            }
+            if (toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+                const startX = Math.min(toolState.current.crop.startPoint.x, x);
+                const startY = Math.min(toolState.current.crop.startPoint.y, y);
+                const endX = Math.max(toolState.current.crop.startPoint.x, x);
+                const endY = Math.max(toolState.current.crop.startPoint.y, y);
+                const width = endX - startX;
+                const height = endY - startY;
+
+                if (preview) previewCanvas.drawRect(startX, startY, width, height, stateCache.current.activeColor);
+            }
+            if (!toolButtonActive && toolState.current.stage === ToolStage.ADJUSTING) {
+                const startX = Math.min(toolState.current.crop.startPoint.x, x);
+                const startY = Math.min(toolState.current.crop.startPoint.y, y);
+                const endX = Math.max(toolState.current.crop.startPoint.x, x);
+                const endY = Math.max(toolState.current.crop.startPoint.y, y);
+
+                // Draw transparent color over the entire preview canvas to remove previous previews
+                let { width, height } = stateCache.current.canvasSize;
+                let clearData = new ImageData(stateCache.current.activeLayer.image.data.slice(), width, height);
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        let index = (y * width + x) * 4;
+                        if (!(x >= startX && x <= endX && y >= startY && y <= endY)) {
+                            clearData.data[index] = 0;
+                            clearData.data[index + 1] = 0;
+                            clearData.data[index + 2] = 0;
+                            clearData.data[index + 3] = 1;
+                        }
+                    }
+                }
+                saveCanvas.putImageData(clearData, 0, 0);
+
+                // Reset the tool state
+                toolState.current.stage = ToolStage.PREVIEW;
+                toolState.current.crop.startPoint = { x: 0, y: 0 };
+            }
+        },
         "mirror": (x, y, toolButtonActive, preview) => {
             const { size, mirror } = stateCache.current.toolSettings;
             let newX = x - Math.floor(size / 2);
@@ -477,23 +625,23 @@ function useCanvas() {
             let end = { x: newX, y: newY };
 
             // Draw line for initial point
-            tempCanvas1.drawLine(start, end, size, stateCache.current.activeColor);
+            tempCanvas1.drawLine(start, end, size, stateCache.current.activeColor, stateCache.current.toolSettings.activeBrush);
 
             // Calculate mirrored positions and draw lines for X and Y axis mirroring
             if (mirror.x) {
                 let mirroredStartX = mainCanvas.getWidth() - start.x - size;
                 let mirroredEndX = mainCanvas.getWidth() - end.x - size;
-                tempCanvas1.drawLine({ x: mirroredStartX, y: start.y }, { x: mirroredEndX, y: end.y }, size, stateCache.current.activeColor);
+                tempCanvas1.drawLine({ x: mirroredStartX, y: start.y }, { x: mirroredEndX, y: end.y }, size, stateCache.current.activeColor, stateCache.current.toolSettings.activeBrush);
             }
             if (mirror.y) {
                 let mirroredStartY = mainCanvas.getHeight() - start.y - size;
                 let mirroredEndY = mainCanvas.getHeight() - end.y - size;
-                tempCanvas1.drawLine({ x: start.x, y: mirroredStartY }, { x: end.x, y: mirroredEndY }, size, stateCache.current.activeColor);
+                tempCanvas1.drawLine({ x: start.x, y: mirroredStartY }, { x: end.x, y: mirroredEndY }, size, stateCache.current.activeColor, stateCache.current.toolSettings.activeBrush);
             }
             if (mirror.x && mirror.y) {
                 let mirroredStartXY = { x: mainCanvas.getWidth() - start.x - size, y: mainCanvas.getHeight() - start.y - size };
                 let mirroredEndXY = { x: mainCanvas.getWidth() - end.x - size, y: mainCanvas.getHeight() - end.y - size };
-                tempCanvas1.drawLine(mirroredStartXY, mirroredEndXY, size, stateCache.current.activeColor);
+                tempCanvas1.drawLine(mirroredStartXY, mirroredEndXY, size, stateCache.current.activeColor, stateCache.current.toolSettings.activeBrush);
             }
 
             toolState.current.mirror.previousPoint.x = newX;
@@ -509,35 +657,44 @@ function useCanvas() {
             }
         },
         "smudge": (x, y, toolButtonActive, preview) => {
-            let brushSize = stateCache.current.toolSettings.size; // Or a specific size for the smudge tool
-            let halfBrushSize = Math.floor(brushSize / 2);
-            let newX = x - halfBrushSize;
-            let newY = y - halfBrushSize;
+            let radius = stateCache.current.toolSettings.size / 2;
+            tempCanvas1.putImageData(stateCache.current.activeLayer.image);
+            let imageData = tempCanvas1.getImageData(x - radius, y - radius, radius * 2, radius * 2);
+            let data = imageData.data;
+            let r = 0, g = 0, b = 0, a = 255, count = 0;
+            let width = stateCache.current.toolSettings.size;
+            let height = stateCache.current.toolSettings.size;
+            let centerX = x - Math.floor(width / 2);
+            let centerY = y - Math.floor(height / 2);
 
-            if (toolButtonActive) {
-                if (toolState.current.smudge.previousPoint.x === 0 && toolState.current.smudge.previousPoint.y === 0) {
-                    toolState.current.smudge.previousColor = tempCanvas1.getColor(newX, newY);
-                    toolState.current.smudge.previousPoint.x = newX;
-                    toolState.current.smudge.previousPoint.y = newY;
-                } else {
-                    let currentColor = tempCanvas1.getColor(newX, newY);
-                    let blendedColor = tinycolor.mix(toolState.current.smudge.previousColor, currentColor, 50);
+            // Loop through the pixel data to average the colors within the circle
+            for (let i = 0; i < data.length; i += 4) {
+                let px = (i / 4) % (radius * 2); // current pixel x position
+                let py = Math.floor((i / 4) / (radius * 2)); // current pixel y position
 
-                    // Apply the blended color to the canvas
-                    // tempCanvas1.drawPixel(newX, newY, brushSize, );
-
-                    toolState.current.smudge.previousColor = blendedColor.toRgb();
-                    toolState.current.smudge.previousPoint.x = newX;
-                    toolState.current.smudge.previousPoint.y = newY;
+                // Check if the pixel is within the circle
+                if ((px - centerX) ** 2 + (py - centerY) ** 2 <= radius ** 2) {
+                    r += data[i];
+                    g += data[i + 1];
+                    b += data[i + 2];
+                    // a += data[i + 3];
+                    count++;
                 }
-            } else {
-                toolState.current.smudge.previousPoint.x = 0;
-                toolState.current.smudge.previousPoint.y = 0;
-                toolState.current.smudge.previousColor = { r: 0, g: 0, b: 0, a: 0 };
             }
 
-            if (preview) {
-                previewCanvas.putImageData(tempCanvas1.getImageData());
+            if (count > 0) {
+                r = Math.floor(r / count);
+                g = Math.floor(g / count);
+                b = Math.floor(b / count);
+                // a = Math.floor(a / count);
+            }
+
+            let color = { r: r, g: g, b: b, a: a };
+
+            if (toolButtonActive) {
+                saveCanvas.drawPixel(x, y, stateCache.current.toolSettings.size, color);
+            } else {
+                if (preview) previewCanvas.drawPixel(centerX, centerY, stateCache.current.toolSettings.size, stateCache.current.activeColor);
             }
         },
         "move": (x, y, toolButtonActive, preview) => {
@@ -1152,6 +1309,20 @@ function useCanvas() {
         "]": () => setBrushSize(1),
     });
 
+    // update brush previews
+    useEffect(() => {
+        let previews: string[] = [];
+        toolSettings.brushes.forEach(brush => {
+            tempCanvas1.resize(brush.width, brush.height);
+            tempCanvas1.putImageData(brush);
+
+            previews.push(tempCanvas1.toDataURL());
+        });
+
+        tempCanvas1.resize(canvasSize.width, canvasSize.height);
+        setBrushPreviews(previews);
+    }, [toolSettings.brushes]);
+
     // animation loop
     useEffect(() => {
         (function render() {
@@ -1530,19 +1701,38 @@ function useCanvas() {
         }
     }
 
+    function saveAsBrush() {
+        let { data, width, height } = toolState.current[toolSettings.leftTool].imgData;
+        console.log(width, height);
+        let brush = new ImageData(data.slice(), width, height);
+
+        setToolSettings({ ...toolSettings, brushes: [...toolSettings.brushes, brush] });
+        toolState.current.stage = ToolStage.PREVIEW;
+    }
+
+    function getActiveBrushPreview() {
+        let index = toolSettings.brushes.findIndex(b => b === toolSettings.activeBrush);
+
+        return brushPreviews[index];
+    }
+
     return {
+        tilemode,
+        canvasSize,
+        tempCanvas1,
+        toolSettings,
+        brushPreviews,
+        mainCanvasZoom,
+        mainCanvasContainer,
         undo,
         redo,
         setZoom,
-        tilemode,
         setTilemode,
-        canvasSize,
-        toolSettings,
-        mainCanvasZoom,
+        saveAsBrush,
         setBrushSize,
         resizeHandler,
         setToolSettings,
-        mainCanvasContainer,
+        getActiveBrushPreview,
     };
 }
 

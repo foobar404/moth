@@ -14,17 +14,17 @@ export function Nav() {
     return (<>
         <ModalExport {...data.modalExport} />
         <ModalImport {...data.modalImport} />
-        <nav className="space-x-2 row-left !flex-nowrap p-app__area-header p-app__block w-max">
+        <nav className="space-x-2 row-left !flex-nowrap w-max overflow-hidden h-full">
             <button aria-label="open import settings"
                 onClick={() => data.modalImport.setIsOpen(true)}
                 className="box-content py-1 btn btn-sm btn-primary">
-                <IoImage className="text-2xl" /> 
+                <IoImage className="text-2xl" />
                 <span className="hidden sm:block">Open</span>
             </button>
             <button aria-label="open export settings"
                 onClick={() => data.modalExport.setIsOpen(true)}
                 className="box-content py-1 btn btn-sm btn-secondary">
-                <HiStar className="text-2xl" /> 
+                <HiStar className="text-2xl" />
                 <span className="hidden sm:block">Save</span>
             </button>
             <a aria-label="report a bug with the moth bug form"
@@ -33,7 +33,7 @@ export function Nav() {
                 target="_blank"
                 className="box-content py-1 btn btn-sm btn-warning"
                 href={"https://forms.gle/pDXePJUoGSFnUBJF7"}>
-                <FaBug className="text-lg"/>
+                <FaBug className="text-lg" />
             </a>
 
             <select aria-label="themes list"
@@ -69,16 +69,16 @@ export function Nav() {
                 placeholder="Enter Name"
                 value={data.projectName}
                 onKeyDown={e => e.stopPropagation()}
-                className="input input-md input-bordered w-min min-w-[250px] hidden sm:block"
+                className="input input-md input-bordered w-min min-w-[250px] hidden lg:block"
                 onChange={e => data.saveProjectName(e.target.value)} />
 
-            <section className="fixed z-50 !hidden p-2 bottom-right lg:!block">
+            {/* <section className="fixed z-50 !hidden p-2 bottom-right lg:!block">
                 {data.message && (
                     <div className="px-6 py-4 badge badge-info">
                         {data.message}
                     </div>
                 )}
-            </section>
+            </section> */}
         </nav>
     </>)
 }

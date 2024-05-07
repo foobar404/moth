@@ -117,42 +117,54 @@ export function useCanvas(props?: IProps) {
         ctx.current.putImageData(imgData, 0, 0);
     }
 
-    function drawLine(start, end, size = 1, color) {
-        let points: { x: number, y: number }[] = [];
+    function drawLine(start, end, size = 1, color, brush?, perfect = false) {
+        let points: any[] = [];
         let x0 = start.x;
         let y0 = start.y;
         let x1 = end.x;
         let y1 = end.y;
 
-        let dx = Math.abs(x1 - x0);
-        let dy = -Math.abs(y1 - y0);
-        let sx = x0 < x1 ? 1 : -1;
-        let sy = y0 < y1 ? 1 : -1;
-        let err = dx + dy;
+        const dx = Math.abs(x1 - x0);
+        const dy = -Math.abs(y1 - y0);
+        const sx = x0 < x1 ? 1 : -1;
+        const sy = y0 < y1 ? 1 : -1;
+        let err = dx + dy, e2; // Error value and doubled error value
 
         while (true) {
             points.push({ x: x0, y: y0 });
 
             if (x0 === x1 && y0 === y1) break;
 
-            let e2 = 2 * err;
-
-            if (e2 >= dy) {
-                err += dy; // Update the error term
-                x0 += sx; // Move in the x direction
-            }
-            if (e2 <= dx) {
-                err += dx; // Update the error term
-                y0 += sy; // Move in the y direction
+            e2 = 2 * err;
+            if (perfect) {
+                // Enhanced control over drawing behavior when perfect is true
+                if (e2 > dy) {
+                    err += dy;
+                    x0 += sx;
+                }
+                if (e2 < dx) {
+                    err += dx;
+                    y0 += sy;
+                }
+            } else {
+                // Original algorithm behavior
+                if (e2 >= dy) {
+                    err += dy;
+                    x0 += sx;
+                }
+                if (e2 <= dx) {
+                    err += dx;
+                    y0 += sy;
+                }
             }
         }
 
-        points.forEach((point: { x: any, y: any }) => {
-            drawPixel(point.x, point.y, size, color);
+        points.forEach(point => {
+            drawPixel(point.x, point.y, size, color, brush);
         });
 
         return points;
-    };
+    }
 
     function drawRect(x, y, width, height, color, fill = false) {
         if (fill) {
@@ -207,26 +219,54 @@ export function useCanvas(props?: IProps) {
         }
     }
 
-    function drawPolygon(points, close = false, color) {
+    function drawPolygon(points, close = false, color, fill = false) {
         for (let i = 1; i < points.length; i++) {
             drawLine(points[i - 1], points[i], 1, color);
         }
         if (close) drawLine(points[points.length - 1], points[0], 1, color);
+
+        if (fill) {
+            points.push(points[0]);
+
+            const n = points.length;
+            let sumX = 0, sumY = 0;
+            points.forEach(({ x, y }) => {
+                sumX += x;
+                sumY += y;
+            });
+
+            floodFill(sumX / n, sumY / n, (x, y) => drawPixel(x, y, 1, color));
+        }
     }
 
-    function drawPixel(x, y, size = 1, color) {
+    function drawPixel(x, y, size = 1, color, brush?) {
         if (isNaN(x) || isNaN(y)) return;
 
-        const imageData = new ImageData(size, size);
+        if (!brush) brush = new ImageData(new Uint8ClampedArray([0, 0, 0, 255]), 1, 1);
 
-        for (let i = 0; i < imageData.data.length; i += 4) {
-            imageData.data[i] = color.r;
-            imageData.data[i + 1] = color.g;
-            imageData.data[i + 2] = color.b;
-            imageData.data[i + 3] = color.a;
+        let scaledWidth = brush.width * size;
+        let scaledHeight = brush.height * size;
+        let scaledImageData = new ImageData(scaledWidth, scaledHeight);
+
+        for (let j = 0; j < scaledHeight; j++) {
+            for (let i = 0; i < scaledWidth; i++) {
+                let srcX = Math.floor(i / size);
+                let srcY = Math.floor(j / size);
+                let destIndex = (j * scaledWidth + i) * 4;
+                let srcIndex = (srcY * brush.width + srcX) * 4;
+
+                if (brush.data[srcIndex + 3] === 0) {
+                    continue;
+                }
+
+                scaledImageData.data[destIndex] = color.r;
+                scaledImageData.data[destIndex + 1] = color.g;
+                scaledImageData.data[destIndex + 2] = color.b;
+                scaledImageData.data[destIndex + 3] = color.a;
+            }
         }
 
-        putImageData(imageData, x, y);
+        putImageData(scaledImageData, x, y);
     }
 
     function erasePixel(x, y, size = 1) {

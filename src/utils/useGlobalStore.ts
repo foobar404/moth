@@ -9,6 +9,7 @@ interface IGlobalStore {
     frames: IFrame[];
     activeFrame: IFrame;
     activeLayer: ILayer;
+    copyLayer: ILayer;
     colorPalettes: IColorPalette[];
     activeColorPalette: IColorPalette;
     activeColor: { r: number; g: number; b: number; a: number };
@@ -21,6 +22,7 @@ interface IGlobalStore {
     setFrames: (frames: IFrame[]) => void;
     setActiveFrame: (activeFrame: IFrame) => void;
     setActiveLayer: (activeLayer: ILayer) => void;
+    setCopyLayer: (copyLayer: ILayer) => void;
     setColorPalettes: (colorPalettes: IColorPalette[]) => void;
     setActiveColorPalette: (activeColorPalette: IColorPalette) => void;
     setActiveColor: (activeColor: { r: number; g: number; b: number; a: number }) => void;
@@ -59,6 +61,13 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
         symbol: Symbol()
     }];
 
+    const initalBrushes = [
+        new ImageData(new Uint8ClampedArray([0, 0, 0, 255]), 1, 1),
+        new ImageData(new Uint8ClampedArray([0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255]), 4, 4),
+        new ImageData(new Uint8ClampedArray([0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 0]), 4, 4),
+        new ImageData(new Uint8ClampedArray([0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 255]), 4, 4),
+    ];
+
     const initialState = {
         projectName: new Date().toLocaleString(),
         canvasSize: { height: 32, width: 32 },
@@ -66,15 +75,19 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
         frames: initialFrames,
         activeFrame: initialFrames[0],
         activeLayer: initialFrames[0].layers[0],
+        copyLayer: initialFrames[0].layers[0],
         colorPalettes: initialColorPalettes,
         activeColorPalette: initialColorPalettes[0],
         activeColor: { r: 0, g: 0, b: 0, a: 255 },
         colorStats: {},
         toolSettings: {
-            size: 1,
             leftTool: "brush" as ITool,
             rightTool: "eraser" as ITool,
             middleTool: "" as ITool,
+            size: 1,
+            brushes: initalBrushes,
+            activeBrush: initalBrushes[0],
+            brush: { fill: false, pixelPerfect: false, maskMode: false },
             mirror: { x: true, y: false },
             shape: "rect" as any,
             fillShape: false,
@@ -83,6 +96,7 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
             eraseAll: false,
             fillAll: false,
             wandSelectAll: false,
+            spray: { density: 2 },
         },
         setProjectName: (projectName: string) => set({ projectName }),
         setCanvasSize: (canvasSize: { height: number; width: number }) => set({ canvasSize }),
@@ -119,6 +133,7 @@ export const useGlobalStore = create<IGlobalStore>((set, get) => {
             }
             set({ activeLayer });
         },
+        setCopyLayer: (copyLayer: ILayer) => set({ copyLayer }),
         setActiveColorPalette: (activeColorPalette: IColorPalette) => {
             let index = get().colorPalettes.findIndex(palette => palette.symbol === activeColorPalette.symbol);
             if (index === -1) { // if palette is new add

@@ -3,8 +3,8 @@
     height: 100vh;
     width: 100vw;
     overflow: hidden;
-    grid-template-rows: 65px 1fr max-content;
-    grid-template-columns: 65px 1fr max-content;
+    grid-template-rows: max-content 1fr max-content;
+    grid-template-columns: max-content 1fr max-content;
     grid-template-areas:
         "left header right"
         "left content right"
@@ -12,9 +12,9 @@
 
     @media (max-width: 1024px) {
         grid-template-areas:
-            "header header header"
+            "header header right"
             "left content right"
-            "left footer footer";
+            "left footer right";
     }
 
     &__area-header {

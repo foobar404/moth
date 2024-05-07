@@ -2,21 +2,32 @@
 
 # Doing
 - Austin
-    - (Medium)(Feature) allow custom brush shapes 
     - (Medium)(Feature) copy / paste selection
+    - (Hard)(Feature) Add smudge tool
+    - (Hard)(Feature) add font tool
     - (Medium)(Feature) mirror mode
         - (Easy)(Feature) mirror from starting point
         - (Easy)(Feature) mirror ying / yang
-    - (Medium)(Feature) add pixel perfect mode to line tool
-    - (Medium)(Feature) mask mode for brush tool
     - (Medium)(Feature) add drag handles to resize the canvas
         - (Hard)(Bug) pixels get deleted when changing the canvas size
         - (Medium)(Feature) add current mouse position & canvas size at bottom left
+    - (Medium)(Feature) scroll zooms to the mouse position
     - (Medium)(Feature) left click in canvas area for center/tool/clear wheel, right click to pan
         - (Easy)(Feature) make clear more accessable
+    - (Hard)(Feature) settings modal
+        - (Easy)(Feature) update shortcut keys
+        - custom shortcuts 
+            - custom shortcuts override default
+        - reset shortcuts to default button 
+        - themes
+            - retro game consoles
+            - grid colors
+            - custom layout, custom shortcut
+            - minimize UI
 - Nate
 
 # TODO
+- (Easy)(Feature) add talorence to wand 
 - (Easy)(Feature) rainbow color mode
 - (Easy)(Feature) random color mode
 - (Easy)(Bug) light and color picker doesint add color if missing
@@ -36,13 +47,10 @@
 - (Easy)(Feature) Join multiple similer tool into one iterface
 - (Medium)(Bug) make local projects use indexDB instead
 - (Medium)(Bug) make light tool use lines
-- (Medium)(Feature) refrence images tab
-- (Medium)(Feature) add spray tool
 - (Medium)(Bug) make sure all brush combinations work with left and right buttons
 - (Medium)(Feature) export as css
 - (Medium)(Feature) onion skinning for furure frame
     - onion skinning color effects
-- (Medium)(Feature) crop tool
 - (Medium)(Feature) import gif as frames
 - (Medium)(Feature) fullscreen canvas mode
 - (Medium)(Feature) Sprite packing
@@ -50,28 +58,13 @@
 - (Medium)(Feature) .pyxel and .asesprite / .ase import
 - (Medium)(Feature) load demo button
 - (Medium)(Feature) wrap around move option
-- (Medium)(Feature) scroll zooms to the mouse position
 - (Medium)(Feature) allow creating multiple animations
 - (Medium)(Feature) add console error watch system
 - (Medium)(Feature) Multiple sprite tabs
-- (Hard)(Feature) add font tool
 - (Hard)(Feature) tools only modify active selection
 - (Hard)(Feature) better selection box
 - (Hard)(Feature) download as svg
 - (Hard)(Feature) export as .tmx
-- (Hard)(Feature) settings modal
-    - (Easy)(Feature) update shortcut keys
-    - custom shortcuts 
-        - custom shortcuts override default
-    - reset shortcuts to default button 
-    - themes
-        - retro game consoles
-        - grid colors
-        - custom layout, custom shortcut
-        - minimize UI
-- (Hard)(Feature) Add blur / jumble tool
-- (Hard)(Feature) Add contour tool 
-    - (Medium)(Feature) fill brush tool (close loop)
 - (Hard)(Feature) make selections standout
     - rotate
     - scale
@@ -130,7 +123,6 @@
     - choose how many frames to create
     - button to generate tweening frames based on "move" tool or "bone" tool
     - provide types of progression arcs
-- ai sprite gen
 - non-destructive "Effects"
     - AA
     - mirror

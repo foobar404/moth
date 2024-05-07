@@ -15,7 +15,7 @@ export function Colors() {
 
     return (<>
         <ModalColorPalettes {...data.modalColorPalettes} />
-        <section className="mt-2">
+        <section className="mt-1 space-y-2">
             <div onKeyDown={e => e.stopPropagation()}>
                 <ChromePicker
                     className="!w-full !bg-base-100 !rounded-xl !shadow-xl border-4 border-accent overflow-hidden !box-border"
@@ -23,16 +23,22 @@ export function Colors() {
                     onChange={(color: any) => data.setActiveColor({ r: color.rgb.r, g: color.rgb.g, b: color.rgb.b, a: Math.ceil(color.rgb.a * 255) })} />
             </div>
 
-            <div data-tip="active / prev color toggle ( z )"
-                data-for="tooltip"
-                onClick={data.swapColors}
-                className={`h-10 row rounded-lg overflow-hidden my-2 hover:scale-95 cursor-pointer`}>
+            <section className="flex-wrap row">
+                {data.visibleColors.map((c: IColor, i) => (
+                    <div key={i}
+                        data-for="tooltip"
+                        onClick={() => data.setActiveColor(c)}
+                        data-tip={`${tinycolor(c).toHexString()}`}
+                        style={{ background: `${tinycolor(c).toHexString()}` }}
+                        className={`hover:scale-105 overflow-hidden box-content row cursor-pointer h-7 w-7 rounded shadow-xl mr-1 mb-1 border-4 border-transparent ${JSON.stringify(c) === JSON.stringify(data.activeColor) ? "border-base-content" : ""}`}>
+                        <span className="text-xs" style={{ color: `${data.getTextColor(c)}`, fontSize: "9px" }}>
+                            {data.colorStats[data.colorToString(c)]?.count ?? 0}
+                        </span>
+                    </div>
+                ))}
+            </section>
 
-                <div className="w-1/2 h-full" style={{ background: `${tinycolor(data.activeColor).toRgbString()}` }}></div>
-                <div className="w-1/2 h-full" style={{ background: `${tinycolor(data.recentColors[1]).toRgbString()}` }}></div>
-            </div>
-
-            <nav className="p-2 my-2 space-y-1 rounded-md bg-accent">
+            <nav className="p-2 space-y-1 rounded-md bg-accent">
                 <div className="space-x-1 row">
                     <button aria-label="import color palette"
                         data-tip="import color palette from lospec or file"
@@ -63,7 +69,7 @@ export function Colors() {
                     <select aria-label="color palettes"
                         data-tip="color pallete selection"
                         data-for="tooltip"
-                        className="w-1/3 select select-xs"
+                        className="flex-1 min-w-0 select select-xs"
                         onChange={(e) => data.setColorPalette(Number(e.target.value))}
                         value={data.colorPalettes.findIndex(x => data.activeColorPalette.symbol === x.symbol)}>
 
@@ -76,7 +82,7 @@ export function Colors() {
                         type="text"
                         data-for="tooltip"
                         data-tip={`${data.activeColorPalette.name}`}
-                        className="w-1/3 input input-xs"
+                        className="flex-1 min-w-0 input input-xs"
                         value={data.activeColorPalette.name}
                         onKeyDown={e => e.stopPropagation()}
                         onChange={e => data.updatePaletteName(e.currentTarget.value)} />
@@ -101,7 +107,7 @@ export function Colors() {
                     <select aria-label="color sorting"
                         data-tip="sort colors"
                         data-for="tooltip"
-                        className="w-1/3 select select-xs"
+                        className="flex-1 min-w-0 select select-xs"
                         value={data.colorState.sort}
                         onChange={e => data.setColorState(s => ({ ...s, sort: e.target.value as any }))}>
                         <option value="default">Default</option>
@@ -111,7 +117,7 @@ export function Colors() {
                     </select>
 
                     <select aria-label="color filtering"
-                        className="w-1/3 select select-xs"
+                        className="flex-1 min-w-0 select select-xs"
                         data-tip="filter colors"
                         data-for="tooltip"
                         value={data.colorState.filter}
@@ -132,20 +138,14 @@ export function Colors() {
                 </div>
             </nav>
 
-            <section className="flex-wrap row">
-                {data.visibleColors.map((c: IColor, i) => (
-                    <div key={i}
-                        data-for="tooltip"
-                        onClick={() => data.setActiveColor(c)}
-                        data-tip={`${tinycolor(c).toHexString()}`}
-                        style={{ background: `${tinycolor(c).toHexString()}` }}
-                        className={`hover:scale-105 overflow-hidden box-content row cursor-pointer h-7 w-7 rounded shadow-xl mr-1 mb-1 border-4 border-transparent ${JSON.stringify(c) === JSON.stringify(data.activeColor) ? "border-base-content" : ""}`}>
-                        <span className="text-xs" style={{ color: `${data.getTextColor(c)}`, fontSize: "9px" }}>
-                            {data.colorStats[data.colorToString(c)]?.count ?? 0}
-                        </span>
-                    </div>
-                ))}
-            </section>
+            <div data-tip="active / prev color toggle"
+                data-for="tooltip"
+                onClick={data.swapColors}
+                className={`h-10 row rounded-lg overflow-hidden hover:scale-95 cursor-pointer`}>
+
+                <div className="w-1/2 h-full" style={{ background: `${tinycolor(data.activeColor).toRgbString()}` }}></div>
+                <div className="w-1/2 h-full" style={{ background: `${tinycolor(data.recentColors[1]).toRgbString()}` }}></div>
+            </div>
         </section>
     </>)
 }
@@ -164,10 +164,6 @@ function useColors() {
     let [colorState, setColorState] = useState<{ filter: "all" | "project" | "frame" | "layer", sort: "default" | "hue" | "recent" | "count" }>({
         filter: "all",
         sort: "default"
-    });
-
-    useShortcuts({
-        "z": swapColors
     });
 
     useEffect(() => {

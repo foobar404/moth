@@ -56,17 +56,22 @@ export interface IColorPalette {
 }
 
 
-export interface IColorStats { [color: string]: { count: number, lastUsed: number } } // key is rgba() string
+export interface IColorStats { [color: string]: { count: number, lastUsed: number } }
 
 
-export type ITool = "brush" | "eraser" | "shape" | "light" | "smudge" | "eyedropper" | "bucket" | "move" | "wand" | "box" | "lasso" | "bone" | "line" | "mirror";
+export type ITool = "brush" | "eraser" | "shape" | "light" | "smudge" | "eyedropper"
+	| "bucket" | "spray" | "move" | "wand" | "box" | "lasso" | "bone" | "line" | "crop"
+	| "mirror" | "crop" | "font";
 
 
 export interface IToolSettings {
-	size: number;
 	leftTool: ITool;
 	rightTool: ITool;
 	middleTool: ITool;
+	size: number;
+	brushes: ImageData[];
+	activeBrush: ImageData;
+	brush: { fill: boolean, pixelPerfect: boolean, maskMode: boolean };
 	mirror: {
 		x: boolean;
 		y: boolean;
@@ -78,6 +83,7 @@ export interface IToolSettings {
 	eraseAll: boolean;
 	fillAll: boolean;
 	wandSelectAll: boolean;
+	spray: { density: number };
 }
 
 

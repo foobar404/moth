@@ -10,11 +10,18 @@ import { useCanvas, useGlobalStore, useSetInterval, useShortcuts } from '../../u
 import { IoCopy, IoPlay, IoStop, IoChevronBack, IoChevronForward } from "react-icons/io5";
 
 
-export function Frames() {
-    const data = useFrames();
+interface IProps {
+    frameHeight: number;
+    setFrameHeight: (frameHeight: number) => void;
+}
+
+export function Frames(props) {
+    const data = useFrames(props);
 
     return (<section className={`h-full overflow-hidden row`}>
+        {/* frames */}
         <section className={`flex-1 w-1/2 space-x-2 row-left h-full`}>
+            {/* onion skin */}
             <section className="rounded-lg h-[120px] max-h-[90%] overflow-hidden col bg-accent p-4 py-3 relative">
                 <input aria-label="onion skin opacity slider"
                     data-tip="onion skin opacity"
@@ -27,7 +34,8 @@ export function Frames() {
                     onChange={e => data.setOnionSkin(e.target.valueAsNumber)} />
             </section>
 
-            <section className={`overflow-auto p-1 row-left max-h-[300px] ${data.enlargePreview ? "!row flex-wrap self-start" : ""}`}>
+            {/* frames */}
+            <section className={`overflow-auto p-1 row-left max-h-[300px] ${props.frameHeight > 200 ? "!row flex-wrap self-start" : ""}`}>
                 {data.frames.map((frame, i) => (
                     <div key={i} draggable
                         onDragStart={(e) => data.handleDragStart(e, frame)}
@@ -83,17 +91,18 @@ export function Frames() {
                 <div data-tip="new frame"
                     data-for="tooltip"
                     onClick={data.addFrame}
-                    className="min-w-[70px] min-h-[70px] m-1 bg-gray-200 border-4 border-gray-400 border-dashed rounded-md cursor-pointer box-content row hover:scale-105 shadow-md">
-                    <MdAddPhotoAlternate aria-label="add new frame" className="text-3xl text-gray-400" />
+                    className="min-w-[70px] min-h-[70px] m-1 border-4 rounded-md cursor-pointer box-content row border-dashed text-base-content/50 border-base-content/20 bg-base-content/5 hover:text-base-content/60 hover:border-base-content/40 hover:bg-base-content/20">
+                    <MdAddPhotoAlternate aria-label="add new frame" className="text-3xl" />
                 </div>
             </section>
         </section>
 
-        <div onClick={() => data.setEnlargePreview(!data.enlargePreview)}
+        {/* preview */}
+        <div onClick={() => props.setFrameHeight(props.frameHeight === 340 ? 150 : 340)}
             className={`h-full row ml-2 cursor-pointer hover:animate-tilt`}>
 
-            <section className="relative group">
-                <Preview {...data.preview} className={`${data.enlargePreview ? "h-[300px] min-w-[300px] max-w-[534px]" : "h-[120px] min-w-[120px] max-w-[213px]"}`} />
+            <section className="relative h-full group">
+                <Preview {...data.preview} className={`h-full min-w-[120px] max-w-[340px]`} />
 
                 <div className="absolute top-left !hidden group-hover:!flex row w-full h-full bg-base-100/40 rounded-md cursor-pointer">
                     <HiOutlineArrowsExpand className="text-3xl text-base-content" />
@@ -149,7 +158,7 @@ export function Frames() {
     </section>)
 }
 
-function useFrames() {
+function useFrames(props) {
     const {
         frames, setFrames, activeFrame, setActiveFrame,
         setActiveLayer, canvasSize, onionSkin, setOnionSkin,
@@ -161,14 +170,14 @@ function useFrames() {
     const emptyImg = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wIAAgEBAJpvAX4AAAAASUVORK5CYII=";
 
     let [imageMap, setImageMap] = useState<any>({});
-    let [enlargePreview, setEnlargePreview] = useState(false);
+    // let [enlargePreview, setEnlargePreview] = useState(false);
     let [draggedFrame, setDraggedFrame] = useState<IFrame | null>(null);
     let [preview, setPreview] = useState<IPreview>({ fps: 24, playing: false, frameCount });
 
     useShortcuts({
         "arrowright": previewFrameRight,
         "arrowleft": previewFrameLeft,
-        " ": toggleAnimationMode
+        " ": togglePlay
     });
 
     // update preview when frames change
@@ -357,16 +366,6 @@ function useFrames() {
         setPreview({ ...preview, fps });
     }
 
-    function toggleAnimationMode() {
-        if (enlargePreview === false) {
-            setEnlargePreview(true);
-            setPreview({ ...preview, playing: true });
-        } else {
-            setEnlargePreview(false);
-            setPreview({ ...preview, playing: false })
-        }
-    }
-
     return {
         frames,
         preview,
@@ -391,8 +390,6 @@ function useFrames() {
         duplicateFrame,
         setActiveFrame,
         setActiveLayer,
-        enlargePreview,
-        setEnlargePreview,
     }
 }
 
