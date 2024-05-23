@@ -17,7 +17,7 @@ export default function ModalHero(props: IProps) {
 
     return (<Modal {...props} blur>
         <main className="space-y-4 rounded-lg max-w-[80vw] max-h-[82vh] w-[600px] col overflow-auto">
-            <img className="mt-8 rounded-2xl" src="/assets/cover.png" alt="Moth: Pixel Art Editor" />
+            <img className="mt-8 rounded-2xl" src="./assets/cover.png" alt="Moth: Pixel Art Editor" />
             <p className="text-base-content text-center max-w-[44ch]">
                 Welcome to Moth, the pixel art editor by indie creators for indie creators.
                 Packing advanced tools and seamless animation into a simple interface!

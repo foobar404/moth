@@ -1,5 +1,5 @@
 
-# Moth: <a href="https://bugpack.io" target="_blank">Pixel Art editor</a>
+# Moth: <a href="https://foobar404.dev/moth/" target="_blank">Pixel Art editor</a>
 
 <img src="./public/assets/cover.png" />
 
