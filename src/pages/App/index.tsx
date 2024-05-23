@@ -92,7 +92,7 @@ export function App() {
 
 					<Drawer className="p-1 border-4 rounded-lg border-secondary">
 						<h2 className="p-2 duration-100 cursor-pointer text-secondary-content row-left bg-secondary rounded-box hover:scale-95">
-							<IoMdImage className="mr-1 text-xl" /> AI
+							<IoMdImage className="mr-1 text-xl" /> AI Reference
 						</h2>
 
 						<AI />

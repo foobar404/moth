@@ -1,8 +1,8 @@
-import { BiSolidDonateHeart } from 'react-icons/bi';
-import { Modal } from '../../components'
+import { Modal } from '../../components';
+import { FaCloud } from 'react-icons/fa';
 import { useGlobalStore } from '../../utils';
-import React, { useEffect, useState } from 'react'
-import { FaCloud, FaKickstarterK, FaProductHunt } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react';
+import { BiSolidDonateHeart } from 'react-icons/bi';
 
 
 interface IProps {
@@ -17,48 +17,39 @@ export default function ModalHero(props: IProps) {
 
     return (<Modal {...props} blur>
         <main className="space-y-4 rounded-lg max-w-[80vw] max-h-[82vh] w-[600px] col overflow-auto">
-            <h1 className="text-3xl font-bold text-base-content row">
-                <img src="/assets/logo.png" className="w-8 h-8 mr-2" alt="rosy maple moth" />
-                <span className="md:hidden">Moth</span>
-                <span className="hidden md:block">Moth: Pixel Art Editor</span>
-            </h1>
-            <p className="text-base-content max-w-[44ch]">
+            <img className="mt-8 rounded-2xl" src="/assets/cover.png" alt="Moth: Pixel Art Editor" />
+            <p className="text-base-content text-center max-w-[44ch]">
                 Welcome to Moth, the pixel art editor by indie creators for indie creators.
                 Packing advanced tools and seamless animation into a simple interface!
             </p>
 
-            <section className="row sm:col">
+            <section className="space-x-1 row">
                 <button aria-label="download offline version of the app"
-                    className="sm:w-[400px] text-lg btn btn-accent row-left mb-4 mr-4"
+                    className="mb-4 mr-4 text-lg btn btn-accent row-left"
                     onClick={() => data.downloadPWA()}>
                     <FaCloud className="text-xl" />
-                    <span className="hidden sm:block">Download App</span>
+                    <span className="hidden sm:block">Download</span>
                 </button>
 
-                <a className="sm:w-[400px] text-lg btn btn-primary row-left mb-4 mr-4"
+                <a className="mb-4 mr-4 text-lg btn btn-primary row-left"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     href="https://coindrop.to/austin">
                     <BiSolidDonateHeart className="text-xl" />
-                    <span className="hidden sm:block">Support Moth</span>
-                </a>
-
-                <a aria-label="support moth by following us on kickstarter"
-                    className="sm:w-[400px] text-lg btn btn-secondary row-left mb-4 mr-4"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    href="https://www.kickstarter.com/projects/foobar404/moth-pixel-art-editor?ref=6psfuy">
-                    <FaKickstarterK className="text-xl" />
-                    <span className="hidden sm:block">Follow Moth on Kickstarter</span>
+                    <span className="hidden sm:block">Donate</span>
                 </a>
             </section>
+
+            {data.message && (
+                <div className="row alert alert-info animate-duration-5000 animate-delay-4000 animate-fade-out">
+                    <div>{data.message}</div>
+                </div>
+            )}
 
             <section className="w-full">
                 <h2 className="p-2 font-bold rounded-t-lg text-base-content w-min bg-base-200">Presets</h2>
                 <section className="bg-base-200 max-h-[200px] overflow-auto p-2 rounded-tl-none rounded-lg row flex-wrap">
-                    {/* <button className="mt-2 mr-2 btn btn-primary btn-sm">Demo</button> */}
                     <button className="mt-2 mr-2 btn btn-primary btn-sm" onClick={() => data.loadPreset("8")}>8x8</button>
                     <button className="mt-2 mr-2 btn btn-primary btn-sm" onClick={() => data.loadPreset("16")}>16x16</button>
                     <button className="mt-2 mr-2 btn btn-primary btn-sm" onClick={() => data.loadPreset("32")}>32x32</button>
@@ -69,7 +60,7 @@ export default function ModalHero(props: IProps) {
                 </section>
             </section>
 
-            <footer className="w-full">
+            {/* <footer className="w-full">
                 <h2 className="p-2 font-bold rounded-t-lg text-base-content w-min bg-base-200">Changelog</h2>
                 <div className="bg-base-200 max-h-[200px] overflow-auto p-2 mockup-code rounded-tl-none rounded-lg">
                     <pre data-prefix="$" className="text-info"><code>v1.1.0 - 5/7/2024</code></pre>
@@ -125,15 +116,7 @@ export default function ModalHero(props: IProps) {
                     <pre data-prefix=">" className="text-success"><code>add project presets</code></pre>
                     <pre data-prefix=">" className="text-success"><code>add mobile support phase 1</code></pre>
                 </div>
-            </footer>
-
-            <div className="w-full toast">
-                {data.message && (
-                    <div className="row alert alert-info animate-duration-5000 animate-delay-4000 animate-fade-out">
-                        <div>{data.message}</div>
-                    </div>
-                )}
-            </div>
+            </footer> */}
         </main>
     </Modal >)
 }

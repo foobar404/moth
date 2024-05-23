@@ -2,7 +2,7 @@
   "name": "moth-pixel-art-editor",
   "version": "1.1.0",
   "private": true,
-  "homepage": "https://bugpack.io/",
+  "homepage": "https://foobar404.github.io/moth",
   "dependencies": {
     "@midudev/tailwind-animations": "^0.0.7",
     "@testing-library/jest-dom": "^5.16.5",
