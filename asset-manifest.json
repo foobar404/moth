@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/moth/static/css/main.eae717fe.css",
-    "main.js": "/moth/static/js/main.555894ca.js",
+    "main.js": "/moth/static/js/main.a6ffa467.js",
     "index.html": "/moth/index.html",
     "main.eae717fe.css.map": "/moth/static/css/main.eae717fe.css.map",
-    "main.555894ca.js.map": "/moth/static/js/main.555894ca.js.map"
+    "main.a6ffa467.js.map": "/moth/static/js/main.a6ffa467.js.map"
   },
   "entrypoints": [
     "static/css/main.eae717fe.css",
-    "static/js/main.555894ca.js"
+    "static/js/main.a6ffa467.js"
   ]
 }
